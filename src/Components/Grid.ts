@@ -1,5 +1,13 @@
-import * as THREE from "three";
+import {
+  Color,
+  Vector3,
+  PlaneGeometry,
+  ShaderMaterial,
+  Mesh,
+  OrthographicCamera,
+} from "three";
 import { Component } from "./interfaces";
+import Graphica from "../Graphica";
 
 const vertexShader = `
   varying vec3 worldPosition;
@@ -38,47 +46,56 @@ const fragmentShader = `
 type GridProps = {
   cellSize?: number;
   pointRadius?: number;
-  pointColor?: THREE.Color;
-}
+  pointColor?: Color;
+};
 
 const defaultGridProps: GridProps = {
   cellSize: 50,
   pointRadius: 2,
-  pointColor: new THREE.Color(0xe1e1e1)
-}
+  pointColor: new Color(0xe1e1e1),
+};
 
 class Grid implements Component {
-  mesh: THREE.Mesh;
-  position: THREE.Vector3;
+  mesh: Mesh;
+  position: Vector3;
 
   constructor(props: GridProps = defaultGridProps) {
-    this.position = new THREE.Vector3();
+    this.position = new Vector3();
 
     const { cellSize, pointRadius, pointColor } = props;
-    const gridGeometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
-    const gridMaterial = new THREE.ShaderMaterial( {
+    const gridGeometry = new PlaneGeometry(
+      window.innerWidth,
+      window.innerHeight
+    );
+    const gridMaterial = new ShaderMaterial({
       uniforms: {
         cellSize: { value: cellSize },
         pointRadius: { value: pointRadius },
         pointColor: { value: pointColor },
         zoomLevel: { value: 1.0 },
-        offset: { value: new THREE.Vector3() }
+        offset: { value: new Vector3() },
       },
       vertexShader,
       fragmentShader,
-      transparent: true
-    } );
+      transparent: true,
+    });
 
-    this.mesh = new THREE.Mesh(gridGeometry, gridMaterial);
+    this.mesh = new Mesh(gridGeometry, gridMaterial);
   }
 
-  addToGraphica(scene: THREE.Scene) {
-    scene.add(this.mesh);
+  addToGraphica(graphica: Graphica) {
+    graphica.addMesh(this.mesh);
   }
 
-  update(camera: THREE.OrthographicCamera) {
-    (this.mesh.material as THREE.ShaderMaterial).uniforms.zoomLevel.value = camera.zoom;
-    (this.mesh.material as THREE.ShaderMaterial).uniforms.offset.value = camera.position;
+  removeFromGraphica(graphica: Graphica) {
+    graphica.removeMesh(this.mesh);
+  }
+
+  update(camera: OrthographicCamera) {
+    (this.mesh.material as ShaderMaterial).uniforms.zoomLevel.value =
+      camera.zoom;
+    (this.mesh.material as ShaderMaterial).uniforms.offset.value =
+      camera.position;
 
     this.mesh.position.set(camera.position.x, camera.position.y, -1);
     this.mesh.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
