@@ -19,7 +19,6 @@
 # misc
 .DS_Store
 *.pem
-/src/index.ts
 
 # debug
 npm-debug.log*
