@@ -9,12 +9,20 @@ const config: Configuration = {
     library: "MyLibrary",
     libraryTarget: "umd",
     globalObject: "this",
+    auxiliaryComment: "Graphica v2",
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: {
+          loader: "ts-loader",
+          options: {
+            configFile: "tsconfig.json", // Specify the path to your tsconfig.json file
+            transpileOnly: true, // Enable faster transpilation by skipping type checking
+            allowTsInNodeModules: true, // Allows importing TypeScript files from node_modules
+          },
+        },
         exclude: /node_modules/,
       },
     ],
@@ -22,6 +30,7 @@ const config: Configuration = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
   },
+  mode: "production",
 };
 
 export default config;
