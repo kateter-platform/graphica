@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Color, MOUSE, Vector3 } from "three";
+import { Color, MOUSE } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Line2 } from "three/examples/jsm/lines/Line2";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry";
@@ -19,8 +19,6 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-class TestClass {}
-
 // Position and THREE.Color Data
 
 const points = [
@@ -32,7 +30,6 @@ const points = [
   0, // (x, y, z) position of the ending point (250, 250, 0)
 ];
 
-const colors = [250 / 255, 25 / 255, 25 / 255]; // Normalize color values between 0 and 1
 // Line2 ( LineGeometry, LineMaterial )
 
 const geometry = new LineGeometry();
