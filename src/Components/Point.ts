@@ -1,6 +1,6 @@
 import { Vector3, CircleGeometry, MeshBasicMaterial, Mesh, Group } from "three";
-import { Component } from "./interfaces";
 import Graphica from "../Graphica";
+import { Component } from "./interfaces";
 type PointProps = {
   color: string;
   position: Vector3;
