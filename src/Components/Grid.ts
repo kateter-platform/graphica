@@ -5,6 +5,7 @@ import {
   ShaderMaterial,
   Mesh,
   OrthographicCamera,
+  Object3D
 } from "three";
 import Graphica from "../Graphica";
 import { Component } from "./interfaces";
@@ -58,9 +59,12 @@ const defaultGridProps: GridProps = {
 class Grid implements Component {
   mesh: Mesh;
   position: Vector3;
+  object: Object3D;
+  draggable: boolean = false;
 
   constructor(props: GridProps = defaultGridProps) {
     this.position = new Vector3();
+    this.object = new Object3D();
 
     const { cellSize, pointRadius, pointColor } = props;
     const gridGeometry = new PlaneGeometry(
@@ -81,24 +85,17 @@ class Grid implements Component {
     });
 
     this.mesh = new Mesh(gridGeometry, gridMaterial);
+    this.object = this.mesh;
   }
-
-  addToGraphica(graphica: Graphica) {
-    graphica.addMesh(this.mesh);
-  }
-
-  removeFromGraphica(graphica: Graphica) {
-    graphica.removeMesh(this.mesh);
-  }
-
+  
   update(camera: OrthographicCamera) {
     (this.mesh.material as ShaderMaterial).uniforms.zoomLevel.value =
       camera.zoom;
     (this.mesh.material as ShaderMaterial).uniforms.offset.value =
       camera.position;
 
-    this.mesh.position.set(camera.position.x, camera.position.y, -1);
-    this.mesh.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+    this.object.position.set(camera.position.x, camera.position.y, -1);
+    this.object.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
   }
 }
 

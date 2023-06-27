@@ -1,4 +1,4 @@
-import { Mesh, OrthographicCamera, Vector3 } from "three";
+import { Mesh, OrthographicCamera, Vector3, Object3D } from "three";
 import { Text as TroikaText } from "troika-three-text";
 import Graphica from "../Graphica";
 import { toVector3 } from "../utils";
@@ -13,7 +13,8 @@ type TextOptions = {
 
 class Text implements Component {
   position: Vector3;
-  mesh: Mesh;
+  object: Object3D;
+  draggable: boolean = false;
 
   constructor(
     content: string,
@@ -25,18 +26,18 @@ class Text implements Component {
     renderText.fontSize = fontSize;
     renderText.color = color;
     renderText.font = "https://files.catbox.moe/sztmjl.ttf";
-    this.mesh = renderText;
+    this.object = renderText;
   }
 
   addToGraphica(graphica: Graphica) {
-    graphica.addMesh(this.mesh);
+    graphica.addMesh(this.object);
   }
 
   removeFromGraphica(graphica: Graphica) {
-    graphica.removeMesh(this.mesh);
+    graphica.removeMesh(this.object);
   }
   update(camera: OrthographicCamera) {
-    this.mesh.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+    this.object.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
   }
 }
 

@@ -6,6 +6,4 @@ const graphica = new Graphica(document.body);
 
 const grid = new Grid();
 graphica.add(grid);
-graphica.add(new Text("test", {}));
-
 graphica.run();

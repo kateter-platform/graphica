@@ -5,20 +5,22 @@ import {
   Scene,
   Color,
   Mesh,
-  Group,
+  Object3D,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { Component } from "./Components/interfaces";
 
 class Graphica {
   components: Component[];
+  draggables: Object3D[];
 
   renderer: WebGLRenderer;
   camera: OrthographicCamera;
   scene: Scene;
 
   constructor(root: HTMLElement) {
-    this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     root.appendChild(this.renderer.domElement);
 
@@ -45,6 +47,24 @@ class Graphica {
     this.scene.background = new Color(0xffffff);
 
     this.components = [];
+    this.draggables = [];
+
+    const dragControls = new DragControls( this.draggables, this.camera, this.renderer.domElement );
+
+    dragControls.addEventListener( 'dragstart', function ( event ) {
+      // Optional: You might want to disable any other controls while dragging
+      // For example, if you are also using OrbitControls
+      // orbitControls.enabled = false;
+      controls.enabled = false;
+  } );
+  
+  dragControls.addEventListener( 'dragend', function ( event ) {
+      // You can also do something when the dragging ends. 
+      // For example, reset the object's color and enable other controls.
+      controls.enabled = true;
+      // orbitControls.enabled = true; // Re-enable OrbitControls, if you are using them
+  } );
+
   }
 
   run() {
@@ -54,21 +74,29 @@ class Graphica {
   }
 
   add(component: Component) {
-    component.addToGraphica(this);
+    this.scene.add(component.object);
+    // Add draggable functionality to draggable components
+    if (component.draggable) {
+      this.draggables.push(component.object);
+    }
     this.components.push(component);
   }
 
   remove(component: Component) {
-    component.removeFromGraphica(this);
+    this.scene.remove(component.object);
+    // Remove draggable functionality from draggable components
+    if (component.draggable) {
+      this.draggables.splice(this.draggables.indexOf(component.object), 1);
+    }
     this.components.splice(this.components.indexOf(component), 1);
   }
 
-  addMesh(mesh: Mesh | Group) {
-    this.scene.add(mesh);
+  addMesh(object: Object3D) {
+    this.scene.add(object);
   }
 
-  removeMesh(mesh: Mesh | Group) {
-    this.scene.remove(mesh);
+  removeMesh(object: Object3D) {
+    this.scene.remove(object);
   }
 }
 
