@@ -7,7 +7,6 @@ import {
   OrthographicCamera,
   Object3D
 } from "three";
-import Graphica from "../Graphica";
 import { Component } from "./interfaces";
 
 const vertexShader = `
@@ -60,7 +59,7 @@ class Grid implements Component {
   mesh: Mesh;
   position: Vector3;
   object: Object3D;
-  draggable: boolean = false;
+  draggable = false;
 
   constructor(props: GridProps = defaultGridProps) {
     this.position = new Vector3();

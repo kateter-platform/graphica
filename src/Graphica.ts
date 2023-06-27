@@ -4,11 +4,10 @@ import {
   MOUSE,
   Scene,
   Color,
-  Mesh,
   Object3D,
 } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Component } from "./Components/interfaces";
 
 class Graphica {
@@ -51,14 +50,14 @@ class Graphica {
 
     const dragControls = new DragControls( this.draggables, this.camera, this.renderer.domElement );
 
-    dragControls.addEventListener( 'dragstart', function ( event ) {
+    dragControls.addEventListener( 'dragstart', function () {
       // Optional: You might want to disable any other controls while dragging
       // For example, if you are also using OrbitControls
       // orbitControls.enabled = false;
       controls.enabled = false;
   } );
   
-  dragControls.addEventListener( 'dragend', function ( event ) {
+  dragControls.addEventListener( 'dragend', function () {
       // You can also do something when the dragging ends. 
       // For example, reset the object's color and enable other controls.
       controls.enabled = true;

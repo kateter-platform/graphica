@@ -1,5 +1,4 @@
 import { Vector3, OrthographicCamera, Object3D } from "three";
-import Graphica from "../Graphica";
 
 export interface Component {
   position: Vector3;

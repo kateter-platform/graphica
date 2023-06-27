@@ -1,4 +1,4 @@
-import { Mesh, OrthographicCamera, Vector3, Object3D } from "three";
+import { OrthographicCamera, Vector3, Object3D } from "three";
 import { Text as TroikaText } from "troika-three-text";
 import Graphica from "../Graphica";
 import { toVector3 } from "../utils";
@@ -14,7 +14,7 @@ type TextOptions = {
 class Text implements Component {
   position: Vector3;
   object: Object3D;
-  draggable: boolean = false;
+  draggable = false;
 
   constructor(
     content: string,

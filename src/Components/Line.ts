@@ -1,4 +1,4 @@
-import { Mesh, Vector3, Object3D } from "three";
+import { Vector3, Object3D } from "three";
 import { Line2 } from "three/examples/jsm/lines/Line2";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial";
@@ -20,7 +20,7 @@ const defaultLineProps: LineProps = {
 class Line implements Component {
   start: Vector3;
   end: Vector3;
-  draggable: boolean = false;
+  draggable = false;
   position: Vector3;
   object: Object3D;
 

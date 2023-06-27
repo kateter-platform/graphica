@@ -1,12 +1,9 @@
 import { Vector3, CircleGeometry, MeshBasicMaterial, Mesh, Object3D } from "three";
-import Graphica from "../Graphica";
 import { Component } from "./interfaces";
 
 
 type PointOptions = {
   color?: string;
-  showCoordinates?: boolean;
-  decimals?: number;
   draggable?: boolean;
 };
 
@@ -15,7 +12,7 @@ class Point implements Component {
   object: Object3D;
   draggable: boolean;
 
-  constructor(x: number = 0, y: number = 0, {color, showCoordinates, decimals, draggable = true}: PointOptions) {
+  constructor(x = 0, y = 0, {color, draggable = true}: PointOptions) {
     // set position of the point instance
     this.draggable = draggable;
     this.position = new Vector3(x, y, 0);

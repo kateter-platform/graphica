@@ -1,5 +1,4 @@
 import Grid from "./Components/Grid";
-import Text from "./Components/Text";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
