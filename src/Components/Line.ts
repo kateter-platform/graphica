@@ -55,11 +55,6 @@ class Line implements Component {
   removeFromGraphica(graphica: Graphica) {
     graphica.removeMesh(this.object);
   }
-  /* eslint-disable no-unused-vars */
-  update(_camera: OrthographicCamera) {
-  /* eslint-enable no-unused-vars */
-    return;
-  }
 }
 
 export default Line;

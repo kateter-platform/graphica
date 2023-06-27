@@ -71,7 +71,10 @@ class Graphica {
 
   run() {
     requestAnimationFrame(this.run.bind(this));
-    this.components.forEach((component) => component.update(this.camera));
+    this.components.forEach(
+      (component) =>
+        component.update !== undefined && component.update(this.camera)
+    );
     this.renderer.render(this.scene, this.camera);
   }
 
