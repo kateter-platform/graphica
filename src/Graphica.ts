@@ -5,6 +5,7 @@ import {
   Scene,
   Color,
   Mesh,
+  Group,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Component } from "./Components/interfaces";
@@ -17,7 +18,7 @@ class Graphica {
   scene: Scene;
 
   constructor(root: HTMLElement) {
-    this.renderer = new WebGLRenderer();
+    this.renderer = new WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     root.appendChild(this.renderer.domElement);
 
@@ -62,11 +63,11 @@ class Graphica {
     this.components.splice(this.components.indexOf(component), 1);
   }
 
-  addMesh(mesh: Mesh) {
+  addMesh(mesh: Mesh | Group) {
     this.scene.add(mesh);
   }
 
-  removeMesh(mesh: Mesh) {
+  removeMesh(mesh: Mesh | Group) {
     this.scene.remove(mesh);
   }
 }

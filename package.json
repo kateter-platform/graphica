@@ -33,7 +33,8 @@
   },
   "dependencies": {
     "@types/three": "^0.152.1",
-    "three": "^0.153.0"
+    "three": "^0.153.0",
+    "troika-three-text": "^0.47.2"
   },
   "scripts": {
     "build": "rm dist -r & yarn tsc && yarn webpack build",
