@@ -6,8 +6,8 @@ import {
   Color,
   Mesh,
 } from "three";
-import { Component } from "./Components/interfaces";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Component } from "./Components/interfaces";
 
 class Graphica {
   components: Component[];
