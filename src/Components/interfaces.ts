@@ -1,7 +1,9 @@
-import * as THREE from "three";
+import { Vector3, OrthographicCamera } from "three";
+import Graphica from "../Graphica";
 
 export interface Component {
-  position: THREE.Vector3;
-  addToGraphica(scene: THREE.Scene): void;
-  update(camera: THREE.OrthographicCamera): void;
+  position: Vector3;
+  addToGraphica(graphica: Graphica): void;
+  removeFromGraphica(graphica: Graphica): void;
+  update(camera: OrthographicCamera): void;
 }
