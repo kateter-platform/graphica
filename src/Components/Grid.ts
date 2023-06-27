@@ -5,7 +5,7 @@ import {
   ShaderMaterial,
   Mesh,
   OrthographicCamera,
-  Object3D
+  Object3D,
 } from "three";
 import { Component } from "./interfaces";
 
@@ -86,7 +86,7 @@ class Grid implements Component {
     this.mesh = new Mesh(gridGeometry, gridMaterial);
     this.object = this.mesh;
   }
-  
+
   update(camera: OrthographicCamera) {
     (this.mesh.material as ShaderMaterial).uniforms.zoomLevel.value =
       camera.zoom;

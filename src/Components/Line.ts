@@ -5,12 +5,12 @@ import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
-type LineProps = {
-  color: number;
-  lineWidth: number;
+export type LineProps = {
+  color?: number;
+  lineWidth?: number;
 };
 
-const defaultLineProps: LineProps = {
+export const defaultLineProps: LineProps = {
   color: 0x000000,
   lineWidth: 4,
 };
@@ -55,7 +55,9 @@ class Line implements Component {
   removeFromGraphica(graphica: Graphica) {
     graphica.removeMesh(this.object);
   }
-  update() {
+  /* eslint-disable no-unused-vars */
+  update(_camera: OrthographicCamera) {
+  /* eslint-enable no-unused-vars */
     return;
   }
 }
