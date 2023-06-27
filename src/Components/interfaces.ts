@@ -1,9 +1,8 @@
-import { Vector3, OrthographicCamera } from "three";
-import Graphica from "../Graphica";
+import { Vector3, OrthographicCamera, Object3D } from "three";
 
 export interface Component {
   position: Vector3;
-  addToGraphica(graphica: Graphica): void;
-  removeFromGraphica(graphica: Graphica): void;
+  object: Object3D;
+  draggable: boolean;
   update(camera: OrthographicCamera): void;
 }

@@ -1,4 +1,4 @@
-import { Mesh, Vector3 } from "three";
+import { Vector3, Object3D } from "three";
 import { Line2 } from "three/examples/jsm/lines/Line2";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial";
@@ -20,8 +20,9 @@ const defaultLineProps: LineProps = {
 class Line implements Component {
   start: Vector3;
   end: Vector3;
+  draggable = false;
   position: Vector3;
-  mesh: Mesh;
+  object: Object3D;
 
   constructor(
     start: InputPosition = [0, 0],
@@ -52,15 +53,15 @@ class Line implements Component {
     const line = new Line2(geometry, matLine);
     line.computeLineDistances();
     line.scale.set(1, 1, 1);
-    this.mesh = line;
+    this.object = line;
   }
 
   addToGraphica(graphica: Graphica) {
-    graphica.addMesh(this.mesh);
+    graphica.addMesh(this.object);
   }
 
   removeFromGraphica(graphica: Graphica) {
-    graphica.removeMesh(this.mesh);
+    graphica.removeMesh(this.object);
   }
   update() {
     return;
