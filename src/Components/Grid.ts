@@ -6,8 +6,8 @@ import {
   Mesh,
   OrthographicCamera,
 } from "three";
-import { Component } from "./interfaces";
 import Graphica from "../Graphica";
+import { Component } from "./interfaces";
 
 const vertexShader = `
   varying vec3 worldPosition;

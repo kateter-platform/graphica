@@ -1,16 +1,39 @@
-module.exports = defineESLint = {
+module.exports = {
   parser: "@typescript-eslint/parser",
-  extends: ["plugin:@typescript-eslint/recommended"],
-  plugins: ["@typescript-eslint"],
+  extends: [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+  ],
+  plugins: ["@typescript-eslint", "import"],
   ignorePatterns: ["dist/*"],
   rules: {
     "@typescript-eslint/no-unused-vars":
       process.env.NODE_ENV === "production" ? "error" : "warn",
-    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-namespace": "error",
+    "import/order": [
+      "error",
+      {
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "type",
+        ],
+        alphabetize: {
+          order: "asc",
+        },
+        "newlines-between": "never", // Add this line to enforce newlines between import groups
+      },
+    ],
   },
   settings: {
-    react: {
-      version: "detect",
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"], // Add this line to specify the file extensions for imports
+      },
     },
   },
 };

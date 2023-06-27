@@ -1,6 +1,6 @@
 {
-  "name": "@kateter-platform/graphica-gemini",
-  "version": "0.0.11",
+  "name": "graphica-gemini",
+  "version": "0.0.111",
   "main": "dist/bundle.js",
   "description": "A tool for advanced graphing and visualization",
   "license": "MIT",
@@ -18,10 +18,11 @@
     "@babel/preset-typescript": "^7.22.5",
     "@babel/register": "^7.22.5",
     "@types/node": "^20.3.1",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
     "babel-loader": "^9.1.2",
     "eslint": "^8.43.0",
+    "eslint-plugin-import": "^2.27.5",
     "expose-loader": "^4.1.0",
     "prettier": "^2.8.8",
     "ts-loader": "^9.4.3",
@@ -37,6 +38,7 @@
   "scripts": {
     "build": "rm dist -r & yarn tsc && yarn webpack build",
     "prettier": "prettier --write --ignore-path .gitignore .",
-    "lint:prod": "NODE_ENV=production yarn eslint ."
+    "lint:prod": "NODE_ENV=production yarn eslint .",
+    "lint": "NODE_ENV=development yarn eslint ."
   }
 }
