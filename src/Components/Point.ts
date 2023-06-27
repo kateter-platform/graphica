@@ -1,6 +1,11 @@
-import { Vector3, CircleGeometry, MeshBasicMaterial, Mesh, Object3D } from "three";
+import {
+  Vector3,
+  CircleGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  Object3D,
+} from "three";
 import { Component } from "./interfaces";
-
 
 type PointOptions = {
   color?: string;
@@ -12,7 +17,7 @@ class Point implements Component {
   object: Object3D;
   draggable: boolean;
 
-  constructor(x = 0, y = 0, {color, draggable = true}: PointOptions) {
+  constructor(x = 0, y = 0, { color, draggable = true }: PointOptions) {
     // set position of the point instance
     this.draggable = draggable;
     this.position = new Vector3(x, y, 0);
