@@ -5,15 +5,19 @@ import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
+type TextOptions = {
+  position?: InputPosition;
+  color?: string;
+  fontSize?: number;
+};
+
 class Text implements Component {
   position: Vector3;
   mesh: Mesh;
 
   constructor(
     content: string,
-    position: InputPosition = [0, 0],
-    color = "black",
-    fontSize = 30
+    { position = [0, 0], color = "black", fontSize = 30 }: TextOptions
   ) {
     this.position = toVector3(position);
     const renderText = new TroikaText();
