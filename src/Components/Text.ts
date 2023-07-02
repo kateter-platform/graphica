@@ -1,10 +1,10 @@
 import { OrthographicCamera, Vector3, Object3D } from "three";
 import { Text as TroikaText } from "troika-three-text";
 import Graphica from "../Graphica";
+import Font from "../assets/fonts/Jost-Regular.ttf";
 import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
-import Font from "../assets/fonts/Jost-Regular.ttf";
 
 type TextOptions = {
   position?: InputPosition;

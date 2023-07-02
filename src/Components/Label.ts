@@ -1,9 +1,9 @@
     import { Vector2, Vector3, Object3D, Group, OrthographicCamera } from "three";
-    import { InputPosition } from "./types";
-    import { Component } from "./interfaces";
+    import { toVector3 } from "../utils";
     import Line from "./Line";
     import Text from "./Text";
-    import { toVector3 } from "../utils";
+    import { Component } from "./interfaces";
+    import { InputPosition } from "./types";
 
     const SCALING_FACTOR = 10;
 
@@ -17,7 +17,7 @@
     class Label implements Component {
         position: Vector3;
         object: Object3D;
-        draggable: boolean = false;
+        draggable = false;
 
         constructor({text, start = new Vector2(0,0), deltaX = 10, deltaY = 4}: LabelOptions) {
             

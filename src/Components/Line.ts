@@ -1,9 +1,9 @@
-import { Vector3, Vector2, Object3D, PlaneGeometry } from "three";
+import { Vector3, Vector2, Object3D } from "three";
+import { Line2, LineGeometry, LineMaterial } from 'three-fatline';
 import Graphica from "../Graphica";
 import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
-import { Line2, LineGeometry, LineMaterial } from 'three-fatline';
 
 type LineProps = {
   color: number;
