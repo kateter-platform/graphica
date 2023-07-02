@@ -33,7 +33,9 @@
   },
   "dependencies": {
     "@types/three": "^0.152.1",
+    "file-loader": "^6.2.0",
     "three": "^0.153.0",
+    "three-fatline": "^0.6.1",
     "troika-three-text": "^0.47.2"
   },
   "scripts": {

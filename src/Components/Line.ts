@@ -1,20 +1,18 @@
-import { Vector3, Object3D } from "three";
-import { Line2 } from "three/examples/jsm/lines/Line2";
-import { LineGeometry } from "three/examples/jsm/lines/LineGeometry";
-import { LineMaterial } from "three/examples/jsm/lines/LineMaterial";
+import { Vector3, Vector2, Object3D } from "three";
+import { Line2, LineGeometry, LineMaterial } from 'three-fatline';
 import Graphica from "../Graphica";
 import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
 type LineProps = {
-  color?: number;
-  lineWidth?: number;
+  color: number;
+  lineWidth: number;
 };
 
 const defaultLineProps: LineProps = {
   color: 0x000000,
-  lineWidth: 1,
+  lineWidth: 4,
 };
 
 class Line implements Component {
@@ -27,30 +25,24 @@ class Line implements Component {
   constructor(
     start: InputPosition = [0, 0],
     end: InputPosition = [0, 0],
-    props: LineProps = defaultLineProps
+    { color, lineWidth }: LineProps = defaultLineProps
   ) {
-    const { color, lineWidth } = props;
 
     this.start = toVector3(start);
     this.end = toVector3(end);
     this.position = new Vector3();
 
-    const points = [this.start, this.end]
-      .map((v) => [v.x, v.y, v.z])
-      .flatMap((e) => e);
-
     const geometry = new LineGeometry();
-    geometry.setPositions(points);
+    geometry.setPositions([this.start.x, this.start.y, 0, this.end.x, this.end.y, 0]);
 
-    const matLine = new LineMaterial({
+    const material = new LineMaterial({
       color: color,
-      linewidth: lineWidth !== undefined ? lineWidth * 0.001 : lineWidth,
-      vertexColors: true,
+      linewidth: lineWidth,
+      resolution: new Vector2(window.innerWidth, window.innerHeight),
       dashed: false,
-      alphaToCoverage: true,
     });
 
-    const line = new Line2(geometry, matLine);
+    const line = new Line2(geometry, material);
     line.computeLineDistances();
     line.scale.set(1, 1, 1);
     this.object = line;

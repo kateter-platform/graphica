@@ -51,7 +51,7 @@ type GridProps = {
 
 const defaultGridProps: GridProps = {
   cellSize: 50,
-  pointRadius: 2,
+  pointRadius: 1.5,
   pointColor: new Color(0xe1e1e1),
 };
 
