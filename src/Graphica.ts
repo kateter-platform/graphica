@@ -8,7 +8,10 @@ import {
 } from "three";
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Component } from "./Components/interfaces";
+import {
+  Component,
+  ConstrainFunction,
+} from "./Components/interfaces";
 
 class Graphica {
   components: Component[];
@@ -55,17 +58,36 @@ class Graphica {
     );
 
     dragControls.addEventListener("dragstart", function () {
-      // Optional: You might want to disable any other controls while dragging
-      // For example, if you are also using OrbitControls
-      // orbitControls.enabled = false;
       controls.enabled = false;
     });
 
+    dragControls.addEventListener("drag", function (event) {
+      const draggedObject = event.object;
+      const draggable = draggedObject.userData.draggable;
+
+      if (draggable === "unrestricted") return;
+
+      if (!draggedObject.userData.initialPosition) {
+        draggedObject.userData.initialPosition = draggedObject.position.clone();
+      }
+
+      if (draggable === "horizontal")
+        draggedObject.position.y = draggedObject.userData.initialPosition.y;
+      if (draggable === "vertical")
+        draggedObject.position.x = draggedObject.userData.initialPosition.x;
+      if (typeof draggable === "function") {
+        const [x, y] = (draggable as ConstrainFunction)(
+          draggedObject.position.x,
+          draggedObject.position.y
+        );
+
+        draggedObject.position.x = x;
+        draggedObject.position.y = y;
+      }
+    });
+
     dragControls.addEventListener("dragend", function () {
-      // You can also do something when the dragging ends.
-      // For example, reset the object's color and enable other controls.
       controls.enabled = true;
-      // orbitControls.enabled = true; // Re-enable OrbitControls, if you are using them
     });
   }
 
@@ -81,7 +103,7 @@ class Graphica {
   add(component: Component) {
     this.scene.add(component.object);
     // Add draggable functionality to draggable components
-    if (component.draggable) {
+    if (component.draggable !== undefined) {
       this.draggables.push(component.object);
     }
     this.components.push(component);
@@ -90,7 +112,7 @@ class Graphica {
   remove(component: Component) {
     this.scene.remove(component.object);
     // Remove draggable functionality from draggable components
-    if (component.draggable) {
+    if (component.draggable !== undefined) {
       this.draggables.splice(this.draggables.indexOf(component.object), 1);
     }
     this.components.splice(this.components.indexOf(component), 1);

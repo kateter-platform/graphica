@@ -1,17 +1,17 @@
 import Grid from "./Components/Grid";
-import Label from "./Components/Label";
+import InfiniteLine from "./Components/InfiniteLine";
 import Point from "./Components/Point";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
 
-const grid = new Grid();
-graphica.add(grid);
-
-const point = new Point(40, 30, {});
+const point = new Point(0, 0, { draggable: "horizontal" });
 graphica.add(point);
 
-const label = new Label({ text: "lab", start: [40, 30] });
-graphica.add(label);
+const line = new InfiniteLine([0, 0], [1, 0]);
+graphica.add(line);
+
+const grid = new Grid();
+graphica.add(grid);
 
 graphica.run();

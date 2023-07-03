@@ -59,7 +59,7 @@ class Grid implements Component {
   mesh: Mesh;
   position: Vector3;
   object: Object3D;
-  draggable = false;
+  draggable = undefined;
 
   constructor(props: GridProps = defaultGridProps) {
     this.position = new Vector3();

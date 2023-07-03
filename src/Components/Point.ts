@@ -4,33 +4,20 @@ import {
   MeshBasicMaterial,
   Mesh,
   Object3D,
-  Vector2,
 } from "three";
-import Text from "./Text";
-import { Component } from "./interfaces";
+import { Component, Draggable } from "./interfaces";
 
 type PointOptions = {
   color?: string;
-  draggable?: boolean;
-  showCoordinates?: boolean;
-  decimals?: number;
+  draggable?: Draggable;
 };
 
 class Point implements Component {
   position: Vector3;
   object: Object3D;
-  draggable: boolean;
+  draggable: Draggable;
 
-  constructor(
-    x = 0,
-    y = 0,
-    {
-      color = "#FAA307",
-      draggable = true,
-      showCoordinates = true,
-      decimals = 1,
-    }: PointOptions
-  ) {
+  constructor(x = 0, y = 0, { color, draggable = undefined }: PointOptions) {
     // set position of the point instance
     this.draggable = draggable;
     this.position = new Vector3(x, y, 0);
@@ -47,20 +34,7 @@ class Point implements Component {
     this.object.add(strokeMesh);
     // set position of the mesh
     this.object.position.set(this.position.x, this.position.y, 0);
-    // show coordinates of point
-    const coordinatesPosition = new Vector2(
-      this.position.x - 20,
-      this.position.y - 37
-    );
-    const coordinateLabelText =
-      "(" + x.toFixed(decimals) + ", " + y.toFixed(decimals) + ")";
-    if (showCoordinates) {
-      const coordinateLabel = new Text(coordinateLabelText, {
-        position: coordinatesPosition,
-        fontSize: 10,
-      });
-      this.object.add(coordinateLabel.object);
-    }
+    this.object.userData.draggable = draggable;
   }
 
   update(camera: THREE.OrthographicCamera) {
