@@ -1,5 +1,5 @@
 import { Vector3, Vector2, Object3D } from "three";
-import { Line2, LineGeometry, LineMaterial } from 'three-fatline';
+import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import Graphica from "../Graphica";
 import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
@@ -27,13 +27,19 @@ class Line implements Component {
     end: InputPosition = [0, 0],
     { color, lineWidth }: LineProps = defaultLineProps
   ) {
-
     this.start = toVector3(start);
     this.end = toVector3(end);
     this.position = new Vector3();
 
     const geometry = new LineGeometry();
-    geometry.setPositions([this.start.x, this.start.y, 0, this.end.x, this.end.y, 0]);
+    geometry.setPositions([
+      this.start.x,
+      this.start.y,
+      0,
+      this.end.x,
+      this.end.y,
+      0,
+    ]);
 
     const material = new LineMaterial({
       color: color,
