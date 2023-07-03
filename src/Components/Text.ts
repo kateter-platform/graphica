@@ -14,14 +14,16 @@ type TextOptions = {
   anchorX?: "left" | "center" | "right";
 };
 
+type TroikaTextType = InstanceType<typeof TroikaText>;
+
 class Text implements Component {
   position: Vector3;
   object: Object3D;
   draggable = false;
-  size = { width: 0, height: 0 };
+  renderText: TroikaTextType;
 
   constructor(
-    content: string,
+    text: string,
     {
       position = [0, 0],
       color = "black",
@@ -32,7 +34,7 @@ class Text implements Component {
   ) {
     this.position = toVector3(position);
     const renderText = new TroikaText();
-    renderText.text = content;
+    renderText.text = text;
     renderText.fontSize = fontSize;
     renderText.color = color;
     renderText.font = Font;
@@ -43,15 +45,11 @@ class Text implements Component {
 
     renderText.position.set(this.position.x, this.position.y, 0);
     this.object = renderText;
+    this.renderText = renderText;
+  }
 
-    renderText.sync(() => {
-      this.size.width =
-        renderText.textRenderInfo.blockBounds[2] -
-        renderText.textRenderInfo.blockBounds[0];
-      this.size.height =
-        renderText.textRenderInfo.blockBounds[3] -
-        renderText.textRenderInfo.blockBounds[1];
-    });
+  setText(text: string) {
+    this.renderText.text = text;
   }
 
   addToGraphica(graphica: Graphica) {
@@ -61,6 +59,7 @@ class Text implements Component {
   removeFromGraphica(graphica: Graphica) {
     graphica.removeMesh(this.object);
   }
+  
   update(camera: OrthographicCamera) {
     this.object.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
     this.object.position.set(this.position.x, this.position.y, 0);
