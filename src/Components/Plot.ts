@@ -1,9 +1,13 @@
+import { evaluate, parse } from "mathjs";
 import {
   Vector3,
-  OrthographicCamera,
   Object3D,
   Mesh,
   MeshBasicMaterial,
+  CatmullRomCurve3,
+  BufferGeometry,
+  LineBasicMaterial,
+  Line,
 } from "three";
 import { ParametricGeometry } from "three/examples/jsm/geometries/ParametricGeometry";
 import Graphica from "../Graphica";
@@ -17,38 +21,47 @@ type PointOptions = {
 class Plot implements Component {
   position: Vector3 = new Vector3(0, 0, 0);
   object: Object3D;
-  draggable = false;
+  draggable = undefined;
 
-  constructor() {
-    const func = function (u: number, v: number) {
-      //Play with these 2 values to get the exact result you want
-      //The height variable is pretty self-explanatory, the size variable acts like a scale on the x/z axis.
-      const height = 300; //Limit the height
-      const size = 1; //Limit the x/z size, try the value 10 for example
-
-      u = u * height;
-      v = v * 2 * Math.PI;
-
-      const x = size * Math.sqrt(u) * Math.cos(v);
-      const y = size * 2 * Math.sqrt(u) * Math.sin(v);
-      const z = u;
-      //Note that the y and z axes are swapped because of how they are displayed in Three.js. Alternatively you could just rotate the resulting mesh and get the same result.
-      return new Vector3(x, y, z);
-    };
-    const geometry = new ParametricGeometry(func, 25, 25);
-    const material = new MeshBasicMaterial({ color: 0x00ff00 });
+  constructor(plotRange: number, numPoints: number, func: string) {
+    const initialCurve = new CatmullRomCurve3(
+      Plot.calculatePoints(plotRange, numPoints, func)
+    );
+    const points = initialCurve.getPoints(numPoints);
+    const geometry = new BufferGeometry().setFromPoints(points);
+    console.log(geometry);
+    const material = new LineBasicMaterial({ color: 0x000000 });
     const mesh = new Mesh(geometry, material);
-    this.object = mesh;
+    mesh.frustumCulled = false;
+    mesh.scale.set(1, 1, 1);
+    const a = new Line(geometry, material);
+
+    this.object = a;
+  }
+
+  private static calculatePoints(
+    plotRange: number,
+    numPoints: number,
+    func: string
+  ): Vector3[] {
+    const minX = -plotRange * 2;
+    const maxX = plotRange * 2;
+    const step = (maxX - minX) / numPoints;
+    const newPoints = Array.from({ length: numPoints }, (_, i) => {
+      const x = minX + i * step;
+      const y = evaluate(parse(func).toString(), { x });
+      console.log(x, y);
+      return new Vector3(x, y, 0);
+    });
+    console.log(newPoints);
+    return newPoints;
   }
 
   addToGraphica(graphica: Graphica): void {
-    graphica.add(this);
+    graphica.addMesh(this.object);
   }
   removeFromGraphica(graphica: Graphica): void {
-    graphica.remove(this);
-  }
-  update(camera: OrthographicCamera): void {
-    return;
+    graphica.removeMesh(this.object);
   }
 }
 
