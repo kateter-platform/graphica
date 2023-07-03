@@ -1,5 +1,5 @@
 import { OrthographicCamera, Vector3 } from "three";
-import { Line2 } from "three/examples/jsm/lines/Line2";
+import { Line2 } from "three-fatline";
 import Line, { LineProps, defaultLineProps } from "./Line";
 import { InputPosition } from "./types";
 
