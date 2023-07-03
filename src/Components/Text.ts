@@ -18,11 +18,17 @@ class Text implements Component {
   position: Vector3;
   object: Object3D;
   draggable = false;
-  size = {width: 0, height: 0}
+  size = { width: 0, height: 0 };
 
   constructor(
     content: string,
-    { position = [0, 0], color = "black", fontSize = 30, anchorX = "left", anchorY = "bottom" }: TextOptions
+    {
+      position = [0, 0],
+      color = "black",
+      fontSize = 30,
+      anchorX = "left",
+      anchorY = "bottom",
+    }: TextOptions
   ) {
     this.position = toVector3(position);
     const renderText = new TroikaText();
@@ -39,10 +45,13 @@ class Text implements Component {
     this.object = renderText;
 
     renderText.sync(() => {
-      this.size.width = renderText.textRenderInfo.blockBounds[2]-renderText.textRenderInfo.blockBounds[0]
-      this.size.height = renderText.textRenderInfo.blockBounds[3]-renderText.textRenderInfo.blockBounds[1]
-    })
-    
+      this.size.width =
+        renderText.textRenderInfo.blockBounds[2] -
+        renderText.textRenderInfo.blockBounds[0];
+      this.size.height =
+        renderText.textRenderInfo.blockBounds[3] -
+        renderText.textRenderInfo.blockBounds[1];
+    });
   }
 
   addToGraphica(graphica: Graphica) {
