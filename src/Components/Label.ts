@@ -17,7 +17,7 @@ type LabelOptions = {
 class Label implements Component {
   position: Vector3;
   object: Object3D;
-  draggable = false;
+  draggable = undefined;
 
   constructor({
     text,

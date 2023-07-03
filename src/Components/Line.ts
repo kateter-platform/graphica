@@ -18,7 +18,7 @@ export const defaultLineProps: LineProps = {
 class Line implements Component {
   start: Vector3;
   end: Vector3;
-  draggable = false;
+  draggable = undefined;
   position: Vector3;
   object: Object3D;
 
