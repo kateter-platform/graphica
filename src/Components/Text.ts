@@ -20,7 +20,7 @@ class Text implements Component {
   position: Vector3;
   object: Object3D;
   draggable = undefined;
-  size = { width: 0, height: 0 };
+  renderText: TroikaTextType;
 
   constructor(
     text: string,
