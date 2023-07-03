@@ -59,7 +59,7 @@ class Text implements Component {
   removeFromGraphica(graphica: Graphica) {
     graphica.removeMesh(this.object);
   }
-  
+
   update(camera: OrthographicCamera) {
     this.object.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
     this.object.position.set(this.position.x, this.position.y, 0);
