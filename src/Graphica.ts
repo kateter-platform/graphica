@@ -6,9 +6,9 @@ import {
   Color,
   Object3D,
 } from "three";
-import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Component, ConstrainFunction } from "./Components/Component";
+import { DragControls } from "./Controls/DragControls";
 
 class Graphica {
   components: Component[];
@@ -55,28 +55,24 @@ class Graphica {
       this.renderer.domElement
     );
 
-    dragControls.transformGroup = true;
-
     dragControls.addEventListener("dragstart", function (event) {
+      controls.enabled = false;
+
       const draggedObject = event.object;
       draggedObject.is_dragged = true;
-      controls.enabled = false;
+      draggedObject.userData.initialPosition = draggedObject.position.clone();
     });
 
     dragControls.addEventListener("drag", function (event) {
       const draggedObject = event.object;
-      draggedObject.is_dragged = true;
+
       if (draggedObject.dragUpdate) {
         draggedObject.dragUpdate();
       }
+
       const draggable = draggedObject.draggable;
 
       if (draggable === "unrestricted") return;
-
-      if (!draggedObject.userData.initialPosition) {
-        draggedObject.userData.initialPosition = draggedObject.position.clone();
-      }
-
       if (draggable === "horizontal")
         draggedObject.position.y = draggedObject.userData.initialPosition.y;
       if (draggable === "vertical")
@@ -93,9 +89,10 @@ class Graphica {
     });
 
     dragControls.addEventListener("dragend", function (event) {
+      controls.enabled = true;
+
       const draggedObject = event.object;
       draggedObject.is_dragged = false;
-      controls.enabled = true;
     });
   }
 
@@ -128,14 +125,6 @@ class Graphica {
       this.draggables.splice(this.draggables.indexOf(component), 1);
     }
     this.components.splice(this.components.indexOf(component), 1);
-  }
-
-  addMesh(object: Object3D) {
-    this.scene.add(object);
-  }
-
-  removeMesh(object: Object3D) {
-    this.scene.remove(object);
   }
 }
 
