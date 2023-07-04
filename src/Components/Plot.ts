@@ -1,13 +1,6 @@
 import { parse } from "mathjs";
-import {
-  Vector3,
-  Object3D,
-  CatmullRomCurve3,
-  Vector2,
-  OrthographicCamera,
-} from "three";
+import { Vector3, CatmullRomCurve3, Vector2, OrthographicCamera } from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
-import Graphica from "../Graphica";
 import { Component } from "./interfaces";
 
 type PointOptions = {
@@ -22,16 +15,18 @@ type Coefficients = {
   [key: string]: number;
 };
 
+const PLOTRANGE = 1250;
+
 class Plot extends Component {
-  position: Vector3 = new Vector3(0, 0, 0);
-  object: Object3D;
   draggable = undefined;
   public func: string;
-  private plotRange = 850;
   private numPoints: number;
-  private minX: number;
-  private maxX: number;
+  private currentMinX: number;
+  private currentMaxX: number;
+  private currentZoom: number;
   private coefficients: Coefficients;
+  private RENDERTHRESHOLDX = 300;
+  private RENDERTHRESHOLDZOOM = 0.3;
 
   constructor(
     func: string,
@@ -44,8 +39,8 @@ class Plot extends Component {
     }: PointOptions
   ) {
     super();
-    const minX = (-this.plotRange / 1) * 2 + 0;
-    const maxX = (this.plotRange / 1) * 2 + 0;
+    const minX = (-PLOTRANGE / 1) * 2 + 0;
+    const maxX = (PLOTRANGE / 1) * 2 + 0;
     const initialCurve = new CatmullRomCurve3(
       Plot.calculatePoints(minX, maxX, numPoints, func, coefficients)
     );
@@ -64,12 +59,15 @@ class Plot extends Component {
     plot.scale.set(1, 1, 1);
     plot.frustumCulled = false;
 
-    this.minX = minX;
-    this.maxX = maxX;
+    this.currentMinX = minX;
+    this.currentMaxX = maxX;
+    this.currentZoom = 1;
     this.func = func;
     this.numPoints = numPoints;
     this.coefficients = coefficients;
-    this.object = plot;
+
+    plot.name = "plot";
+    this.add(plot);
   }
 
   private static calculatePoints(
@@ -86,9 +84,7 @@ class Plot extends Component {
       const expr = parse(func);
       const scope = { x, ...coefficients };
       const compiledExpr = expr.compile();
-      console.log(compiledExpr);
       const y = compiledExpr.evaluate(scope);
-      console.log(x, y);
       return new Vector3(x, y, 0);
     });
     return newPoints;
@@ -96,11 +92,10 @@ class Plot extends Component {
 
   public setCoefficients(coefficients: Coefficients): void {
     this.coefficients = coefficients;
-    this.reRenderPlot(this.minX, this.maxX);
+    this.reRenderPlot(this.currentMinX, this.currentMaxX);
   }
 
   private reRenderPlot(minX: number, maxX: number): void {
-    this.minX = minX;
     const initialCurve = new CatmullRomCurve3(
       Plot.calculatePoints(
         minX,
@@ -111,24 +106,25 @@ class Plot extends Component {
       )
     );
     const points = initialCurve.getPoints(this.numPoints);
-    (this.object as Line2).geometry = new LineGeometry().setPositions(
-      points.flatMap((e) => [e.x, e.y, e.z])
-    );
-    (this.object as Line2).computeLineDistances();
-  }
-
-  addToGraphica(graphica: Graphica): void {
-    graphica.addMesh(this.object);
-  }
-  removeFromGraphica(graphica: Graphica): void {
-    graphica.removeMesh(this.object);
+    (this.getObjectByName("plot") as Line2).geometry =
+      new LineGeometry().setPositions(points.flatMap((e) => [e.x, e.y, e.z]));
+    (this.getObjectByName("plot") as Line2)?.computeLineDistances();
   }
 
   update(camera: OrthographicCamera): void {
-    const minX = (-this.plotRange / camera.zoom) * 2 + camera.position.x;
-    const maxX = (this.plotRange / camera.zoom) * 2 + camera.position.x;
+    const minX = (-PLOTRANGE / camera.zoom) * 2 + camera.position.x;
+    const maxX = (PLOTRANGE / camera.zoom) * 2 + camera.position.x;
 
-    if (minX !== this.minX) {
+    if (
+      Math.abs(this.currentMinX - minX) > this.RENDERTHRESHOLDX ||
+      Math.abs(Math.abs(this.currentZoom - camera.zoom) / this.currentZoom) >
+        this.RENDERTHRESHOLDZOOM ||
+      Math.abs(this.currentMaxX - maxX) > this.RENDERTHRESHOLDX
+    ) {
+      this.currentMinX = minX;
+      this.currentMaxX = maxX;
+      this.currentZoom = camera.zoom;
+      this.RENDERTHRESHOLDX /= camera.zoom >= 1 ? camera.zoom : camera.zoom * 5;
       this.reRenderPlot(minX, maxX);
     }
   }

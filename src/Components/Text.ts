@@ -1,6 +1,4 @@
-import {
-  OrthographicCamera,
-} from "three";
+import { OrthographicCamera } from "three";
 import { Text as TroikaText } from "troika-three-text";
 import Font from "../assets/fonts/Jost-Medium.ttf";
 import { toVector3 } from "../utils";

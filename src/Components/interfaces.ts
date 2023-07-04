@@ -1,7 +1,4 @@
-import {
-  OrthographicCamera,
-  Mesh,
-} from "three";
+import { OrthographicCamera, Mesh } from "three";
 
 export class Component extends Mesh {
   draggable: Draggable;
