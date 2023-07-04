@@ -22,7 +22,7 @@ type Coefficients = {
   [key: string]: number;
 };
 
-class Plot implements Component {
+class Plot extends Component {
   position: Vector3 = new Vector3(0, 0, 0);
   object: Object3D;
   draggable = undefined;
@@ -43,6 +43,7 @@ class Plot implements Component {
       coefficients = {},
     }: PointOptions
   ) {
+    super();
     const minX = (-this.plotRange / 1) * 2 + 0;
     const maxX = (this.plotRange / 1) * 2 + 0;
     const initialCurve = new CatmullRomCurve3(

@@ -14,7 +14,7 @@ type LabelOptions = {
   deltaY?: number;
 };
 
-class Label implements Component {
+class Label extends Component {
   position: Vector3;
   object: Object3D;
   draggable = undefined;
@@ -25,6 +25,7 @@ class Label implements Component {
     deltaX = 20,
     deltaY = 4,
   }: LabelOptions) {
+    super();
     // set position of the point instance
     this.position = toVector3(start);
 
@@ -41,7 +42,7 @@ class Label implements Component {
       anchorY: "middle",
       anchorX: deltaX < 0 ? "right" : "left",
     });
-    textComponent.object.position.set(
+    textComponent.position.set(
       endPoint.x + (deltaX < 0 ? -1 : 1) * 10,
       endPoint.y,
       0.1
@@ -49,9 +50,9 @@ class Label implements Component {
 
     // Create a group to contain both lines and text
     this.object = new Group();
-    this.object.add(line1.object);
-    this.object.add(line2.object);
-    this.object.add(textComponent.object);
+    this.object.add(line1);
+    this.object.add(line2);
+    this.object.add(textComponent);
 
     // set position of the group
     this.object.position.set(this.position.x, this.position.y, 0);

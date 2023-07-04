@@ -12,7 +12,7 @@ import { Component, ConstrainFunction } from "./Components/interfaces";
 
 class Graphica {
   components: Component[];
-  draggables: Object3D[];
+  draggables: Component[];
 
   renderer: WebGLRenderer;
   camera: OrthographicCamera;
@@ -21,6 +21,7 @@ class Graphica {
   constructor(root: HTMLElement) {
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     root.appendChild(this.renderer.domElement);
 
     this.camera = new OrthographicCamera( // TODO: Should depend on the renderer size
@@ -54,13 +55,21 @@ class Graphica {
       this.renderer.domElement
     );
 
-    dragControls.addEventListener("dragstart", function () {
+    dragControls.transformGroup = true;
+
+    dragControls.addEventListener("dragstart", function (event) {
+      const draggedObject = event.object;
+      draggedObject.is_dragged = true;
       controls.enabled = false;
     });
 
     dragControls.addEventListener("drag", function (event) {
       const draggedObject = event.object;
-      const draggable = draggedObject.userData.draggable;
+      draggedObject.is_dragged = true;
+      if (draggedObject.dragUpdate) {
+        draggedObject.dragUpdate();
+      }
+      const draggable = draggedObject.draggable;
 
       if (draggable === "unrestricted") return;
 
@@ -83,7 +92,9 @@ class Graphica {
       }
     });
 
-    dragControls.addEventListener("dragend", function () {
+    dragControls.addEventListener("dragend", function (event) {
+      const draggedObject = event.object;
+      draggedObject.is_dragged = false;
       controls.enabled = true;
     });
   }
@@ -98,19 +109,19 @@ class Graphica {
   }
 
   add(component: Component) {
-    this.scene.add(component.object);
+    this.scene.add(component);
     // Add draggable functionality to draggable components
     if (component.draggable !== undefined) {
-      this.draggables.push(component.object);
+      this.draggables.push(component);
     }
     this.components.push(component);
   }
 
   remove(component: Component) {
-    this.scene.remove(component.object);
+    this.scene.remove(component);
     // Remove draggable functionality from draggable components
     if (component.draggable !== undefined) {
-      this.draggables.splice(this.draggables.indexOf(component.object), 1);
+      this.draggables.splice(this.draggables.indexOf(component), 1);
     }
     this.components.splice(this.components.indexOf(component), 1);
   }
