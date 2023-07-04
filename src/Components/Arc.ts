@@ -1,6 +1,7 @@
-import { ArcCurve, MeshBasicMaterial, Shape, Vector2 } from "three";
+import { ArcCurve, CircleGeometry, MeshBasicMaterial, Vector2 } from "three";
+import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import Line from "./Line";
-import Point from "./Point";
+import Text from "./Text";
 import { Component } from "./interfaces";
 
 type ArcOptions = {
@@ -17,7 +18,7 @@ class Arc extends Component {
     const vectorBtoA = pointA.clone().sub(pointB.clone());
     const vectorBtoC = pointC.clone().sub(pointB.clone());
     const angle = vectorBtoA.angleTo(vectorBtoC);
-    //finner riktig vinkel
+    //finner hvilken vinkel som er riktig
     const angle1 =
       (Math.atan2(vectorBtoA.y, vectorBtoA.x) + Math.PI * 2) % (Math.PI * 2);
     const angle2 =
@@ -45,51 +46,47 @@ class Arc extends Component {
     );
     //generate points on ArcCurve
     const points = arcCurve.getPoints(50);
-    for (let i = 0; i < points.length; i++) {
-      points[i].add(new Vector2(pointB.x, pointB.y));
-    }
-    //fyllet på toppen
-    const toppen = new Shape();
-    toppen.absarc(pointB.x, pointB.y, radius, startAngle, endAngle, false);
 
     //punktene arcen krysser linjene
-    const krysningAB = vectorBtoA
-      .clone()
-      .normalize()
-      .multiplyScalar(radius)
-      .add(pointB);
+    const krysningAB = vectorBtoA.clone().normalize().multiplyScalar(radius);
+    const krysningCB = vectorBtoC.clone().normalize().multiplyScalar(radius);
 
-    const krysningCB = vectorBtoC
-      .clone()
-      .normalize()
-      .multiplyScalar(radius)
-      .add(pointB);
+    // Create circle-geometry -- lager fyllet i vinkelen
+    this.geometry = new CircleGeometry(radius, 32, startAngle, angle);
+    this.material = new MeshBasicMaterial({ color: "#FAA307" });
 
-    //fyllet til trekanten
-    const trekanten = new Shape();
-    trekanten.moveTo(pointB.x, pointB.y);
-    trekanten.lineTo(krysningAB.x, krysningAB.y);
-    trekanten.lineTo(krysningCB.x, krysningCB.y);
-    trekanten.lineTo(pointB.x, pointB.y);
+    //setter posisjonen til å være fra punktB
+    this.position.set(pointB.x, pointB.y, 0);
 
-    //lage linjer og shapes som fyll
+    //lage outline og tekst
     const vinkelTekst = new Text(
-      (Math.round((angle * 180) / Math.PI) + " °").toString()
+      (Math.round((angle * 180) / Math.PI) + " °").toString(),
+      { fontSize: 18, anchorY: "middle", anchorX: "left", position: [15, 0] }
     );
-    const punkt = new Point(pointB.x, pointB.y, {});
-    const linje1 = new Line(krysningAB, pointB, { lineWidth: 2 });
-    const linje2 = new Line(pointB, krysningCB, { lineWidth: 2 });
-    // const linje3 = new Line(points);
-    // const topp = new ShapGeometry(args:[toppen], new MeshBasicMaterial(color:"#FAA307"))
-    // const trekant = new ShapBufferGeometry(args:[trekanten], new MeshBasicMaterial(color:"#FAA307"))
+    const linje1 = new Line(krysningAB, [0, 0], {
+      lineWidth: 4,
+      color: 0x080007,
+    });
+    const linje2 = new Line([0, 0], krysningCB, {
+      lineWidth: 4,
+      color: 0x080007,
+    });
+    const tempLine = new LineGeometry();
+    tempLine.setPositions(points.flatMap((v) => [v.x, v.y, 3]));
+    const linje3 = new Line2(
+      tempLine,
+      new LineMaterial({
+        color: 0x080007,
+        linewidth: 4,
+        resolution: new Vector2(window.innerWidth, window.innerHeight),
+      })
+    );
 
-    // this.add(vinkelTekst);
-    this.add(punkt);
+    //legger til outline og tekst
+    this.add(vinkelTekst);
     this.add(linje1);
     this.add(linje2);
-    // this.add(linje3);
-    // this.add(topp);
-    // this.add(trekant)
+    this.add(linje3);
   }
 }
 export default Arc;
