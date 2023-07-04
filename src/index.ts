@@ -1,6 +1,8 @@
 import { Vector2 } from "three";
 import Arcc from "./Components/Arc";
 import Grid from "./Components/Grid";
+import Line from "./Components/Line";
+import Plot from "./Components/Plot";
 import Point from "./Components/Point";
 import Graphica from "./Graphica";
 
@@ -23,7 +25,7 @@ const arc = new Arcc({
   pointC: new Vector2(40, 20),
   radius: 30,
 });
-const a = new Plot("sin(x)", {});
+const a = new Plot("a*x", { coefficients: { a: 2 } });
 const b = new Line([0, 0], [50, 50], { color: 0x000000 });
 graphica.add(a);
 graphica.add(b);

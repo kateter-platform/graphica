@@ -12,7 +12,7 @@ You can install the package by following the instructions here: [https://github.
 
 ## Getting Started
 
-First, run the development server:
+First, build the project with parcel. You will need to start a live server yourself on the ./index.html file:
 
 ```bash
 yarn dev
@@ -27,7 +27,7 @@ yarn start
 To run prettier and lint run:
 
 ```bash
-yarn prettier:fix && yarn lint
+yarn lint
 ```
 
 To build the project with webpack use:
@@ -36,12 +36,8 @@ To build the project with webpack use:
 yarn dist
 ```
 
-Please note that jsx should be set to react in the tsconfig, and all next files/folders should be removed from the include before building for production.
-
 To publish the project to the registry run
 
 ```bash
 yarn publish
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
