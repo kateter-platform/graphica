@@ -1,5 +1,5 @@
-import { parse } from "mathjs";
 import { Vector3, CatmullRomCurve3, Vector2, OrthographicCamera } from "three";
+import { parse } from "mathjs";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./interfaces";
 
