@@ -1,6 +1,5 @@
 import { OrthographicCamera } from "three";
 import { Text as TroikaText } from "troika-three-text";
-import Font from "../assets/fonts/Jost-Medium.ttf";
 import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
@@ -35,7 +34,7 @@ class Text extends Component {
     renderText.text = text;
     renderText.fontSize = fontSize;
     renderText.color = color;
-    renderText.font = Font;
+    renderText.font = "https://files.catbox.moe/nodsjn.ttf";
     renderText.sdfGlyphSize = 32;
     renderText.anchorX = anchorX;
     renderText.anchorY = anchorY;

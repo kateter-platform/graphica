@@ -1,7 +1,7 @@
 {
   "name": "graphica-gemini",
   "version": "0.0.2",
-  "main": "dist/bundle.js",
+  "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
   "license": "MIT",
   "repository": {
@@ -24,7 +24,9 @@
     "eslint": "^8.43.0",
     "eslint-plugin-import": "^2.27.5",
     "expose-loader": "^4.1.0",
+    "parcel": "^2.9.3",
     "prettier": "^2.8.8",
+    "process": "^0.11.10",
     "ts-loader": "^9.4.3",
     "typescript": "^5.1.3",
     "webpack": "^5.88.0",
@@ -40,9 +42,18 @@
     "troika-three-text": "^0.47.2"
   },
   "scripts": {
-    "build": "rm dist -r & yarn tsc && yarn webpack build",
+    "dev": "rm dist -r & yarn parcel watch",
+    "run": "yarn dev",
+    "dist": "rm dist -r & yarn tsc && yarn webpack build",
     "prettier": "prettier --write --ignore-path .gitignore .",
-    "lint:prod": "NODE_ENV=production yarn eslint .",
-    "lint": "NODE_ENV=development yarn eslint ."
+    "lint": "NODE_ENV=production yarn eslint . --fix && yarn prettier --write --ignore-path .gitignore",
+    "lint:test": "NODE_ENV=production yarn eslint .",
+    "prettier:test": "yarn prettier --check --ignore-path .gitignore ."
+  },
+  "watch": {
+    "include": [
+      "**/*.js",
+      "**/*.ts"
+    ]
   }
 }
