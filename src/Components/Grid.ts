@@ -3,9 +3,7 @@ import {
   Vector3,
   PlaneGeometry,
   ShaderMaterial,
-  Mesh,
   OrthographicCamera,
-  Object3D,
 } from "three";
 import { Component } from "./interfaces";
 
@@ -55,21 +53,19 @@ const defaultGridProps: GridProps = {
   pointColor: new Color(0xe1e1e1),
 };
 
-class Grid implements Component {
-  mesh: Mesh;
-  position: Vector3;
-  object: Object3D;
+class Grid extends Component {
   draggable = undefined;
 
   constructor(props: GridProps = defaultGridProps) {
-    this.position = new Vector3();
-    this.object = new Object3D();
+    super();
 
     const { cellSize, pointRadius, pointColor } = props;
+
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
       window.innerHeight
     );
+
     const gridMaterial = new ShaderMaterial({
       uniforms: {
         cellSize: { value: cellSize },
@@ -83,18 +79,16 @@ class Grid implements Component {
       transparent: true,
     });
 
-    this.mesh = new Mesh(gridGeometry, gridMaterial);
-    this.object = this.mesh;
+    this.geometry = gridGeometry;
+    this.material = gridMaterial;
   }
 
   update(camera: OrthographicCamera) {
-    (this.mesh.material as ShaderMaterial).uniforms.zoomLevel.value =
-      camera.zoom;
-    (this.mesh.material as ShaderMaterial).uniforms.offset.value =
-      camera.position;
+    (this.material as ShaderMaterial).uniforms.zoomLevel.value = camera.zoom;
+    (this.material as ShaderMaterial).uniforms.offset.value = camera.position;
 
-    this.object.position.set(camera.position.x, camera.position.y, -1);
-    this.object.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+    this.position.set(camera.position.x, camera.position.y, -1);
+    this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
   }
 }
 

@@ -1,6 +1,5 @@
-import { Vector3, Vector2, Object3D } from "three";
-import { Line2, LineGeometry, LineMaterial } from "three-fatline";
-import Graphica from "../Graphica";
+import { Vector2, OrthographicCamera } from "three";
+import { LineGeometry, LineMaterial } from "three-fatline";
 import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
@@ -15,51 +14,47 @@ export const defaultLineProps: LineProps = {
   lineWidth: 4,
 };
 
-class Line implements Component {
-  start: Vector3;
-  end: Vector3;
+class Line extends Component {
+  start: InputPosition;
+  end: InputPosition;
   draggable = undefined;
-  position: Vector3;
-  object: Object3D;
 
   constructor(
-    start: InputPosition = [0, 0],
-    end: InputPosition = [0, 0],
+    start: InputPosition,
+    end: InputPosition,
     { color, lineWidth }: LineProps = defaultLineProps
   ) {
-    this.start = toVector3(start);
-    this.end = toVector3(end);
-    this.position = new Vector3();
+    super();
+    this.start = start;
+    this.end = end;
 
-    const geometry = new LineGeometry();
-    geometry.setPositions([
-      this.start.x,
-      this.start.y,
-      0,
-      this.end.x,
-      this.end.y,
-      0,
-    ]);
-
-    const material = new LineMaterial({
+    this.material = new LineMaterial({
       color: color,
       linewidth: lineWidth,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
       dashed: false,
     });
 
-    const line = new Line2(geometry, material);
-    line.computeLineDistances();
-    line.scale.set(1, 1, 1);
-    this.object = line;
+    this.geometry = new LineGeometry();
+    this.updateGeometry(start, end);
   }
 
-  addToGraphica(graphica: Graphica) {
-    graphica.addMesh(this.object);
+  public updateGeometry(start: InputPosition, end: InputPosition) {
+    const startPosition = toVector3(start);
+    const endPosition = toVector3(end);
+
+    (this.geometry as LineGeometry).setPositions([
+      startPosition.x,
+      startPosition.y,
+      0,
+      endPosition.x,
+      endPosition.y,
+      0,
+    ]);
   }
 
-  removeFromGraphica(graphica: Graphica) {
-    graphica.removeMesh(this.object);
+  update(_camera: OrthographicCamera) {
+    this.updateGeometry(this.start, this.end);
   }
 }
 
