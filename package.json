@@ -1,7 +1,8 @@
 {
   "name": "graphica-gemini",
   "version": "0.0.2",
-  "main": "dist/bundle.js",
+  "main": "./dist/bundle.js",
+  "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
   "license": "MIT",
   "repository": {
@@ -24,6 +25,7 @@
     "eslint": "^8.43.0",
     "eslint-plugin-import": "^2.27.5",
     "expose-loader": "^4.1.0",
+    "parcel": "^2.9.3",
     "prettier": "^2.8.8",
     "ts-loader": "^9.4.3",
     "typescript": "^5.1.3",
