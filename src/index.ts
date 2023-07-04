@@ -23,7 +23,10 @@ const arc = new Arcc({
   pointC: new Vector2(40, 20),
   radius: 30,
 });
-
+const a = new Plot("sin(x)", {});
+const b = new Line([0, 0], [50, 50], { color: 0x000000 });
+graphica.add(a);
+graphica.add(b);
 graphica.add(grid);
 graphica.add(arc);
 graphica.add(pointA);
