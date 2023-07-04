@@ -1,6 +1,6 @@
 {
   "name": "graphica-gemini",
-  "version": "0.0.111",
+  "version": "0.0.2",
   "main": "dist/bundle.js",
   "description": "A tool for advanced graphing and visualization",
   "license": "MIT",

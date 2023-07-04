@@ -1,8 +1,4 @@
-import {
-  CircleGeometry,
-  MeshBasicMaterial,
-  Mesh,
-} from "three";
+import { CircleGeometry, MeshBasicMaterial, Mesh } from "three";
 import Text from "./Text";
 import { Component, Draggable } from "./interfaces";
 

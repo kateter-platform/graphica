@@ -1,5 +1,6 @@
 import Grid from "./Components/Grid";
 import Line from "./Components/Line";
+import Plot from "./Components/Plot";
 import Point from "./Components/Point";
 import Text from "./Components/Text";
 import Graphica from "./Graphica";
@@ -16,7 +17,10 @@ const text = new Text("Hello World this is awesome!", {
   anchorX: "left",
   anchorY: "bottom",
 });
-
+const a = new Plot("sin(x)", {});
+const b = new Line([0, 0], [50, 50], { color: 0x000000 });
+graphica.add(a);
+graphica.add(b);
 graphica.add(grid);
 graphica.add(line);
 graphica.add(point);
