@@ -8,7 +8,7 @@ import {
 } from "three";
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Component, ConstrainFunction } from "./Components/interfaces";
+import { Component, ConstrainFunction } from "./Components/Component";
 
 class Graphica {
   components: Component[];

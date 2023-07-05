@@ -1,6 +1,6 @@
 import { CircleGeometry, MeshBasicMaterial, Mesh } from "three";
+import { Component, Draggable } from "../Component";
 import Text from "./Text";
-import { Component, Draggable } from "./interfaces";
 
 type PointOptions = {
   label?: boolean;

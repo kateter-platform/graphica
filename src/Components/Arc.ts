@@ -1,8 +1,8 @@
 import { ArcCurve, CircleGeometry, MeshBasicMaterial, Vector2 } from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
-import Line from "./Line";
-import Text from "./Text";
-import { Component } from "./interfaces";
+import { Component } from "./Component";
+import Line from "./Primitives/Line";
+import Text from "./Primitives/Text";
 
 type ArcOptions = {
   pointA: Vector2;

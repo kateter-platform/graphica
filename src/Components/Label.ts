@@ -1,9 +1,9 @@
 import { Vector2, Vector3, Object3D, Group, OrthographicCamera } from "three";
 import { toVector3 } from "../utils";
-import Line from "./Line";
-import Text from "./Text";
-import { Component } from "./interfaces";
-import { InputPosition } from "./types";
+import { Component } from "./Component";
+import Line from "./Primitives/Line";
+import Text from "./Primitives/Text";
+import { InputPosition } from "./Types/InputPosition";
 
 const SCALING_FACTOR = 10;
 
@@ -34,8 +34,8 @@ class Label extends Component {
     const endPoint = this.calculateEndPoint(deltaX, deltaY);
 
     // Create line and text components
-    const line1 = new Line(start, breakPoint);
-    const line2 = new Line(breakPoint, endPoint);
+    const line1 = new Line(start, breakPoint, {});
+    const line2 = new Line(breakPoint, endPoint, {});
     const textComponent = new Text(text, {
       color: "black",
       fontSize: 22,

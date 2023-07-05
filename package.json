@@ -42,9 +42,9 @@
     "troika-three-text": "^0.47.2"
   },
   "scripts": {
-    "dev": "rm dist -r & yarn parcel watch",
+    "dev": "rm -r dist & yarn parcel watch",
     "run": "yarn dev",
-    "dist": "rm dist -r & yarn tsc && yarn webpack build",
+    "dist": "rm -r dist & yarn tsc && yarn webpack build",
     "prettier": "prettier --write --ignore-path .gitignore .",
     "lint": "NODE_ENV=production yarn eslint . --fix && yarn prettier --write --ignore-path .gitignore",
     "lint:test": "NODE_ENV=production yarn eslint .",
