@@ -41,13 +41,13 @@ const fragmentShader = `
   }
 `;
 
-type GridProps = {
+type GridOptions = {
   cellSize?: number;
   pointRadius?: number;
   pointColor?: Color;
 };
 
-const defaultGridProps: GridProps = {
+const defaultGridOptions: GridOptions = {
   cellSize: 50,
   pointRadius: 1.5,
   pointColor: new Color(0xe1e1e1),
@@ -56,10 +56,13 @@ const defaultGridProps: GridProps = {
 class Grid extends Component {
   draggable = undefined;
 
-  constructor(props: GridProps = defaultGridProps) {
+  constructor(options?: GridOptions) {
     super();
 
-    const { cellSize, pointRadius, pointColor } = props;
+    const { cellSize, pointRadius, pointColor } = {
+      ...defaultGridOptions,
+      ...options,
+    };
 
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,

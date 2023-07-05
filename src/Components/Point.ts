@@ -9,18 +9,21 @@ type PointOptions = {
   draggable?: Draggable;
 };
 
+const defaultPointOptions = {
+  color: "#FAA307",
+  draggable: undefined,
+  decimals: 1,
+  label: false,
+};
+
 class Point extends Component {
-  constructor(
-    x = 0,
-    y = 0,
-    {
-      color = "#FAA307",
-      draggable = undefined,
-      decimals = 1,
-      label = false,
-    }: PointOptions
-  ) {
+  constructor(x = 0, y = 0, options?: PointOptions) {
     super();
+    const { color, draggable, decimals, label } = {
+      ...defaultPointOptions,
+      ...options,
+    };
+
     // set position of the point instance
     this.draggable = draggable;
     // create a circle geometry

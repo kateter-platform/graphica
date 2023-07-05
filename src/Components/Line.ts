@@ -4,13 +4,13 @@ import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
-export type LineProps = {
+export type LineOptions = {
   color?: number;
   lineWidth?: number;
 };
 
-export const defaultLineProps: LineProps = {
-  color: 0x000000,
+export const defaultLineOptions: LineOptions = {
+  color: 0x080007,
   lineWidth: 4,
 };
 
@@ -19,12 +19,10 @@ class Line extends Component {
   end: InputPosition;
   draggable = undefined;
 
-  constructor(
-    start: InputPosition,
-    end: InputPosition,
-    { color, lineWidth }: LineProps = defaultLineProps
-  ) {
+  constructor(start: InputPosition, end: InputPosition, options?: LineOptions) {
     super();
+    const { color, lineWidth } = { ...defaultLineOptions, ...options };
+
     this.start = start;
     this.end = end;
 
