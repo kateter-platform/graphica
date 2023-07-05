@@ -2,8 +2,8 @@ import { OrthographicCamera } from "three";
 import renderToString from "katex";
 import { CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer";
 import { toVector3 } from "../utils";
-import { Component, Draggable } from "./interfaces";
-import { InputPosition } from "./types";
+import { Component, Draggable } from "./Component";
+import { InputPosition } from "./Types/InputPosition";
 
 type LatexOptions = {
   position?: InputPosition;

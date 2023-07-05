@@ -1,25 +1,12 @@
 import { Vector2 } from "three";
 import Arcc from "./Components/Arc";
 import Grid from "./Components/Grid";
-import Latex from "./Components/Latex";
-import Line from "./Components/Line";
 import Plot from "./Components/Plot";
-import Point from "./Components/Point";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
 
-const grid = new Grid();
-
-const pointB = new Point(70, 60, { draggable: "unrestricted" });
-const pointA = new Point(20, 30, {
-  draggable: "unrestricted",
-  color: "#F4493B",
-});
-const pointC = new Point(40, 20, {
-  draggable: "unrestricted",
-  color: "#F4493B",
-});
+const grid = new Grid({});
 const arc = new Arcc({
   pointA: new Vector2(20, 30),
   pointB: new Vector2(70, 60),
@@ -27,19 +14,8 @@ const arc = new Arcc({
   radius: 30,
 });
 const a = new Plot("a*x", { coefficients: { a: 2 } });
-const b = new Line([0, 0], [50, 50], { color: 0x000000 });
-const d = new Latex("F = \\frac{m}{{v^2}} \\cdot r", {
-  fontSize: 60,
-  position: [300, 25],
-  draggable: "unrestricted",
-});
 
 graphica.add(a);
-graphica.add(b);
 graphica.add(grid);
 graphica.add(arc);
-graphica.add(pointA);
-graphica.add(pointB);
-graphica.add(pointC);
-graphica.add(d);
 graphica.run();

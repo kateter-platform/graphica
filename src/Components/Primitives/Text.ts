@@ -16,11 +16,11 @@ type TextOptions = {
 type TroikaTextType = InstanceType<typeof TroikaText>;
 
 const weightMap = {
-  "regular": "Jost-Regular.ttf",
-  "medium": "Jost-Medium.ttf",
+  regular: "Jost-Regular.ttf",
+  medium: "Jost-Medium.ttf",
   "semi-bold": "Jost-SemiBold.ttf",
-  "black": "Jost-Black.ttf"
-}
+  black: "Jost-Black.ttf",
+};
 
 class Text extends Component {
   draggable = undefined;
@@ -34,7 +34,7 @@ class Text extends Component {
       fontSize = 30,
       anchorX = "left",
       anchorY = "bottom",
-      weight = "medium"
+      weight = "medium",
     }: TextOptions
   ) {
     super();

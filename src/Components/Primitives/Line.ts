@@ -1,6 +1,6 @@
-import { Vector2, OrthographicCamera, Mesh } from "three";
+import { Vector2, OrthographicCamera } from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
-import { toVector3, toVector2 } from "../../utils";
+import { toVector2 } from "../../utils";
 import { Component } from "../Component";
 import { InputPosition } from "./../Types/InputPosition";
 
@@ -9,7 +9,7 @@ const ARROWHEAD_LENGTH = 12;
 /**
  * Properties for a Line
  * @typedef {Object} LineProps
- * 
+ *
  * @property {number} [color=0x000000] - The color of the line as a hex value.
  * @property {number} [lineWidth=4] - The width of the line.
  * @property {boolean} [static=false] - If true, the line is static and cannot be manipulated.
@@ -32,7 +32,7 @@ class Line extends Component {
   arrowhead: boolean;
   draggable = undefined;
 
-    /**
+  /**
    * Create a new line.
    *
    * @param {InputPosition} start - The starting position of the line.
@@ -59,13 +59,21 @@ class Line extends Component {
     this.geometry = new LineGeometry();
     if (arrowhead) {
       const arrowheadGeometry = new LineGeometry();
-      const arrowheadLine = new Line2(arrowheadGeometry, this.material as LineMaterial);
+      const arrowheadLine = new Line2(
+        arrowheadGeometry,
+        this.material as LineMaterial
+      );
       arrowheadLine.name = "arrowhead";
       this.add(arrowheadLine);
     }
   }
 
-  public updateGeometry(start: InputPosition, end: InputPosition, arrowhead: boolean, camera: OrthographicCamera) {
+  public updateGeometry(
+    start: InputPosition,
+    end: InputPosition,
+    arrowhead: boolean,
+    camera: OrthographicCamera
+  ) {
     const startPosition = toVector2(start);
     const endPosition = toVector2(end);
 
@@ -81,11 +89,18 @@ class Line extends Component {
     ]);
 
     if (arrowhead) {
-      const arrowheadLine = (this.getObjectByName("arrowhead") as Line2);
-      const arrowheadGeometry = (arrowheadLine.geometry as LineGeometry);
-      const leftPoint = direction.clone().rotateAround(new Vector2(0, 0), Math.PI / 4).multiplyScalar(ARROWHEAD_LENGTH/camera.zoom).add(endPosition);
-      const rightPoint = direction.clone().rotateAround(new Vector2(0, 0), -Math.PI / 4).multiplyScalar(ARROWHEAD_LENGTH/camera.zoom).add(endPosition);
-
+      const arrowheadLine = this.getObjectByName("arrowhead") as Line2;
+      const arrowheadGeometry = arrowheadLine.geometry as LineGeometry;
+      const leftPoint = direction
+        .clone()
+        .rotateAround(new Vector2(0, 0), Math.PI / 4)
+        .multiplyScalar(ARROWHEAD_LENGTH / camera.zoom)
+        .add(endPosition);
+      const rightPoint = direction
+        .clone()
+        .rotateAround(new Vector2(0, 0), -Math.PI / 4)
+        .multiplyScalar(ARROWHEAD_LENGTH / camera.zoom)
+        .add(endPosition);
 
       arrowheadGeometry.setPositions([
         leftPoint.x,
@@ -96,7 +111,7 @@ class Line extends Component {
         0,
         rightPoint.x,
         rightPoint.y,
-        0
+        0,
       ]);
     }
   }

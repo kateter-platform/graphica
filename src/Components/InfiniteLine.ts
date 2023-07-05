@@ -1,7 +1,7 @@
 import { OrthographicCamera, Vector3 } from "three";
 import { toVector3 } from "../utils";
 import Line, { LineOptions } from "./Line";
-import { InputPosition } from "./types";
+import { InputPosition } from "./Types/InputPosition";
 
 class InfiniteLine extends Line {
   constructor(start: InputPosition, end: InputPosition, props?: LineOptions) {

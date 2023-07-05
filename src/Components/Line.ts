@@ -1,8 +1,8 @@
 import { Vector2, OrthographicCamera } from "three";
 import { LineGeometry, LineMaterial } from "three-fatline";
 import { toVector3 } from "../utils";
-import { Component } from "./interfaces";
-import { InputPosition } from "./types";
+import { Component } from "./Component";
+import { InputPosition } from "./Types/InputPosition";
 
 export type LineOptions = {
   color?: number;

@@ -10,7 +10,7 @@ import {
   Vector2,
   Vector3,
 } from "three";
-import { Component } from "../Components/interfaces";
+import { Component } from "./../Components/Component";
 
 const _plane = new Plane();
 const _raycaster = new Raycaster();
