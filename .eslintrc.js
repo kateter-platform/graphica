@@ -41,5 +41,6 @@ module.exports = {
         extensions: [".js", ".jsx", ".ts", ".tsx"], // Add this line to specify the file extensions for imports
       },
     },
+    "import/core-modules": ["three"],
   },
 };
