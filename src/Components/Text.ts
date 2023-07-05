@@ -12,23 +12,28 @@ type TextOptions = {
   anchorX?: "left" | "center" | "right";
 };
 
+const defaultTextOptions = {
+  position: [0, 0] as [number, number],
+  color: "black",
+  fontSize: 30,
+  anchorX: "left",
+  anchorY: "bottom",
+};
+
 type TroikaTextType = InstanceType<typeof TroikaText>;
 
 class Text extends Component {
   draggable = undefined;
   renderText: TroikaTextType;
 
-  constructor(
-    text: string,
-    {
-      position = [0, 0],
-      color = "black",
-      fontSize = 30,
-      anchorX = "left",
-      anchorY = "bottom",
-    }: TextOptions
-  ) {
+  constructor(text: string, options?: TextOptions) {
     super();
+
+    const { position, color, fontSize, anchorX, anchorY } = {
+      ...defaultTextOptions,
+      ...options,
+    };
+
     const renderText = new TroikaText();
     const pos = toVector3(position);
     renderText.text = text;
