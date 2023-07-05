@@ -13,14 +13,6 @@ type TextOptions = {
   weight?: "regular" | "medium" | "semi-bold" | "black";
 };
 
-const defaultTextOptions = {
-  position: [0, 0] as [number, number],
-  color: "black",
-  fontSize: 30,
-  anchorX: "left",
-  anchorY: "bottom",
-};
-
 type TroikaTextType = InstanceType<typeof TroikaText>;
 
 const weightMap = {

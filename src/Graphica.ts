@@ -16,7 +16,6 @@ const ORBIT_CONTROL_OPTIONS = {
   MIDDLE: MOUSE.DOLLY,
   RIGHT: MOUSE.ROTATE,
 };
-
 class Graphica {
   components: Component[];
   draggables: Component[];

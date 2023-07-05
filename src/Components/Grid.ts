@@ -55,12 +55,6 @@ type GridOptions = {
   xLabelText?: string;
 };
 
-const defaultGridOptions: GridOptions = {
-  cellSize: 50,
-  pointRadius: 1.5,
-  pointColor: new Color(0xe1e1e1),
-};
-
 class Grid extends Component {
   draggable = undefined;
   private shaderMesh: Mesh;
@@ -69,10 +63,8 @@ class Grid extends Component {
   private xLabel: Text;
   private yLabel: Text;
 
-
   constructor({cellSize = 50, pointRadius = 1.5, pointColor = new Color(0xe1e1e1), labels = true, xLabelText = "x", yLabelText = "y"}: GridOptions) {
     super();
-
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
       window.innerHeight
