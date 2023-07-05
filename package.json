@@ -1,6 +1,6 @@
 {
   "name": "graphica-gemini",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
   "license": "MIT",
