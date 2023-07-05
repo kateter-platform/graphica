@@ -1,10 +1,10 @@
 import { OrthographicCamera, Vector3 } from "three";
 import { toVector3 } from "../utils";
-import Line, { LineProps } from "./Line";
+import Line, { LineOptions } from "./Line";
 import { InputPosition } from "./types";
 
 class InfiniteLine extends Line {
-  constructor(start: InputPosition, end: InputPosition, props?: LineProps) {
+  constructor(start: InputPosition, end: InputPosition, props?: LineOptions) {
     super(start, end, props);
     this.frustumCulled = false;
   }
