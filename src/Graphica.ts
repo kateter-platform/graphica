@@ -7,14 +7,22 @@ import {
   Object3D,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer";
 import { Component, ConstrainFunction } from "./Components/interfaces";
 import { DragControls } from "./Controls/DragControls";
+
+const ORBIT_CONTROL_OPTIONS = {
+  LEFT: MOUSE.PAN,
+  MIDDLE: MOUSE.DOLLY,
+  RIGHT: MOUSE.ROTATE,
+};
 
 class Graphica {
   components: Component[];
   draggables: Component[];
 
   renderer: WebGLRenderer;
+  domRenderer: CSS3DRenderer;
   camera: OrthographicCamera;
   scene: Scene;
 
@@ -23,6 +31,13 @@ class Graphica {
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
     root.appendChild(this.renderer.domElement);
+
+    this.domRenderer = new CSS3DRenderer();
+    this.domRenderer.setSize(window.innerWidth, window.innerHeight);
+    this.domRenderer.domElement.style.position = "absolute";
+    this.domRenderer.domElement.style.top = "0px";
+    this.domRenderer.domElement.style.pointerEvents = "none";
+    root.appendChild(this.domRenderer.domElement);
 
     this.camera = new OrthographicCamera( // TODO: Should depend on the renderer size
       window.innerWidth / -2,
@@ -37,11 +52,7 @@ class Graphica {
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableRotate = false;
     controls.enablePan = true;
-    controls.mouseButtons = {
-      LEFT: MOUSE.PAN,
-      MIDDLE: MOUSE.DOLLY,
-      RIGHT: MOUSE.ROTATE,
-    };
+    controls.mouseButtons = ORBIT_CONTROL_OPTIONS;
 
     this.scene = new Scene();
     this.scene.background = new Color(0xffffff);
@@ -106,6 +117,7 @@ class Graphica {
         child.update(this.camera);
       }
     });
+    this.domRenderer.render(this.scene, this.camera);
     this.renderer.render(this.scene, this.camera);
   }
 
