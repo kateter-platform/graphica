@@ -3,12 +3,20 @@ import { parse } from "mathjs";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./Component";
 
-type PointOptions = {
+type PlotOptions = {
   numPoints?: number;
   dashed?: boolean;
   lineWidth?: number;
   color?: number;
   coefficients?: Coefficients;
+};
+
+const defaultPlotOptions = {
+  numPoints: 2500,
+  dashed: false,
+  lineWidth: 1,
+  color: 0xff0000,
+  coefficients: {},
 };
 
 type Coefficients = {
@@ -28,17 +36,17 @@ class Plot extends Component {
   private RENDERTHRESHOLDX = 300;
   private RENDERTHRESHOLDZOOM = 0.3;
 
-  constructor(
-    func: string,
-    {
+  constructor(func: string, options?: PlotOptions) {
+    super();
+
+    const {
       numPoints = 2500,
       dashed = false,
       lineWidth = 1,
       color = 0xff0000,
       coefficients = {},
-    }: PointOptions
-  ) {
-    super();
+    } = { ...defaultPlotOptions, ...options };
+
     const minX = (-PLOTRANGE / 1) * 2 + 0;
     const maxX = (PLOTRANGE / 1) * 2 + 0;
     const initialCurve = new CatmullRomCurve3(

@@ -46,7 +46,7 @@ const fragmentShader = `
   }
 `;
 
-type GridProps = {
+type GridOptions = {
   cellSize?: number;
   pointRadius?: number;
   pointColor?: Color;
@@ -55,6 +55,11 @@ type GridProps = {
   xLabelText?: string;
 };
 
+const defaultGridOptions: GridOptions = {
+  cellSize: 50,
+  pointRadius: 1.5,
+  pointColor: new Color(0xe1e1e1),
+};
 
 class Grid extends Component {
   draggable = undefined;
@@ -65,7 +70,7 @@ class Grid extends Component {
   private yLabel: Text;
 
 
-  constructor({cellSize = 50, pointRadius = 1.5, pointColor = new Color(0xe1e1e1), labels = true, xLabelText = "x", yLabelText = "y"}: GridProps) {
+  constructor({cellSize = 50, pointRadius = 1.5, pointColor = new Color(0xe1e1e1), labels = true, xLabelText = "x", yLabelText = "y"}: GridOptions) {
     super();
 
     const gridGeometry = new PlaneGeometry(
