@@ -1,49 +1,17 @@
 import { Vector2 } from "three";
-import Arcc from "./Components/Arc";
 import Grid from "./Components/Grid";
 import Latex from "./Components/Latex";
-import Line from "./Components/Line";
 import Plot from "./Components/Plot";
 import Point from "./Components/Point";
 import Vector from "./Components/Vector";
+import Polygon from "./Components/Shape";
+import Slider from "./Components/Slider";
+import { Component } from "./Components/interfaces";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
 
-const grid = new Grid({ yLabelText: "THIS is AwESome NN", xLabelText: "x" });
+const grid = new Grid({ yLabelText: "y", xLabelText: "x" });
 
-const pointB = new Point(70, 60, { draggable: "unrestricted" });
-const pointA = new Point(20, 30, {
-  draggable: "unrestricted",
-  color: "#F4493B",
-});
-const pointC = new Point(40, 20, {
-  draggable: "unrestricted",
-  color: "#F4493B",
-});
-const arc = new Arcc({
-  pointA: new Vector2(20, 30),
-  pointB: new Vector2(70, 60),
-  pointC: new Vector2(40, 20),
-  radius: 30,
-});
-const a = new Plot("a*x", { coefficients: { a: 2 } });
-const b = new Line([0, 0], [50, 50]);
-const d = new Latex("F = \\frac{m}{{v^2}} \\cdot r", {
-  fontSize: 60,
-  position: [300, 25],
-  draggable: "unrestricted",
-});
-
-const vector = new Vector(pointB, new Vector2(20, 80), { color: 0x000000 });
-
-graphica.add(a);
-graphica.add(b);
-graphica.add(arc);
 graphica.add(grid);
-graphica.add(pointA);
-graphica.add(pointB);
-graphica.add(pointC);
-graphica.add(vector);
-graphica.add(d);
 graphica.run();
