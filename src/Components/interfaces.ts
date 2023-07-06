@@ -21,3 +21,7 @@ export type Draggable =
   | "horizontal"
   | "vertical"
   | ConstrainFunction;
+
+export interface GuiComponent {
+  htmlElement: HTMLElement;
+}
