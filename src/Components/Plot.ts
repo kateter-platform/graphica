@@ -33,14 +33,14 @@ class Plot extends Component {
   private currentMaxX: number;
   private currentZoom: number;
   private coefficients: Coefficients;
-  private RENDERTHRESHOLDX = 300;
-  private RENDERTHRESHOLDZOOM = 0.3;
+  private RENDERTHRESHOLDX = 500;
+  private RENDERTHRESHOLDZOOM = 2;
 
   constructor(func: string, options?: PlotOptions) {
     super();
 
     const {
-      numPoints = 2500,
+      numPoints = 1000,
       dashed = false,
       lineWidth = 1,
       color = 0xff0000,
@@ -129,10 +129,10 @@ class Plot extends Component {
         this.RENDERTHRESHOLDZOOM ||
       Math.abs(this.currentMaxX - maxX) > this.RENDERTHRESHOLDX
     ) {
+      console.log("re-rendering");
       this.currentMinX = minX;
       this.currentMaxX = maxX;
       this.currentZoom = camera.zoom;
-      this.RENDERTHRESHOLDX /= camera.zoom >= 1 ? camera.zoom : camera.zoom * 5;
       this.reRenderPlot(minX, maxX);
     }
   }
