@@ -8,7 +8,11 @@ import {
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer";
-import { Component, ConstrainFunction } from "./Components/interfaces";
+import {
+  Component,
+  ConstrainFunction,
+  GuiComponent,
+} from "./Components/interfaces";
 import { DragControls } from "./Controls/DragControls";
 
 const ORBIT_CONTROL_OPTIONS = {
@@ -26,10 +30,16 @@ class Graphica {
   camera: OrthographicCamera;
   scene: Scene;
 
+  guiRoot: HTMLElement;
+
   constructor(root: HTMLElement) {
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    this.guiRoot = document.createElement("div");
+    this.guiRoot.className = "gui";
+    root.appendChild(this.guiRoot);
     root.appendChild(this.renderer.domElement);
 
     this.domRenderer = new CSS3DRenderer();
@@ -137,6 +147,14 @@ class Graphica {
       this.draggables.splice(this.draggables.indexOf(component), 1);
     }
     this.components.splice(this.components.indexOf(component), 1);
+  }
+
+  addGui(component: GuiComponent) {
+    this.guiRoot.appendChild(component.htmlElement);
+  }
+
+  removeGui(component: GuiComponent) {
+    this.guiRoot.removeChild(component.htmlElement);
   }
 }
 

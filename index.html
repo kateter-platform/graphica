@@ -7,6 +7,81 @@
       body {
         margin: 0;
       }
+
+      .gui {
+        position: relative;
+        top: 0;
+        left: 0;
+        z-index: 999;
+      }
+
+      .slider-wrapper {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        display: flex;
+      }
+
+      .slider {
+        -webkit-appearance: none;
+        width: 200px;
+        height: 5px;
+        background: #080007;
+        border-radius: 5px;
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: yellow;
+        border: 2px solid #080007;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .slider::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background: #faa307;
+        border: 4px solid #080007;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .edge-left,
+      .edge-right {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        top: -5px;
+      }
+
+      .edge-left {
+        left: -5px;
+      }
+
+      .edge-right {
+        left: 190px;
+      }
+
+      .serif {
+        width: 5px;
+        height: 20px;
+        background: #080007;
+        z-index: 2;
+      }
+
+      .text {
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+        font-size: 24px;
+        text-align: center;
+        margin: 0;
+      }
     </style>
   </head>
   <body>
