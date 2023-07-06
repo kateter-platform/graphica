@@ -6,6 +6,7 @@ import Line from "./Components/Line";
 import Plot from "./Components/Plot";
 import Point from "./Components/Point";
 import Graphica from "./Graphica";
+import Bracket from "./Components/Bracket";
 
 const graphica = new Graphica(document.body);
 
@@ -33,7 +34,9 @@ const d = new Latex("F = \\frac{m}{{v^2}} \\cdot r", {
   position: [300, 25],
   draggable: "unrestricted",
 });
+const brack = new Bracket("bracket", pointB, pointA);
 
+graphica.add(brack);
 graphica.add(a);
 graphica.add(b);
 graphica.add(grid);
