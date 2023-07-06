@@ -5,11 +5,12 @@ import Latex from "./Components/Latex";
 import Line from "./Components/Line";
 import Plot from "./Components/Plot";
 import Point from "./Components/Point";
+import Vector from "./Components/Vector";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
 
-const grid = new Grid();
+const grid = new Grid({ yLabelText: "THIS is AwESome NN", xLabelText: "x" });
 
 const pointB = new Point(70, 60, { draggable: "unrestricted" });
 const pointA = new Point(20, 30, {
@@ -27,19 +28,22 @@ const arc = new Arcc({
   radius: 30,
 });
 const a = new Plot("a*x", { coefficients: { a: 2 } });
-const b = new Line([0, 0], [50, 50], { color: 0x000000 });
+const b = new Line([0, 0], [50, 50]);
 const d = new Latex("F = \\frac{m}{{v^2}} \\cdot r", {
   fontSize: 60,
   position: [300, 25],
   draggable: "unrestricted",
 });
 
+const vector = new Vector(pointB, new Vector2(20, 80), { color: 0x000000 });
+
 graphica.add(a);
 graphica.add(b);
-graphica.add(grid);
 graphica.add(arc);
+graphica.add(grid);
 graphica.add(pointA);
 graphica.add(pointB);
 graphica.add(pointC);
+graphica.add(vector);
 graphica.add(d);
 graphica.run();
