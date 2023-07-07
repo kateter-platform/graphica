@@ -184,14 +184,24 @@ class Grid extends Component {
 
     for (let i = 0; i < 80; i++) {
       const size = i - 80 / 2;
-      const contentX = ((size+1 + roundedX / dynamicSize)*dynamicCameraScale2).toString();
-      const contentY = ((size+1 + roundedY / dynamicSize)*dynamicCameraScale2).toString();
 
+      const x = (size + 1) * this.cellSize * dynamicCameraScale;
+      const camX = camera.position.x + window.innerWidth / (2 * camera.zoom);
+      const diffX =camX - x;
+      const rdx = Math.floor(diffX / (80 * dynamicSize));
 
-      this.labelsX[i].position.set(roundedX + (size+1) * this.cellSize * dynamicCameraScale - 5*contentX.length / camera.zoom, -26 / camera.zoom, this.labelsX[i].position.z);
+      const y = (size + 1) * this.cellSize * dynamicCameraScale;
+      const camY = camera.position.y + window.innerHeight / (2 * camera.zoom);
+      const diffY =camY - y;
+      const rdy = Math.floor(diffY / (80 * dynamicSize));
+
+      const contentX = ((size+1+rdx*80)*dynamicCameraScale2).toString();
+      const contentY = ((size+1+rdy*80)*dynamicCameraScale2).toString();
+
+      this.labelsX[i].position.set(80*dynamicSize*rdx + x - 5*contentX.length / camera.zoom, -26 / camera.zoom, this.labelsX[i].position.z);
       this.labelsX[i].setText(contentX);
 
-      this.labelsY[i].position.set(-26 / camera.zoom, roundedY + (size+1) * this.cellSize * dynamicCameraScale - 5*contentY.length / camera.zoom, this.labelsY[i].position.z);
+      this.labelsY[i].position.set(-26 / camera.zoom, rdy*80*dynamicSize+(size+1) * this.cellSize * dynamicCameraScale - 5*contentY.length / camera.zoom, this.labelsY[i].position.z);
       this.labelsY[i].setText(contentY);
 
       if (contentY == '0') {
