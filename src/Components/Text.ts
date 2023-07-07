@@ -36,7 +36,7 @@ type TroikaTextType = InstanceType<typeof TroikaText>;
 class Text extends Component {
   draggable = undefined;
   renderText: TroikaTextType;
-
+  
   constructor(text?: string, options?: TextOptions) {
     super();
 

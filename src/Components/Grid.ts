@@ -55,7 +55,7 @@ type GridOptions = {
 };
 
 const defaultGridOptions: GridOptions = {
-  cellSize: 50,
+  cellSize: 64,
   pointRadius: 1.5,
   pointColor: new Color(0xe1e1e1),
   labels: true,
@@ -70,6 +70,9 @@ class Grid extends Component {
   private yAxis: Line;
   private xLabel: Text;
   private yLabel: Text;
+  private labelsX: Text[];
+  private labelsY: Text[];
+  private cellSize: number;
 
   constructor(options?: GridOptions) {
     super();
@@ -85,6 +88,7 @@ class Grid extends Component {
       ...defaultGridOptions,
       ...options,
     };
+    this.cellSize = cellSize!;
 
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
@@ -122,7 +126,19 @@ class Grid extends Component {
     }
 
     this.add(this.shaderMesh, this.xAxis, this.yAxis);
+
+    // Coordinate labels
+    this.labelsX = [];
+    this.labelsY = [];
+
+    for (let i = 0; i < 80; i++) {
+      this.labelsX.push(new Text(i.toString(), { position: [i*this.cellSize-5, -26], fontSize: 16}));
+      this.add(this.labelsX[i]);
+      this.labelsY.push(new Text(i.toString(), { position: [i*this.cellSize-5, -26], fontSize: 16}));
+      this.add(this.labelsY[i]);
+    }
   }
+
 
   update(camera: OrthographicCamera) {
     (this.shaderMesh.material as ShaderMaterial).uniforms.zoomLevel.value =
@@ -132,30 +148,59 @@ class Grid extends Component {
 
     this.shaderMesh.position.set(camera.position.x, camera.position.y, -1);
     this.shaderMesh.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+
+    const PADDING = 25;
     this.xAxis.start = new Vector2(
-      camera.position.x - window.innerWidth / camera.zoom,
+      camera.position.x - window.innerWidth * 0.5 / camera.zoom,
       0
     );
     this.xAxis.end = new Vector2(
-      camera.position.x + (window.innerWidth - 780) / camera.zoom,
+      camera.position.x + (window.innerWidth * 0.5 - PADDING) / camera.zoom,
       0
     );
     this.yAxis.start = new Vector2(
       0,
-      camera.position.y - window.innerHeight / camera.zoom
+      camera.position.y - window.innerHeight * 0.5 / camera.zoom
     );
     this.yAxis.end = new Vector2(
       0,
-      camera.position.y + (window.innerHeight - 400) / camera.zoom
+      camera.position.y + (window.innerHeight * 0.5 - PADDING) / camera.zoom
     );
     this.xLabel.position.setX(
-      camera.position.x + (window.innerWidth - 792) / camera.zoom
+      camera.position.x + (window.innerWidth * 0.5 - PADDING - 10) / camera.zoom
     );
-    this.xLabel.position.setY(15 / camera.zoom);
+    this.xLabel.position.setY(10 / camera.zoom);
     this.yLabel.position.setY(
-      camera.position.y + (window.innerHeight - 420) / camera.zoom
+      camera.position.y + (window.innerHeight * 0.5 - PADDING - 15) / camera.zoom
     );
-    this.yLabel.position.setX(23 / camera.zoom);
+    this.yLabel.position.setX(20 / camera.zoom);
+
+    const dynamicCameraScale = Math.pow(2, Math.floor(Math.log(1. / camera.zoom) / Math.log(2.)));
+    const dynamicCameraScale2 = Math.pow(2, 6+Math.floor(Math.log(1. / camera.zoom) / Math.log(2.)));
+
+    const dynamicSize = dynamicCameraScale * this.cellSize;
+    const roundedX = dynamicSize * Math.floor(camera.position.x / dynamicSize);
+    const roundedY = dynamicSize * Math.floor(camera.position.y / dynamicSize);
+
+    for (let i = 0; i < 80; i++) {
+      const size = i - 80 / 2;
+      const contentX = ((size+1 + roundedX / dynamicSize)*dynamicCameraScale2).toString();
+      const contentY = ((size+1 + roundedY / dynamicSize)*dynamicCameraScale2).toString();
+
+
+      this.labelsX[i].position.set(roundedX + (size+1) * this.cellSize * dynamicCameraScale - 5*contentX.length / camera.zoom, -26 / camera.zoom, this.labelsX[i].position.z);
+      this.labelsX[i].setText(contentX);
+
+      this.labelsY[i].position.set(-26 / camera.zoom, roundedY + (size+1) * this.cellSize * dynamicCameraScale - 5*contentY.length / camera.zoom, this.labelsY[i].position.z);
+      this.labelsY[i].setText(contentY);
+
+      if (contentY == '0') {
+      this.labelsY[i].setText('');
+      }
+      if (contentX == '0') {
+      this.labelsX[i].setText('');
+      }
+    }
   }
 }
 
