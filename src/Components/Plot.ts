@@ -12,9 +12,9 @@ type PlotOptions = {
 };
 
 const defaultPlotOptions = {
-  numPoints: 2500,
+  numPoints: 1500,
   dashed: false,
-  lineWidth: 1,
+  lineWidth: 4,
   color: 0xff0000,
   coefficients: {},
 };
@@ -22,8 +22,6 @@ const defaultPlotOptions = {
 type Coefficients = {
   [key: string]: number;
 };
-
-const PLOTRANGE = 1250;
 
 class Plot extends Component {
   draggable = undefined;
@@ -33,8 +31,11 @@ class Plot extends Component {
   private currentMaxX: number;
   private currentZoom: number;
   private coefficients: Coefficients;
-  private RENDERTHRESHOLDX = 500;
-  private RENDERTHRESHOLDZOOM = 2;
+  private RENDERTHRESHOLDX = 1400;
+  private RENDERTHRESHOLDZOOM = 2.5;
+
+  private PLOTRANGE = 1450;
+  private DEFAULT_RENDERTHRESHOLD = 1400;
 
   constructor(func: string, options?: PlotOptions) {
     super();
@@ -47,8 +48,8 @@ class Plot extends Component {
       coefficients = {},
     } = { ...defaultPlotOptions, ...options };
 
-    const minX = (-PLOTRANGE / 1) * 2 + 0;
-    const maxX = (PLOTRANGE / 1) * 2 + 0;
+    const minX = (-this.PLOTRANGE / 1) * 2 + 0;
+    const maxX = (this.PLOTRANGE / 1) * 2 + 0;
     const initialCurve = new CatmullRomCurve3(
       Plot.calculatePoints(minX, maxX, numPoints, func, coefficients)
     );
@@ -120,8 +121,8 @@ class Plot extends Component {
   }
 
   update(camera: OrthographicCamera): void {
-    const minX = (-PLOTRANGE / camera.zoom) * 2 + camera.position.x;
-    const maxX = (PLOTRANGE / camera.zoom) * 2 + camera.position.x;
+    const minX = (-this.PLOTRANGE / camera.zoom) * 2 + camera.position.x;
+    const maxX = (this.PLOTRANGE / camera.zoom) * 2 + camera.position.x;
 
     if (
       Math.abs(this.currentMinX - minX) > this.RENDERTHRESHOLDX ||
@@ -129,10 +130,11 @@ class Plot extends Component {
         this.RENDERTHRESHOLDZOOM ||
       Math.abs(this.currentMaxX - maxX) > this.RENDERTHRESHOLDX
     ) {
-      console.log("re-rendering");
       this.currentMinX = minX;
       this.currentMaxX = maxX;
       this.currentZoom = camera.zoom;
+      this.RENDERTHRESHOLDX = this.DEFAULT_RENDERTHRESHOLD / camera.zoom;
+      this.RENDERTHRESHOLDX = Math.abs(this.RENDERTHRESHOLDX);
       this.reRenderPlot(minX, maxX);
     }
   }
