@@ -1,12 +1,11 @@
 import { Vector2 } from "three";
 import Arcc from "./Components/Arc";
+import Bracket from "./Components/Bracket";
 import Grid from "./Components/Grid";
-import Latex from "./Components/Latex";
 import Line from "./Components/Line";
 import Plot from "./Components/Plot";
 import Point from "./Components/Point";
 import Graphica from "./Graphica";
-import Bracket from "./Components/Bracket";
 
 const graphica = new Graphica(document.body);
 
@@ -29,12 +28,7 @@ const arc = new Arcc({
 });
 const a = new Plot("a*x", { coefficients: { a: 2 } });
 const b = new Line([0, 0], [50, 50], { color: 0x000000 });
-const d = new Latex("F = \\frac{m}{{v^2}} \\cdot r", {
-  fontSize: 60,
-  position: [300, 25],
-  draggable: "unrestricted",
-});
-const brack = new Bracket("bracket", pointB, pointA);
+const brack = new Bracket("BRACKET", pointB, pointA);
 
 graphica.add(brack);
 graphica.add(a);
@@ -44,5 +38,4 @@ graphica.add(arc);
 graphica.add(pointA);
 graphica.add(pointB);
 graphica.add(pointC);
-graphica.add(d);
 graphica.run();

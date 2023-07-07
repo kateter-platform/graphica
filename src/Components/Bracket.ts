@@ -1,6 +1,7 @@
 import { OrthographicCamera, Vector2 } from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { toVector3 } from "../utils";
+import Text from "./Text";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
@@ -15,29 +16,45 @@ class Bracket extends Component {
     this.start = start;
     this.end = end;
 
-    const bracket = this.createBracket(content, start, end, 1);
+    const bracket = this.createBracket(start, end, 1);
+    const bracketText = this.createBracketText(content, start, end);
     this.add(bracket);
+    this.add(bracketText);
   }
 
   update(camera: OrthographicCamera) {
     this.removeLines();
 
-    const bracket = this.createBracket(
+    const bracket = this.createBracket(this.start, this.end, camera.zoom);
+
+    const bracketText = this.createBracketText(
       this.content,
       this.start,
-      this.end,
-      camera.zoom
+      this.end
     );
 
+    this.add(bracketText);
     this.add(bracket);
   }
 
-  createBracket(
-    content: string,
-    start: InputPosition,
-    end: InputPosition,
-    cameraZoom: number
-  ) {
+  createBracketText(content: string, start: InputPosition, end: InputPosition) {
+    const start3 = toVector3(end);
+    const end3 = toVector3(start);
+    const diff = end3.clone().sub(start3.clone());
+    const middle = diff.clone().divideScalar(2).add(start3.clone());
+    const angle = Math.atan2(diff.y, diff.x);
+    const textPosition = new Vector2(
+      middle.x + Math.cos(angle + Math.PI / 2) * 40,
+      middle.y + Math.sin(angle + Math.PI / 2) * 40
+    );
+    const bracketText = new Text(content, {
+      position: textPosition,
+      anchorX: "left",
+    });
+    return bracketText;
+  }
+
+  createBracket(start: InputPosition, end: InputPosition, cameraZoom: number) {
     const start3 = toVector3(end);
     const end3 = toVector3(start);
     const diff = end3.clone().sub(start3.clone());
@@ -70,11 +87,6 @@ class Bracket extends Component {
     const punkt4 = new Vector2(
       endLine.x + (formelCos * 10) / cameraZoom,
       endLine.y + (formelSin * 10) / cameraZoom
-    );
-
-    const textPosition = new Vector2(
-      punkt3.x + formelCos * 40,
-      punkt3.y + formelSin * 40
     );
 
     const brekkHøyre = new Vector2(
