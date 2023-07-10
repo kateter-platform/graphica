@@ -63,16 +63,20 @@ const defaultGridOptions: GridOptions = {
   yLabelText: "y",
 };
 
+const LABELS_LENGTH = 81;
+
 class Grid extends Component {
   draggable = undefined;
+  private cellSize: number;
   private shaderMesh: Mesh;
   private xAxis: Line;
   private yAxis: Line;
   private xLabel: Text;
   private yLabel: Text;
+
+  // Axis labels
   private labelsX: Text[];
   private labelsY: Text[];
-  private cellSize: number;
 
   constructor(options?: GridOptions) {
     super();
@@ -131,14 +135,47 @@ class Grid extends Component {
     this.labelsX = [];
     this.labelsY = [];
 
-    for (let i = 0; i < 80; i++) {
-      this.labelsX.push(new Text(i.toString(), { position: [i*this.cellSize-5, -26], fontSize: 16}));
+    for (let i = 0; i < LABELS_LENGTH; i++) {
+      const worldIndex = i - LABELS_LENGTH / 2;
+      this.labelsX.push(new Text(worldIndex.toString(), { position: [worldIndex, 0], fontSize: 16, anchorX: "center", anchorY: "top" }));
+      this.labelsY.push(new Text(worldIndex.toString(), { position: [0, worldIndex], fontSize: 16, anchorX: "right", anchorY: "middle" }));
       this.add(this.labelsX[i]);
-      this.labelsY.push(new Text(i.toString(), { position: [i*this.cellSize-5, -26], fontSize: 16}));
       this.add(this.labelsY[i]);
     }
   }
 
+  _updateAxisLabels(camera: OrthographicCamera) {
+    const dynamicCameraScale = Math.pow(2, Math.floor(Math.log(1. / camera.zoom) / Math.log(2.)));
+    const dynamicCellSize = dynamicCameraScale * this.cellSize;
+
+    const centeredCameraX = camera.position.x + window.innerWidth / (2 * camera.zoom);
+    const centeredCameraY = camera.position.y + window.innerHeight / (2 * camera.zoom);
+    const axisMargin = -9 / camera.zoom;
+
+    for (let i = 0; i < LABELS_LENGTH; i++) {
+      const worldIndex = Math.floor(i - LABELS_LENGTH / 2);
+
+      const worldX = worldIndex * dynamicCellSize;
+      const worldY = worldIndex * dynamicCellSize;
+
+      const diffX = centeredCameraX - worldX;
+      const diffY = centeredCameraY - worldY;
+
+      const roundedOffsetX = LABELS_LENGTH * dynamicCellSize * Math.floor(diffX / (LABELS_LENGTH * dynamicCellSize));
+      const roundedOffsetY = LABELS_LENGTH * dynamicCellSize * Math.floor(diffY / (LABELS_LENGTH * dynamicCellSize));
+
+      let contentX = (worldIndex * dynamicCellSize + roundedOffsetX).toString();
+      let contentY = (worldIndex * dynamicCellSize + roundedOffsetY).toString();
+      if (contentX == '0') contentX = '';
+      if (contentX == '0') contentX = '';
+
+      this.labelsX[i].setText(contentX);
+      this.labelsX[i].position.set(roundedOffsetX + worldX, axisMargin, this.labelsX[i].position.z);
+
+      this.labelsY[i].setText(contentY);
+      this.labelsY[i].position.set(axisMargin, roundedOffsetY + worldY, this.labelsY[i].position.z);
+    }
+  }
 
   update(camera: OrthographicCamera) {
     (this.shaderMesh.material as ShaderMaterial).uniforms.zoomLevel.value =
@@ -175,42 +212,7 @@ class Grid extends Component {
     );
     this.yLabel.position.setX(20 / camera.zoom);
 
-    const dynamicCameraScale = Math.pow(2, Math.floor(Math.log(1. / camera.zoom) / Math.log(2.)));
-    const dynamicCameraScale2 = Math.pow(2, 6+Math.floor(Math.log(1. / camera.zoom) / Math.log(2.)));
-
-    const dynamicSize = dynamicCameraScale * this.cellSize;
-    const roundedX = dynamicSize * Math.floor(camera.position.x / dynamicSize);
-    const roundedY = dynamicSize * Math.floor(camera.position.y / dynamicSize);
-
-    for (let i = 0; i < 80; i++) {
-      const size = i - 80 / 2;
-
-      const x = (size + 1) * this.cellSize * dynamicCameraScale;
-      const camX = camera.position.x + window.innerWidth / (2 * camera.zoom);
-      const diffX =camX - x;
-      const rdx = Math.floor(diffX / (80 * dynamicSize));
-
-      const y = (size + 1) * this.cellSize * dynamicCameraScale;
-      const camY = camera.position.y + window.innerHeight / (2 * camera.zoom);
-      const diffY =camY - y;
-      const rdy = Math.floor(diffY / (80 * dynamicSize));
-
-      const contentX = ((size+1+rdx*80)*dynamicCameraScale2).toString();
-      const contentY = ((size+1+rdy*80)*dynamicCameraScale2).toString();
-
-      this.labelsX[i].position.set(80*dynamicSize*rdx + x - 5*contentX.length / camera.zoom, -26 / camera.zoom, this.labelsX[i].position.z);
-      this.labelsX[i].setText(contentX);
-
-      this.labelsY[i].position.set(-26 / camera.zoom, rdy*80*dynamicSize+(size+1) * this.cellSize * dynamicCameraScale - 5*contentY.length / camera.zoom, this.labelsY[i].position.z);
-      this.labelsY[i].setText(contentY);
-
-      if (contentY == '0') {
-      this.labelsY[i].setText('');
-      }
-      if (contentX == '0') {
-      this.labelsX[i].setText('');
-      }
-    }
+    this._updateAxisLabels(camera);
   }
 }
 

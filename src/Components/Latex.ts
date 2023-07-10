@@ -51,6 +51,7 @@ class Latex extends Component {
     container.element.style.fontWeight = "normal";
     container.element.style.textAlign = anchorX;
     container.element.style.verticalAlign = anchorY;
+    container.element.style.pointerEvents = "none";
 
     container.scale.set(1, 1, 1);
     this.draggable = draggable;
