@@ -54,9 +54,9 @@ class Text extends Component {
     renderText.sdfGlyphSize = 32;
     renderText.anchorX = anchorX;
     renderText.anchorY = anchorY;
-    renderText.position.set(pos.x, pos.y, 0.1);
     this.renderText = renderText;
     this.add(renderText);
+    this.position.set(pos.x, pos.y, 0.1);
   }
 
   setText(text: string) {

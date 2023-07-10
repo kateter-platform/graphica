@@ -11,6 +11,7 @@ const graphica = new Graphica(document.body);
 
 const grid = new Grid();
 
+
 const p = new Plot("cos(x)* sin(x) + sin(x)");
 const s = new Slider({ maxValue: 500, minValue: 1 });
 let a = new Component();
