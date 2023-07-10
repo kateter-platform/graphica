@@ -1,41 +1,51 @@
 import { Vector2 } from "three";
-import Arcc from "./Components/Arc";
-import Bracket from "./Components/Bracket";
 import Grid from "./Components/Grid";
-import Line from "./Components/Line";
+import Latex from "./Components/Latex";
 import Plot from "./Components/Plot";
-import Point from "./Components/Point";
+import Polygon from "./Components/Shape";
+import Slider from "./Components/Slider";
+import { Component } from "./Components/interfaces";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
 
 const grid = new Grid();
 
-const pointB = new Point(70, 60, { draggable: "unrestricted" });
-const pointA = new Point(20, 30, {
-  draggable: "unrestricted",
-  color: "#F4493B",
-});
-const pointC = new Point(40, 20, {
-  draggable: "unrestricted",
-  color: "#F4493B",
-});
-const arc = new Arcc({
-  pointA: new Vector2(20, 30),
-  pointB: new Vector2(70, 60),
-  pointC: new Vector2(40, 20),
-  radius: 30,
-});
-const a = new Plot("a*x", { coefficients: { a: 2 } });
-const b = new Line([0, 0], [50, 50], { color: 0x000000 });
-const brack = new Bracket("BRACKET", pointB, pointA);
 
-graphica.add(brack);
-graphica.add(a);
-graphica.add(b);
+const p = new Plot("cos(x)* sin(x) + sin(x)");
+const s = new Slider({ maxValue: 500, minValue: 1 });
+let a = new Component();
+
+const l = new Latex(
+  " \\sum_{i=1}^{n} [\\sin(x_i)\\cdot\\cos(x_i)+\\sin(x_i)] \\Delta x",
+  {
+    position: [-10, 5],
+  }
+);
+
+s.addObserver((v) => {
+  graphica.remove(a);
+  a = new Component();
+  const range = 20;
+  const stepSize = range / v;
+  for (let i = 0; i < range; i += stepSize) {
+    a.add(
+      new Polygon(
+        [
+          new Vector2(i, 0),
+          new Vector2(i + stepSize, 0),
+          new Vector2(i + stepSize, Math.sin(i) * Math.cos(i) + Math.sin(i)),
+          new Vector2(i, Math.sin(i) * Math.cos(i) + Math.sin(i)),
+        ],
+        { fill: true }
+      )
+    );
+  }
+  graphica.add(a);
+});
+
+graphica.add(l);
+graphica.addGui(s);
+graphica.add(p);
 graphica.add(grid);
-graphica.add(arc);
-graphica.add(pointA);
-graphica.add(pointB);
-graphica.add(pointC);
 graphica.run();

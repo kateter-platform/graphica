@@ -4,12 +4,15 @@ import { toVector3 } from "../utils";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
+type fontWeight = "regular" | "medium" | "semi-bold" | "black";
+
 type TextOptions = {
   position?: InputPosition;
   color?: string;
   fontSize?: number;
   anchorY?: "top" | "middle" | "bottom";
   anchorX?: "left" | "center" | "right";
+  weight?: fontWeight;
 };
 
 const defaultTextOptions = {
@@ -18,6 +21,14 @@ const defaultTextOptions = {
   fontSize: 30,
   anchorX: "left",
   anchorY: "bottom",
+  weight: "regular" as fontWeight,
+};
+
+const fontMap = {
+  regular: "Jost-Regular.ttf",
+  medium: "Jost-Medium.ttf",
+  "semi-bold": "Jost-SemiBold.ttf",
+  black: "Jost-Black.ttf",
 };
 
 type TroikaTextType = InstanceType<typeof TroikaText>;
@@ -26,10 +37,10 @@ class Text extends Component {
   draggable = undefined;
   renderText: TroikaTextType;
 
-  constructor(text: string, options?: TextOptions) {
+  constructor(text?: string, options?: TextOptions) {
     super();
 
-    const { position, color, fontSize, anchorX, anchorY } = {
+    const { position, color, fontSize, anchorX, anchorY, weight } = {
       ...defaultTextOptions,
       ...options,
     };
@@ -39,7 +50,7 @@ class Text extends Component {
     renderText.text = text;
     renderText.fontSize = fontSize;
     renderText.color = color;
-    renderText.font = "https://files.catbox.moe/nodsjn.ttf";
+    renderText.font = `/public/fonts/${fontMap[weight]}`;
     renderText.sdfGlyphSize = 32;
     renderText.anchorX = anchorX;
     renderText.anchorY = anchorY;
