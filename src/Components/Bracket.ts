@@ -17,7 +17,7 @@ class Bracket extends Component {
     this.end = end;
 
     const bracket = this.createBracket(start, end, 1);
-    const bracketText = this.createBracketText(content, start, end);
+    const bracketText = this.createBracketText(content, start, end, 1);
     this.add(bracket);
     this.add(bracketText);
   }
@@ -30,26 +30,32 @@ class Bracket extends Component {
     const bracketText = this.createBracketText(
       this.content,
       this.start,
-      this.end
+      this.end,
+      camera.zoom
     );
 
     this.add(bracketText);
     this.add(bracket);
   }
 
-  createBracketText(content: string, start: InputPosition, end: InputPosition) {
+  createBracketText(
+    content: string,
+    start: InputPosition,
+    end: InputPosition,
+    cameraZoom: number
+  ) {
     const start3 = toVector3(end);
     const end3 = toVector3(start);
     const diff = end3.clone().sub(start3.clone());
     const middle = diff.clone().divideScalar(2).add(start3.clone());
     const angle = Math.atan2(diff.y, diff.x);
     const textPosition = new Vector2(
-      middle.x + Math.cos(angle + Math.PI / 2) * 40,
-      middle.y + Math.sin(angle + Math.PI / 2) * 40
+      middle.x + (Math.cos(angle + Math.PI / 2) * 100) / cameraZoom,
+      middle.y + (Math.sin(angle + Math.PI / 2) * 100) / cameraZoom
     );
     const bracketText = new Text(content, {
       position: textPosition,
-      anchorX: "left",
+      anchorX: "center",
     });
     return bracketText;
   }
