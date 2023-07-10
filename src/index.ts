@@ -13,13 +13,14 @@ const grid = new Grid();
 
 
 const p = new Plot("cos(x)* sin(x) + sin(x)");
-const s = new Slider({ maxValue: 500, minValue: 1 });
+const s = new Slider({ maxValue: 99, minValue: 1 });
 let a = new Component();
 
 const l = new Latex(
   " \\sum_{i=1}^{n} [\\sin(x_i)\\cdot\\cos(x_i)+\\sin(x_i)] \\Delta x",
   {
-    position: [-10, 5],
+    position: [5, 5],
+    fontSize: 30
   }
 );
 
@@ -37,7 +38,7 @@ s.addObserver((v) => {
           new Vector2(i + stepSize, Math.sin(i) * Math.cos(i) + Math.sin(i)),
           new Vector2(i, Math.sin(i) * Math.cos(i) + Math.sin(i)),
         ],
-        { fill: true }
+        { fill: false }
       )
     );
   }

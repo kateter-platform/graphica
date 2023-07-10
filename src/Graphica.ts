@@ -58,6 +58,8 @@ class Graphica {
       1000
     );
     this.camera.position.z = 5;
+    this.camera.zoom = 50;
+    this.camera.updateProjectionMatrix();
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableRotate = false;
