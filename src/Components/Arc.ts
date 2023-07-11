@@ -2,6 +2,7 @@ import {
   ArcCurve,
   CircleGeometry,
   Group,
+  Mesh,
   MeshBasicMaterial,
   OrthographicCamera,
   Vector2,
@@ -30,30 +31,24 @@ class Arc extends Component {
     this.pointB = pointB;
     this.pointC = pointC;
     this.radius = radius;
+    this.angle = 0;
+  }
 
-    const pointAvec3 = toVector3(pointA);
-    const pointBvec3 = toVector3(pointB);
-    const pointCvec3 = toVector3(pointC);
+  update(camera: OrthographicCamera) {
+    const pointAvec3 = toVector3(this.pointA);
+    const pointBvec3 = toVector3(this.pointB);
+    const pointCvec3 = toVector3(this.pointC);
     const vectorBtoA = pointAvec3.clone().sub(pointBvec3.clone());
     const vectorBtoC = pointCvec3.clone().sub(pointBvec3.clone());
     const angle = vectorBtoA.angleTo(vectorBtoC);
     this.angle = angle;
 
-    const outline = this.createOutline();
-    this.add(outline);
-    const arcText = this.createAngleText(this.angle);
-    this.add(arcText);
-    const arc = this.createArc();
-    this.add(arc);
-  }
-
-  update(camera: OrthographicCamera) {
     //bruker ikke camera, trenger jeg denne i det hele tatt?
     this.removeLines();
 
     const outline = this.createOutline();
     this.add(outline);
-    const arcText = this.createAngleText(this.angle);
+    const arcText = this.createAngleText(this.angle, camera.zoom);
     this.add(arcText);
     const arc = this.createArc();
     this.add(arc);
@@ -159,18 +154,28 @@ class Arc extends Component {
     }
 
     // Create circle-geometry -- lager fyllet i vinkelen
-    this.geometry = new CircleGeometry(this.radius, 32, startAngle, this.angle);
-    this.material = new MeshBasicMaterial({ color: "#FAA307" });
+    const geometry = new CircleGeometry(
+      this.radius,
+      32,
+      startAngle,
+      this.angle
+    );
+    const material = new MeshBasicMaterial({ color: "#FAA307" });
     //setter posisjonen til å være fra punktB
     this.position.set(pointBvec3.x, pointBvec3.y, 0);
 
-    return this; //hvordan setter jeg this til å være hele circlegeometrien
+    return new Mesh(geometry, material);
   }
 
-  createAngleText(angle: number) {
+  createAngleText(angle: number, cameraZoom: number) {
     const vinkelTekst = new Text(
       (Math.round((angle * 180) / Math.PI) + " °").toString(),
-      { fontSize: 18, anchorY: "middle", anchorX: "left", position: [15, 0] }
+      {
+        fontSize: 20,
+        anchorY: "middle",
+        anchorX: "left",
+        position: [-60 / cameraZoom, 0],
+      }
     );
     return vinkelTekst;
   }

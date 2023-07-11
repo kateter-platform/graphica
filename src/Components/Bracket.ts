@@ -15,11 +15,6 @@ class Bracket extends Component {
     this.content = content;
     this.start = start;
     this.end = end;
-
-    const bracket = this.createBracket(start, end, 1);
-    const bracketText = this.createBracketText(content, start, end, 1);
-    this.add(bracket);
-    this.add(bracketText);
   }
 
   update(camera: OrthographicCamera) {
@@ -50,10 +45,11 @@ class Bracket extends Component {
     const middle = diff.clone().divideScalar(2).add(start3.clone());
     const angle = Math.atan2(diff.y, diff.x);
     const textPosition = new Vector2(
-      middle.x + (Math.cos(angle + Math.PI / 2) * 100) / cameraZoom,
-      middle.y + (Math.sin(angle + Math.PI / 2) * 100) / cameraZoom
+      middle.x + (Math.cos(angle + Math.PI / 2) * 70) / cameraZoom,
+      middle.y + (Math.sin(angle + Math.PI / 2) * 70) / cameraZoom
     );
     const bracketText = new Text(content, {
+      fontSize: 20,
       position: textPosition,
       anchorX: "center",
     });

@@ -67,10 +67,10 @@ class Line extends Component {
     (this.geometry as LineGeometry).setPositions([
       startPosition.x,
       startPosition.y,
-      0,
+      1,
       endPosition.x,
       endPosition.y,
-      0,
+      1,
     ]);
 
     if (arrowhead) {
