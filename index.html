@@ -35,7 +35,7 @@
         appearance: none;
         width: 20px;
         height: 20px;
-        background: yellow;
+        background: #faa307;
         border: 2px solid #080007;
         border-radius: 50%;
         cursor: pointer;
@@ -78,9 +78,41 @@
         -webkit-user-select: none; /* Safari */
         -ms-user-select: none; /* IE 10 and IE 11 */
         user-select: none; /* Standard syntax */
-        font-size: 24px;
+        font-size: 18px;
         text-align: center;
+        font-family: "Jost-Font", sans-serif;
+
         margin: 0;
+      }
+
+      /*Style of button: */
+      @font-face {
+        font-family: "Jost-Font";
+        src: url("/public/fonts/Jost-Regular.ttf");
+      }
+      .button {
+        position: absolute;
+        top: 100px;
+        left: 50px;
+        border-radius: 5px;
+        border: 2px solid #000;
+        background: #fafafa;
+        display: inline-flex;
+        padding: 5px 23px;
+        align-items: flex-start;
+        gap: 10px;
+        font-family: "Jost-Font", sans-serif;
+        font-size: 15px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: normal;
+      }
+      .button:hover {
+        background: #080007;
+        color: #fafafa;
+      }
+      .button:active {
+        background: #faa307;
       }
     </style>
   </head>
