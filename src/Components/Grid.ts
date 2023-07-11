@@ -55,7 +55,7 @@ type GridOptions = {
 };
 
 const defaultGridOptions: GridOptions = {
-  cellSize: 50,
+  cellSize: 64,
   pointRadius: 1.5,
   pointColor: new Color(0xe1e1e1),
   labels: true,
@@ -63,13 +63,20 @@ const defaultGridOptions: GridOptions = {
   yLabelText: "y",
 };
 
+const LABELS_LENGTH = 81;
+
 class Grid extends Component {
   draggable = undefined;
+  private cellSize: number;
   private shaderMesh: Mesh;
   private xAxis: Line;
   private yAxis: Line;
   private xLabel: Text;
   private yLabel: Text;
+
+  // Axis labels
+  private labelsX: Text[];
+  private labelsY: Text[];
 
   constructor(options?: GridOptions) {
     super();
@@ -85,6 +92,7 @@ class Grid extends Component {
       ...defaultGridOptions,
       ...options,
     };
+    this.cellSize = cellSize ?? 64;
 
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
@@ -122,6 +130,84 @@ class Grid extends Component {
     }
 
     this.add(this.shaderMesh, this.xAxis, this.yAxis);
+
+    // Coordinate labels
+    this.labelsX = [];
+    this.labelsY = [];
+
+    for (let i = 0; i < LABELS_LENGTH; i++) {
+      const worldIndex = i - LABELS_LENGTH / 2;
+      this.labelsX.push(
+        new Text(worldIndex.toString(), {
+          position: [worldIndex, 0],
+          fontSize: 16,
+          anchorX: "center",
+          anchorY: "top",
+        })
+      );
+      this.labelsY.push(
+        new Text(worldIndex.toString(), {
+          position: [0, worldIndex],
+          fontSize: 16,
+          anchorX: "right",
+          anchorY: "middle",
+        })
+      );
+      this.add(this.labelsX[i]);
+      this.add(this.labelsY[i]);
+    }
+  }
+
+  _updateAxisLabels(camera: OrthographicCamera) {
+    const dynamicCameraScale = Math.pow(
+      2,
+      Math.floor(Math.log(1 / camera.zoom) / Math.log(2))
+    );
+    const dynamicCellSize = dynamicCameraScale * this.cellSize;
+
+    const centeredCameraX =
+      camera.position.x + window.innerWidth / (2 * camera.zoom);
+    const centeredCameraY =
+      camera.position.y + window.innerHeight / (2 * camera.zoom);
+    const axisMargin = -9 / camera.zoom;
+
+    for (let i = 0; i < LABELS_LENGTH; i++) {
+      const worldIndex = Math.floor(i - LABELS_LENGTH / 2);
+
+      const worldX = worldIndex * dynamicCellSize;
+      const worldY = worldIndex * dynamicCellSize;
+
+      const diffX = centeredCameraX - worldX;
+      const diffY = centeredCameraY - worldY;
+
+      const roundedOffsetX =
+        LABELS_LENGTH *
+        dynamicCellSize *
+        Math.floor(diffX / (LABELS_LENGTH * dynamicCellSize));
+      const roundedOffsetY =
+        LABELS_LENGTH *
+        dynamicCellSize *
+        Math.floor(diffY / (LABELS_LENGTH * dynamicCellSize));
+
+      let contentX = (worldIndex * dynamicCellSize + roundedOffsetX).toString();
+      let contentY = (worldIndex * dynamicCellSize + roundedOffsetY).toString();
+      if (contentX === "0") contentX = "";
+      if (contentY === "0") contentY = "";
+
+      this.labelsX[i].setText(contentX);
+      this.labelsX[i].position.set(
+        roundedOffsetX + worldX,
+        axisMargin,
+        this.labelsX[i].position.z
+      );
+
+      this.labelsY[i].setText(contentY);
+      this.labelsY[i].position.set(
+        axisMargin,
+        roundedOffsetY + worldY,
+        this.labelsY[i].position.z
+      );
+    }
   }
 
   update(camera: OrthographicCamera) {
@@ -132,30 +218,35 @@ class Grid extends Component {
 
     this.shaderMesh.position.set(camera.position.x, camera.position.y, -1);
     this.shaderMesh.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+
+    const PADDING = 25;
     this.xAxis.start = new Vector2(
-      camera.position.x - window.innerWidth / camera.zoom,
+      camera.position.x - (window.innerWidth * 0.5) / camera.zoom,
       0
     );
     this.xAxis.end = new Vector2(
-      camera.position.x + (window.innerWidth - 780) / camera.zoom,
+      camera.position.x + (window.innerWidth * 0.5 - PADDING) / camera.zoom,
       0
     );
     this.yAxis.start = new Vector2(
       0,
-      camera.position.y - window.innerHeight / camera.zoom
+      camera.position.y - (window.innerHeight * 0.5) / camera.zoom
     );
     this.yAxis.end = new Vector2(
       0,
-      camera.position.y + (window.innerHeight - 400) / camera.zoom
+      camera.position.y + (window.innerHeight * 0.5 - PADDING) / camera.zoom
     );
     this.xLabel.position.setX(
-      camera.position.x + (window.innerWidth - 792) / camera.zoom
+      camera.position.x + (window.innerWidth * 0.5 - PADDING - 10) / camera.zoom
     );
-    this.xLabel.position.setY(15 / camera.zoom);
+    this.xLabel.position.setY(10 / camera.zoom);
     this.yLabel.position.setY(
-      camera.position.y + (window.innerHeight - 420) / camera.zoom
+      camera.position.y +
+        (window.innerHeight * 0.5 - PADDING - 15) / camera.zoom
     );
-    this.yLabel.position.setX(23 / camera.zoom);
+    this.yLabel.position.setX(20 / camera.zoom);
+
+    this._updateAxisLabels(camera);
   }
 }
 
