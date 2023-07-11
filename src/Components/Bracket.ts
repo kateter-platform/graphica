@@ -1,64 +1,64 @@
 import { OrthographicCamera, Vector2 } from "three";
-import { Line2, LineGeometry, LineMaterial } from "three-fatline";
+import { Line2, LineMaterial } from "three-fatline";
 import { toVector3 } from "../utils";
 import Text from "./Text";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
 class Bracket extends Component {
-  content: string;
   start: InputPosition;
   end: InputPosition;
 
+  _bracket: Line2;
+  _text: Text;
+
   constructor(content: string, start: InputPosition, end: InputPosition) {
     super();
-    this.content = content;
     this.start = start;
     this.end = end;
+
+    this._bracket = new Line2(
+      undefined,
+      new LineMaterial({
+        color: 0x080007,
+        linewidth: 4,
+        resolution: new Vector2(window.innerWidth, window.innerHeight),
+      })
+    );
+    this.add(this._bracket);
+    this._updateBracketGeometry();
+
+    this._text = new Text(content, {
+      fontSize: 20,
+      position: [0, 0],
+      anchorX: "center",
+    });
+    this.add(this._text);
+    this._updateBracketText();
   }
 
   update(camera: OrthographicCamera) {
-    this.removeLines();
-
-    const bracket = this.createBracket(this.start, this.end, camera.zoom);
-
-    const bracketText = this.createBracketText(
-      this.content,
-      this.start,
-      this.end,
-      camera.zoom
-    );
-
-    this.add(bracketText);
-    this.add(bracket);
+    this._updateBracketGeometry(camera.zoom);
+    this._updateBracketText(camera.zoom);
   }
 
-  createBracketText(
-    content: string,
-    start: InputPosition,
-    end: InputPosition,
-    cameraZoom: number
-  ) {
-    const start3 = toVector3(end);
-    const end3 = toVector3(start);
+  _updateBracketText(cameraZoom = 1) {
+    const start3 = toVector3(this.end);
+    const end3 = toVector3(this.start);
     const diff = end3.clone().sub(start3.clone());
     const middle = diff.clone().divideScalar(2).add(start3.clone());
     const angle = Math.atan2(diff.y, diff.x);
-    const textPosition = new Vector2(
+
+    this._text.position.set(
       middle.x + (Math.cos(angle + Math.PI / 2) * 70) / cameraZoom,
-      middle.y + (Math.sin(angle + Math.PI / 2) * 70) / cameraZoom
+      middle.y + (Math.sin(angle + Math.PI / 2) * 70) / cameraZoom,
+      this._text.position.z
     );
-    const bracketText = new Text(content, {
-      fontSize: 20,
-      position: textPosition,
-      anchorX: "center",
-    });
-    return bracketText;
   }
 
-  createBracket(start: InputPosition, end: InputPosition, cameraZoom: number) {
-    const start3 = toVector3(end);
-    const end3 = toVector3(start);
+  _updateBracketGeometry(cameraZoom = 1) {
+    const start3 = toVector3(this.end);
+    const end3 = toVector3(this.start);
     const diff = end3.clone().sub(start3.clone());
     const middle = diff.clone().divideScalar(2).add(start3.clone());
     const angle = Math.atan2(diff.y, diff.x);
@@ -109,24 +109,7 @@ class Bracket extends Component {
       punkt4,
       endLine,
     ];
-    const tempLine = new LineGeometry();
-    tempLine.setPositions(points.flatMap((v) => [v.x, v.y, 3]));
-    const bracket = new Line2(
-      tempLine,
-      new LineMaterial({
-        color: 0x080007,
-        linewidth: 4,
-        resolution: new Vector2(window.innerWidth, window.innerHeight),
-      })
-    );
-
-    return bracket;
-  }
-
-  removeLines() {
-    this.children.forEach((child) => {
-      this.remove(child);
-    });
+    this._bracket.geometry.setPositions(points.flatMap((v) => [v.x, v.y, 3]));
   }
 }
 export default Bracket;
