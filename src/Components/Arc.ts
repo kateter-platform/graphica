@@ -1,23 +1,73 @@
-import { ArcCurve, CircleGeometry, MeshBasicMaterial, Vector2 } from "three";
+import {
+  ArcCurve,
+  CircleGeometry,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  OrthographicCamera,
+  Vector2,
+} from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
+import { toVector3 } from "../utils";
 import Line from "./Line";
 import Text from "./Text";
 import { Component } from "./interfaces";
-
-type ArcOptions = {
-  pointA: Vector2;
-  pointB: Vector2;
-  pointC: Vector2;
-  radius: number;
-};
+import { InputPosition } from "./types";
 
 class Arc extends Component {
-  constructor({ pointA, pointB, pointC, radius = 20 }: ArcOptions) {
+  pointA: InputPosition;
+  pointB: InputPosition;
+  pointC: InputPosition;
+  radius: number;
+  angle: number;
+  constructor(
+    pointA: InputPosition,
+    pointB: InputPosition,
+    pointC: InputPosition,
+    radius = 20
+  ) {
     super();
-    //finne linjene i vinkelen og den minste vinkelen mellom de
-    const vectorBtoA = pointA.clone().sub(pointB.clone());
-    const vectorBtoC = pointC.clone().sub(pointB.clone());
+    this.pointA = pointA;
+    this.pointB = pointB;
+    this.pointC = pointC;
+    this.radius = radius;
+    this.angle = 0;
+  }
+
+  update(camera: OrthographicCamera) {
+    const pointAvec3 = toVector3(this.pointA);
+    const pointBvec3 = toVector3(this.pointB);
+    const pointCvec3 = toVector3(this.pointC);
+    const vectorBtoA = pointAvec3.clone().sub(pointBvec3.clone());
+    const vectorBtoC = pointCvec3.clone().sub(pointBvec3.clone());
     const angle = vectorBtoA.angleTo(vectorBtoC);
+    this.angle = angle;
+
+    //bruker ikke camera, trenger jeg denne i det hele tatt?
+    this.removeLines();
+
+    const outline = this.createOutline();
+    this.add(outline);
+    const arcText = this.createAngleText(this.angle, camera.zoom);
+    this.add(arcText);
+    const arc = this.createArc();
+    this.add(arc);
+  }
+  removeLines() {
+    this.children.forEach((child) => {
+      this.remove(child);
+    });
+  }
+
+  createOutline() {
+    const lines = new Group();
+
+    const pointAvec3 = toVector3(this.pointA);
+    const pointBvec3 = toVector3(this.pointB);
+    const pointCvec3 = toVector3(this.pointC);
+    const vectorBtoA = pointAvec3.clone().sub(pointBvec3.clone());
+    const vectorBtoC = pointCvec3.clone().sub(pointBvec3.clone());
+
     //finner hvilken vinkel som er riktig
     const angle1 =
       (Math.atan2(vectorBtoA.y, vectorBtoA.x) + Math.PI * 2) % (Math.PI * 2);
@@ -32,14 +82,14 @@ class Arc extends Component {
     ) {
       startAngle = angle1;
     }
-    const endAngle = startAngle + angle; // Ending angle of the arc in radians
+    const endAngle = startAngle + this.angle; // Ending angle of the arc in radians
     const clockwise = false; // Whether the arc is drawn in a clockwise direction
 
     //Create Arc-curve
     const arcCurve = new ArcCurve(
       0,
       0,
-      radius,
+      this.radius,
       startAngle,
       endAngle,
       clockwise
@@ -48,29 +98,25 @@ class Arc extends Component {
     const points = arcCurve.getPoints(50);
 
     //punktene arcen krysser linjene
-    const krysningAB = vectorBtoA.clone().normalize().multiplyScalar(radius);
-    const krysningCB = vectorBtoC.clone().normalize().multiplyScalar(radius);
+    const krysningAB = vectorBtoA
+      .clone()
+      .normalize()
+      .multiplyScalar(this.radius);
+    const krysningCB = vectorBtoC
+      .clone()
+      .normalize()
+      .multiplyScalar(this.radius);
 
-    // Create circle-geometry -- lager fyllet i vinkelen
-    this.geometry = new CircleGeometry(radius, 32, startAngle, angle);
-    this.material = new MeshBasicMaterial({ color: "#FAA307" });
-
-    //setter posisjonen til å være fra punktB
-    this.position.set(pointB.x, pointB.y, 0);
-
-    //lage outline og tekst
-    const vinkelTekst = new Text(
-      (Math.round((angle * 180) / Math.PI) + " °").toString(),
-      { fontSize: 18, anchorY: "middle", anchorX: "left", position: [15, 0] }
-    );
-    const linje1 = new Line(krysningAB, [0, 0], {
+    const linje1 = new Line(new Vector2(krysningAB.x, krysningAB.y), [0, 0], {
       lineWidth: 4,
       color: 0x080007,
     });
-    const linje2 = new Line([0, 0], krysningCB, {
+    lines.add(linje1);
+    const linje2 = new Line([0, 0], new Vector2(krysningCB.x, krysningCB.y), {
       lineWidth: 4,
       color: 0x080007,
     });
+    lines.add(linje2);
     const tempLine = new LineGeometry();
     tempLine.setPositions(points.flatMap((v) => [v.x, v.y, 3]));
     const linje3 = new Line2(
@@ -81,12 +127,57 @@ class Arc extends Component {
         resolution: new Vector2(window.innerWidth, window.innerHeight),
       })
     );
+    lines.add(linje3);
+    return lines;
+  }
 
-    //legger til outline og tekst
-    this.add(vinkelTekst);
-    this.add(linje1);
-    this.add(linje2);
-    this.add(linje3);
+  createArc() {
+    const pointAvec3 = toVector3(this.pointA);
+    const pointBvec3 = toVector3(this.pointB);
+    const pointCvec3 = toVector3(this.pointC);
+    const vectorBtoA = pointAvec3.clone().sub(pointBvec3.clone());
+    const vectorBtoC = pointCvec3.clone().sub(pointBvec3.clone());
+
+    //finner hvilken vinkel som er riktig
+    const angle1 =
+      (Math.atan2(vectorBtoA.y, vectorBtoA.x) + Math.PI * 2) % (Math.PI * 2);
+    const angle2 =
+      (Math.atan2(vectorBtoC.y, vectorBtoC.x) + Math.PI * 2) % (Math.PI * 2);
+
+    let startAngle = angle2; // Starting angle of the arc in radians
+
+    if (
+      (angle1 - angle2 + Math.PI * 2) % (2 * Math.PI) >
+      (angle2 - angle1 + Math.PI * 2) % (2 * Math.PI)
+    ) {
+      startAngle = angle1;
+    }
+
+    // Create circle-geometry -- lager fyllet i vinkelen
+    const geometry = new CircleGeometry(
+      this.radius,
+      32,
+      startAngle,
+      this.angle
+    );
+    const material = new MeshBasicMaterial({ color: "#FAA307" });
+    //setter posisjonen til å være fra punktB
+    this.position.set(pointBvec3.x, pointBvec3.y, 0);
+
+    return new Mesh(geometry, material);
+  }
+
+  createAngleText(angle: number, cameraZoom: number) {
+    const vinkelTekst = new Text(
+      (Math.round((angle * 180) / Math.PI) + " °").toString(),
+      {
+        fontSize: 20,
+        anchorY: "middle",
+        anchorX: "left",
+        position: [-60 / cameraZoom, 0],
+      }
+    );
+    return vinkelTekst;
   }
 }
 export default Arc;

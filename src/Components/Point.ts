@@ -39,7 +39,7 @@ class Point extends Component {
     this.material = circleMesh.material;
     this.add(strokeMesh);
     // set position of the mesh
-    this.position.set(x, y, 1);
+    this.position.set(x, y, 2);
 
     if (label) {
       const text = new Text(
