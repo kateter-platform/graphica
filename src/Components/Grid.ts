@@ -30,7 +30,12 @@ const fragmentShader = `
     uniform vec3 offset;
 
   void main() {
-    float dynamicCameraScale = pow(2., floor(log(1. / zoomLevel) / log(2.)));
+    float dynamicCameraScale1 = pow(10., floor(log(45. / zoomLevel) / log(10.)));
+    float dynamicCameraScale2 = 2. * pow(10., floor(log(45. / (2. * zoomLevel)) / log(10.)));
+    float dynamicCameraScale3 = 5. * pow(10., floor(log(45. / (5. * zoomLevel)) / log(10.)));
+
+    float dynamicCameraScale = min(dynamicCameraScale1, min(dynamicCameraScale2, dynamicCameraScale3));
+
     float size = cellSize * dynamicCameraScale * zoomLevel;
     vec2 r = (offset.xy * zoomLevel + worldPosition.xy) / size;
     vec2 roundedR = round(r);
@@ -55,7 +60,7 @@ type GridOptions = {
 };
 
 const defaultGridOptions: GridOptions = {
-  cellSize: 64,
+  cellSize: 10,
   pointRadius: 1.5,
   pointColor: new Color(0xe1e1e1),
   labels: true,
@@ -92,7 +97,7 @@ class Grid extends Component {
       ...defaultGridOptions,
       ...options,
     };
-    this.cellSize = cellSize ?? 64;
+    this.cellSize = cellSize ?? 10;
 
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
@@ -159,11 +164,20 @@ class Grid extends Component {
   }
 
   _updateAxisLabels(camera: OrthographicCamera) {
-    const dynamicCameraScale = Math.pow(
-      2,
-      Math.floor(Math.log(1 / camera.zoom) / Math.log(2))
+    const dynamicCameraScale1 = Math.pow(
+      10,
+      Math.floor(Math.log(45 / camera.zoom) / Math.log(10))
     );
-    const dynamicCellSize = dynamicCameraScale * this.cellSize;
+    const dynamicCameraScale2 =
+      2 *
+      Math.pow(10, Math.floor(Math.log(45 / (2 * camera.zoom)) / Math.log(10)));
+    const dynamicCameraScale3 =
+      5 *
+      Math.pow(10, Math.floor(Math.log(45 / (5 * camera.zoom)) / Math.log(10)));
+    const dynamicCellSize =
+      Math.min(dynamicCameraScale1, dynamicCameraScale2, dynamicCameraScale3) *
+      this.cellSize;
+    console.log(dynamicCellSize);
 
     const centeredCameraX =
       camera.position.x + window.innerWidth / (2 * camera.zoom);
@@ -189,10 +203,18 @@ class Grid extends Component {
         dynamicCellSize *
         Math.floor(diffY / (LABELS_LENGTH * dynamicCellSize));
 
-      let contentX = (worldIndex * dynamicCellSize + roundedOffsetX).toString();
-      let contentY = (worldIndex * dynamicCellSize + roundedOffsetY).toString();
-      if (contentX === "0") contentX = "";
-      if (contentY === "0") contentY = "";
+      const numberX =
+        Math.round((worldIndex * dynamicCellSize + roundedOffsetX) * 1000) /
+        1000;
+      const numberY =
+        Math.round((worldIndex * dynamicCellSize + roundedOffsetY) * 1000) /
+        1000;
+      let contentX =
+        dynamicCellSize >= 10000 ? numberX.toExponential() : numberX.toString();
+      let contentY =
+        dynamicCellSize >= 10000 ? numberY.toExponential() : numberY.toString();
+      if (numberX === 0) contentX = "";
+      if (numberY === 0) contentY = "";
 
       this.labelsX[i].setText(contentX);
       this.labelsX[i].position.set(
