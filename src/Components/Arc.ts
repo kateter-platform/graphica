@@ -1,13 +1,12 @@
 import {
   ArcCurve,
   CircleGeometry,
-  Group,
   Mesh,
   MeshBasicMaterial,
   OrthographicCamera,
   Vector2,
 } from "three";
-import { Line2, LineGeometry, LineMaterial } from "three-fatline";
+import { Line2, LineMaterial } from "three-fatline";
 import { toVector3 } from "../utils";
 import Line from "./Line";
 import Text from "./Text";
@@ -19,49 +18,84 @@ class Arc extends Component {
   pointB: InputPosition;
   pointC: InputPosition;
   radius: number;
-  angle: number;
+
+  _arc: Mesh;
+  _text: Text;
+  _curvedOutline: Line2;
+  _side1Outline: Line;
+  _side2Outline: Line;
+
   constructor(
     pointA: InputPosition,
     pointB: InputPosition,
     pointC: InputPosition,
-    radius = 20
+    radius = 40
   ) {
     super();
     this.pointA = pointA;
     this.pointB = pointB;
     this.pointC = pointC;
     this.radius = radius;
-    this.angle = 0;
+
+    this._side1Outline = new Line([0, 0], [0, 0], {
+      lineWidth: 4,
+      color: 0x080007,
+    });
+    this._side2Outline = new Line([0, 0], [0, 0], {
+      lineWidth: 4,
+      color: 0x080007,
+    });
+    this._curvedOutline = new Line2(
+      undefined,
+      new LineMaterial({
+        color: 0x080007,
+        linewidth: 4,
+        resolution: new Vector2(window.innerWidth, window.innerHeight),
+      })
+    );
+    this.add(this._side1Outline);
+    this.add(this._side2Outline);
+    this.add(this._curvedOutline);
+
+    this._arc = new Mesh(
+      undefined,
+      new MeshBasicMaterial({ color: "#FAA307" })
+    );
+    this.add(this._arc);
+
+    this._text = new Text("0", {
+      fontSize: 20,
+      anchorY: "middle",
+      anchorX: "left",
+      position: [0, 0],
+    });
+    this.add(this._text);
+
+    const angle = this._calcAngle();
+    this._updateOutline(angle);
+    this._updateArc(angle);
   }
 
   update(camera: OrthographicCamera) {
+    const pointBVec = toVector3(this.pointB);
+    this.position.set(pointBVec.x, pointBVec.y, 0);
+
+    const angle = this._calcAngle();
+    this._updateOutline(angle, camera.zoom);
+    this._updateArc(angle, camera.zoom);
+    this._updateText(angle, camera.zoom);
+  }
+
+  _calcAngle() {
     const pointAvec3 = toVector3(this.pointA);
     const pointBvec3 = toVector3(this.pointB);
     const pointCvec3 = toVector3(this.pointC);
     const vectorBtoA = pointAvec3.clone().sub(pointBvec3.clone());
     const vectorBtoC = pointCvec3.clone().sub(pointBvec3.clone());
-    const angle = vectorBtoA.angleTo(vectorBtoC);
-    this.angle = angle;
-
-    //bruker ikke camera, trenger jeg denne i det hele tatt?
-    this.removeLines();
-
-    const outline = this.createOutline();
-    this.add(outline);
-    const arcText = this.createAngleText(this.angle, camera.zoom);
-    this.add(arcText);
-    const arc = this.createArc();
-    this.add(arc);
-  }
-  removeLines() {
-    this.children.forEach((child) => {
-      this.remove(child);
-    });
+    return vectorBtoA.angleTo(vectorBtoC);
   }
 
-  createOutline() {
-    const lines = new Group();
-
+  _updateOutline(angle: number, cameraZoom = 1) {
     const pointAvec3 = toVector3(this.pointA);
     const pointBvec3 = toVector3(this.pointB);
     const pointCvec3 = toVector3(this.pointC);
@@ -82,56 +116,39 @@ class Arc extends Component {
     ) {
       startAngle = angle1;
     }
-    const endAngle = startAngle + this.angle; // Ending angle of the arc in radians
+    const endAngle = startAngle + angle; // Ending angle of the arc in radians
     const clockwise = false; // Whether the arc is drawn in a clockwise direction
 
     //Create Arc-curve
     const arcCurve = new ArcCurve(
       0,
       0,
-      this.radius,
+      this.radius / cameraZoom,
       startAngle,
       endAngle,
       clockwise
     );
     //generate points on ArcCurve
     const points = arcCurve.getPoints(50);
+    this._curvedOutline.geometry.setPositions(
+      points.flatMap((v) => [v.x, v.y, 3])
+    );
 
     //punktene arcen krysser linjene
     const krysningAB = vectorBtoA
       .clone()
       .normalize()
-      .multiplyScalar(this.radius);
+      .multiplyScalar(this.radius / cameraZoom);
     const krysningCB = vectorBtoC
       .clone()
       .normalize()
-      .multiplyScalar(this.radius);
+      .multiplyScalar(this.radius / cameraZoom);
 
-    const linje1 = new Line(new Vector2(krysningAB.x, krysningAB.y), [0, 0], {
-      lineWidth: 4,
-      color: 0x080007,
-    });
-    lines.add(linje1);
-    const linje2 = new Line([0, 0], new Vector2(krysningCB.x, krysningCB.y), {
-      lineWidth: 4,
-      color: 0x080007,
-    });
-    lines.add(linje2);
-    const tempLine = new LineGeometry();
-    tempLine.setPositions(points.flatMap((v) => [v.x, v.y, 3]));
-    const linje3 = new Line2(
-      tempLine,
-      new LineMaterial({
-        color: 0x080007,
-        linewidth: 4,
-        resolution: new Vector2(window.innerWidth, window.innerHeight),
-      })
-    );
-    lines.add(linje3);
-    return lines;
+    this._side1Outline.start = new Vector2(krysningAB.x, krysningAB.y);
+    this._side2Outline.start = new Vector2(krysningCB.x, krysningCB.y);
   }
 
-  createArc() {
+  _updateArc(angle: number, cameraZoom = 1) {
     const pointAvec3 = toVector3(this.pointA);
     const pointBvec3 = toVector3(this.pointB);
     const pointCvec3 = toVector3(this.pointC);
@@ -154,30 +171,19 @@ class Arc extends Component {
     }
 
     // Create circle-geometry -- lager fyllet i vinkelen
-    const geometry = new CircleGeometry(
-      this.radius,
+    this._arc.geometry.dispose();
+    this._arc.geometry = new CircleGeometry(
+      this.radius / cameraZoom,
       32,
       startAngle,
-      this.angle
+      angle
     );
-    const material = new MeshBasicMaterial({ color: "#FAA307" });
-    //setter posisjonen til å være fra punktB
-    this.position.set(pointBvec3.x, pointBvec3.y, 0);
-
-    return new Mesh(geometry, material);
+    this._arc.geometry.computeVertexNormals();
   }
 
-  createAngleText(angle: number, cameraZoom: number) {
-    const vinkelTekst = new Text(
-      (Math.round((angle * 180) / Math.PI) + " °").toString(),
-      {
-        fontSize: 20,
-        anchorY: "middle",
-        anchorX: "left",
-        position: [-60 / cameraZoom, 0],
-      }
-    );
-    return vinkelTekst;
+  _updateText(angle: number, cameraZoom: number) {
+    this._text.setText(Math.round((angle * 180) / Math.PI).toString() + " °");
+    this._text.position.set(-60 / cameraZoom, 0, this._text.position.z);
   }
 }
 export default Arc;
