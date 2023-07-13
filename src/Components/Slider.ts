@@ -56,8 +56,8 @@ class Slider implements GuiComponent {
     textRight.className = "text";
     textRight.textContent = maxValue.toString();
 
-    wrapper.appendChild(input);
     wrapper.appendChild(edgeLeft);
+    wrapper.appendChild(input);
     wrapper.appendChild(edgeRight);
     edgeLeft.appendChild(serifLeft);
     edgeRight.appendChild(serifRight);

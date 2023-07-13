@@ -177,7 +177,6 @@ class Grid extends Component {
     const dynamicCellSize =
       Math.min(dynamicCameraScale1, dynamicCameraScale2, dynamicCameraScale3) *
       this.cellSize;
-    console.log(dynamicCellSize);
 
     const centeredCameraX =
       camera.position.x + window.innerWidth / (2 * camera.zoom);
