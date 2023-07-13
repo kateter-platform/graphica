@@ -26,7 +26,7 @@ To run prettier use:
 yarn prettier
 ```
 
-Or to run both prettier and lint use:
+Or to run both prettier and eslint use:
 
 ```bash
 yarn lint
