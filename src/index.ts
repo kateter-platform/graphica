@@ -2,6 +2,7 @@ import Arc from "./Components/Arc";
 import Bracket from "./Components/Bracket";
 import Button from "./Components/Button";
 import Grid from "./Components/Grid";
+import InputField from "./Components/InputField";
 import Point from "./Components/Point";
 import Slider from "./Components/Slider";
 import Graphica from "./Graphica";
@@ -36,6 +37,13 @@ graphica.addGui(button);
 
 button.addObserver(() => {
   console.log("12345");
+});
+
+const inputfield = new InputField();
+graphica.addGui(inputfield);
+
+inputfield.addObserver((value) => {
+  console.log(value);
 });
 
 graphica.add(punkt1);
