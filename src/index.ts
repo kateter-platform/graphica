@@ -1,6 +1,7 @@
 import Arc from "./Components/Arc";
 import Bracket from "./Components/Bracket";
 import Button from "./Components/Button";
+import Circle from "./Components/Circle";
 import Grid from "./Components/Grid";
 import InputField from "./Components/InputField";
 import Point from "./Components/Point";
@@ -45,6 +46,9 @@ graphica.addGui(inputfield);
 inputfield.addObserver((value) => {
   console.log(value);
 });
+
+const circle = new Circle(30, 20, 10);
+graphica.add(circle);
 
 graphica.add(punkt1);
 graphica.add(punkt2);
