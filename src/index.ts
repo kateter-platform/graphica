@@ -1,5 +1,6 @@
 import { Vector2 } from "three";
 import Button from "./Components/Button";
+import Circle from "./Components/Circle";
 import Grid from "./Components/Grid";
 import InputField from "./Components/InputField";
 import Shape from "./Components/Shape";
@@ -31,6 +32,15 @@ inputfield.addObserver((value) => {
   console.log(value);
 });
 
+
+const circle = new Circle(30, 20, 10);
+graphica.add(circle);
+
+graphica.add(punkt1);
+graphica.add(punkt2);
+graphica.add(punkt3);
+graphica.add(arc);
+
 const shape = new Shape(
   [
     new Vector2(5, 20),
@@ -47,6 +57,7 @@ const shape2 = new Shape([
 ]);
 graphica.add(shape);
 graphica.add(shape2);
+
 
 graphica.add(grid);
 graphica.run();
