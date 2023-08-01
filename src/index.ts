@@ -1,63 +1,34 @@
-import { Vector2 } from "three";
-import Button from "./Components/Button";
 import Circle from "./Components/Circle";
 import Grid from "./Components/Grid";
-import InputField from "./Components/InputField";
-import Shape from "./Components/Shape";
-import Slider from "./Components/Slider";
+import Line from "./Components/Line";
+import Plot from "./Components/Plot";
+import Point from "./Components/Point";
 import Graphica from "./Graphica";
 
 const graphica = new Graphica(document.body);
 
 const grid = new Grid();
 
-const slider = new Slider();
-graphica.addGui(slider);
+const p = new Plot("sin(x)", { plotBetween: [0, 10] });
+const s = new Circle(-3, 0, 1);
+const p2 = new Point(-3, 0);
+const p3 = new Point(0, 0);
+const a = new Line([-3, 0], [-2, 0]);
+const b = new Line(p2, p3, { dashed: true, color: 0xa1a1a1 });
+const c = new Line([-3, 0], p2);
 
-slider.addObserver((value) => {
-  console.log(value);
-});
-
-const button = new Button({ label: "KnappKnappKnappKnappKnapp" });
-graphica.addGui(button);
-
-button.addObserver(() => {
-  console.log("12345");
-});
-
-const inputfield = new InputField();
-graphica.addGui(inputfield);
-
-inputfield.addObserver((value) => {
-  console.log(value);
-});
-
-
-const circle = new Circle(30, 20, 10);
-graphica.add(circle);
-
-graphica.add(punkt1);
-graphica.add(punkt2);
-graphica.add(punkt3);
-graphica.add(arc);
-
-const shape = new Shape(
-  [
-    new Vector2(5, 20),
-    new Vector2(20, 20),
-    new Vector2(20, 5),
-    new Vector2(5, 5),
-  ],
-  { color: 0x5603ad }
-);
-const shape2 = new Shape([
-  new Vector2(30, 25),
-  new Vector2(30, 40),
-  new Vector2(40, 30),
-]);
-graphica.add(shape);
-graphica.add(shape2);
-
-
+graphica.add(p2);
+graphica.add(s);
+graphica.add(p);
+graphica.add(p3);
 graphica.add(grid);
-graphica.run();
+graphica.add(a);
+graphica.add(b);
+graphica.add(c);
+graphica.run((deltatime): void => {
+  p.setExpression(`sin(x + ${deltatime})`);
+  p2.position.set(-3, Math.sin(0 + deltatime), p2.position.z);
+  p3.position.set(0, Math.sin(0 + deltatime), p2.position.z);
+  a.setEnd([-3 + Math.cos(deltatime), Math.sin(deltatime)]);
+  c.setStart([-3 + Math.cos(deltatime), Math.sin(deltatime)]);
+});
