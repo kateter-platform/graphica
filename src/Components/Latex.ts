@@ -46,7 +46,7 @@ class Latex extends Component {
     this.position.set(pos.x, pos.y, 1);
     container.scale.set(fontSize, fontSize, 1);
     container.element.style.color = color;
-    container.element.style.fontFamily = "sans-serif";
+    container.element.style.fontFamily = "Roboto";
     container.element.style.fontSize = `${fontSize}px`;
     container.element.style.fontWeight = "normal";
     container.element.style.textAlign = anchorX;

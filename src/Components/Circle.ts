@@ -1,4 +1,10 @@
-import { MeshBasicMaterial, Mesh, CircleGeometry, RingGeometry } from "three";
+import {
+  MeshBasicMaterial,
+  Mesh,
+  CircleGeometry,
+  RingGeometry,
+  OrthographicCamera,
+} from "three";
 import { Component } from "./interfaces";
 
 export type CircleOptions = {
@@ -10,12 +16,12 @@ export const defaultShapeOptions: CircleOptions = {
 };
 
 class Circle extends Component {
-  draggable = undefined; //usikker på hva denne gjør
-  //color: number;
-  //object: Object3D;
+  radius: number;
+  _strokeMesh: Mesh;
 
   constructor(x = 0, y = 0, radius = 30, options?: CircleOptions) {
     super();
+    this.radius = radius;
 
     const { color } = { ...defaultShapeOptions, ...options };
 
@@ -29,13 +35,21 @@ class Circle extends Component {
     const strokeMaterial = new MeshBasicMaterial({ color: "#080007" });
     // set mesh of the point instance
     const circleMesh = new Mesh(geometry, material);
-    const strokeMesh = new Mesh(strokeGeometry, strokeMaterial);
-    strokeMesh.position.set(0, 0, 1);
+    this._strokeMesh = new Mesh(strokeGeometry, strokeMaterial);
+    this._strokeMesh.position.set(0, 0, 1);
     this.geometry = circleMesh.geometry;
     this.material = circleMesh.material;
-    this.add(strokeMesh);
+    this.add(this._strokeMesh);
     // set position of the mesh
     this.position.set(x, y, 0);
+  }
+
+  update(camera: OrthographicCamera) {
+    this._strokeMesh.geometry = new RingGeometry(
+      this.radius - 4 / camera.zoom,
+      this.radius,
+      50
+    );
   }
 }
 

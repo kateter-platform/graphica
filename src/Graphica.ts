@@ -5,6 +5,7 @@ import {
   Scene,
   Color,
   Object3D,
+  Clock,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer";
@@ -31,8 +32,10 @@ class Graphica {
   scene: Scene;
 
   guiRoot: HTMLElement;
+  clock: Clock;
 
   constructor(root: HTMLElement) {
+    this.clock = new Clock();
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -119,8 +122,11 @@ class Graphica {
     });
   }
 
-  run() {
-    requestAnimationFrame(this.run.bind(this));
+  run(onUpdate?: (elapsedTime: number) => void) {
+    if (!this.clock.running) {
+      this.clock.start();
+    }
+    requestAnimationFrame(this.run.bind(this, onUpdate));
     this.scene.traverse((child: Object3D) => {
       if (!(child instanceof Component)) {
         return;
@@ -129,6 +135,7 @@ class Graphica {
         child.update(this.camera);
       }
     });
+    if (onUpdate) onUpdate(this.clock.getElapsedTime());
     this.domRenderer.render(this.scene, this.camera);
     this.renderer.render(this.scene, this.camera);
   }
