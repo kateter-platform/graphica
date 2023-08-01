@@ -1,5 +1,5 @@
 import { Vector2, OrthographicCamera } from "three";
-import { toVector3 } from "./../utils";
+import { toVector2, toVector3 } from "./../utils";
 import Line from "./Line";
 import { InputPosition } from "./types";
 
@@ -8,9 +8,9 @@ export type VectorProps = {
 };
 
 class Vector extends Line {
-  vector: Vector2;
+  vector: InputPosition;
 
-  constructor(position: InputPosition, vector: Vector2, {}: VectorProps) {
+  constructor(position: InputPosition, vector: InputPosition, {}: VectorProps) {
     super(position, position, { lineWidth: 4, arrowhead: true });
     this.vector = vector;
   }
@@ -21,7 +21,7 @@ class Vector extends Line {
   }
 
   update(camera: OrthographicCamera) {
-    this.end = this.calculateEndPoint(this.start, this.vector);
+    this.end = this.calculateEndPoint(this.start, toVector2(this.vector));
     this.updateGeometry(this.start, this.end, this.arrowhead, camera);
   }
 }
