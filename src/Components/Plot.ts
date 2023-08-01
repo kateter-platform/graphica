@@ -9,6 +9,8 @@ type PlotOptions = {
   lineWidth?: number;
   color?: number;
   coefficients?: Coefficients;
+  plotRange?: number;
+  plotBetween: [number, number] | undefined;
 };
 
 const defaultPlotOptions = {
@@ -17,6 +19,7 @@ const defaultPlotOptions = {
   lineWidth: 4,
   color: 0xff0000,
   coefficients: {},
+  plotBetween: undefined,
 };
 
 type Coefficients = {
@@ -31,9 +34,10 @@ class Plot extends Component {
   private currentMaxX: number;
   private currentZoom: number;
   private coefficients: Coefficients;
+  private plotBetween: [number, number] | undefined;
+
   private RENDERTHRESHOLDX = 1400;
   private RENDERTHRESHOLDZOOM = 2.5;
-
   private PLOTRANGE = 1450;
   private DEFAULT_RENDERTHRESHOLD = 1400;
 
@@ -46,12 +50,20 @@ class Plot extends Component {
       lineWidth = 1,
       color = 0xff0000,
       coefficients = {},
+      plotBetween = undefined,
     } = { ...defaultPlotOptions, ...options };
 
     const minX = (-this.PLOTRANGE / 1) * 2 + 0;
     const maxX = (this.PLOTRANGE / 1) * 2 + 0;
     const initialCurve = new CatmullRomCurve3(
-      Plot.calculatePoints(minX, maxX, numPoints, func, coefficients)
+      Plot.calculatePoints(
+        minX,
+        maxX,
+        numPoints,
+        func,
+        coefficients,
+        plotBetween
+      )
     );
     const points = initialCurve.getPoints(numPoints);
     const geometry = new LineGeometry().setPositions(
@@ -74,7 +86,7 @@ class Plot extends Component {
     this.func = func;
     this.numPoints = numPoints;
     this.coefficients = coefficients;
-
+    this.plotBetween = plotBetween;
     plot.name = "plot";
     this.add(plot);
   }
@@ -84,7 +96,8 @@ class Plot extends Component {
     maxX: number,
     numPoints: number,
     func: string,
-    coefficients: { [key: string]: number }
+    coefficients: { [key: string]: number },
+    plotBetween: [number, number] | undefined
   ): Vector3[] {
     const step = (maxX - minX) / numPoints;
     const newPoints = Array.from({ length: numPoints }, (_, i) => {
@@ -96,11 +109,21 @@ class Plot extends Component {
       const y = compiledExpr.evaluate(scope);
       return new Vector3(x, y, 0);
     });
+    if (plotBetween !== undefined) {
+      return newPoints.filter(
+        (e) => e.x > plotBetween[0] && e.x < plotBetween[1]
+      );
+    }
     return newPoints;
   }
 
   public setCoefficients(coefficients: Coefficients): void {
     this.coefficients = coefficients;
+    this.reRenderPlot(this.currentMinX, this.currentMaxX);
+  }
+
+  public setExpression(expression: string): void {
+    this.func = expression;
     this.reRenderPlot(this.currentMinX, this.currentMaxX);
   }
 
@@ -111,7 +134,8 @@ class Plot extends Component {
         maxX,
         this.numPoints,
         this.func,
-        this.coefficients
+        this.coefficients,
+        this.plotBetween
       )
     );
     const points = initialCurve.getPoints(this.numPoints);
