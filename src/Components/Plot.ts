@@ -41,6 +41,8 @@ class Plot extends Component {
   private PLOTRANGE = 1450;
   private DEFAULT_RENDERTHRESHOLD = 1400;
 
+  private plotMaterial: LineMaterial;
+
   constructor(func: string, options?: PlotOptions) {
     super();
 
@@ -69,13 +71,13 @@ class Plot extends Component {
     const geometry = new LineGeometry().setPositions(
       points.flatMap((e) => [e.x, e.y, e.z])
     );
-    const material = new LineMaterial({
+    this.plotMaterial = new LineMaterial({
       color: color,
       linewidth: lineWidth,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
       dashed: dashed,
     });
-    const plot = new Line2(geometry, material);
+    const plot = new Line2(geometry, this.plotMaterial);
     plot.computeLineDistances();
     plot.scale.set(1, 1, 1);
     plot.frustumCulled = false;
@@ -161,6 +163,10 @@ class Plot extends Component {
       this.RENDERTHRESHOLDX = Math.abs(this.RENDERTHRESHOLDX);
       this.reRenderPlot(minX, maxX);
     }
+  }
+
+  onWindowResize() {
+    this.plotMaterial.resolution.set(window.innerWidth, window.innerHeight);
   }
 }
 

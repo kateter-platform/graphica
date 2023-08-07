@@ -269,6 +269,13 @@ class Grid extends Component {
 
     this._updateAxisLabels(camera);
   }
+
+  onWindowResize() {
+    this.shaderMesh.geometry = new PlaneGeometry(
+      window.innerWidth,
+      window.innerHeight
+    );
+  }
 }
 
 export default Grid;

@@ -120,6 +120,27 @@ class Graphica {
       const draggedObject = event.object;
       draggedObject.is_dragged = false;
     });
+
+    const onWindowResize = () => {
+      (this.camera.left = window.innerWidth / -2),
+        (this.camera.right = window.innerWidth / 2),
+        (this.camera.top = window.innerHeight / 2),
+        (this.camera.bottom = window.innerHeight / -2),
+        this.camera.updateProjectionMatrix();
+
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+      this.scene.traverse((child: Object3D) => {
+        if (!(child instanceof Component)) {
+          return;
+        }
+        if (child.onWindowResize) {
+          child.onWindowResize();
+        }
+      });
+    };
+
+    window.addEventListener("resize", onWindowResize);
   }
 
   run(onUpdate?: (elapsedTime: number) => void) {

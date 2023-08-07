@@ -119,6 +119,13 @@ class Line extends Component {
   update(camera: OrthographicCamera) {
     this.updateGeometry(this.start, this.end, this.arrowhead, camera);
   }
+
+  onWindowResize() {
+    (this.material as LineMaterial).resolution.set(
+      window.innerWidth,
+      window.innerHeight
+    );
+  }
 }
 
 export default Line;
