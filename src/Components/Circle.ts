@@ -9,10 +9,12 @@ import { Component } from "./interfaces";
 
 export type CircleOptions = {
   color?: number;
+  segments?: number;
 };
 
 export const defaultShapeOptions: CircleOptions = {
   color: 0xfaa307,
+  segments: 64,
 };
 
 class Circle extends Component {
@@ -23,9 +25,9 @@ class Circle extends Component {
     super();
     this.radius = radius;
 
-    const { color } = { ...defaultShapeOptions, ...options };
+    const { color, segments } = { ...defaultShapeOptions, ...options };
 
-    const geometry = new CircleGeometry(radius, 32);
+    const geometry = new CircleGeometry(radius, segments);
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
