@@ -4,6 +4,7 @@ export class Component extends Mesh {
   draggable: Draggable;
   is_dragged: boolean;
   update?(camera: OrthographicCamera): void;
+  onWindowResize?(): void;
   dragUpdate?(): void;
 
   constructor() {

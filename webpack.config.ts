@@ -1,48 +1,27 @@
-import * as path from "path";
-import { Configuration } from "webpack";
+import path from "path";
 
-const config: Configuration = {
+module.exports = {
   entry: "./src/index.ts",
+  mode: "production",
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js",
-    library: "MyLibrary",
+    filename: "graphica.js",
+    library: "Graphica", // Replace 'YourLibraryName' with your library's global variable name
     libraryTarget: "umd",
-    globalObject: "this",
-    auxiliaryComment: "Graphica v2",
+    umdNamedDefine: true,
+    globalObject: 'typeof self !== "undefined" ? self : this', // For handling different environments like browser, Node.js, etc.
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: {
-          loader: "ts-loader",
-          options: {
-            configFile: "tsconfig.json", // Specify the path to your tsconfig.json file
-            transpileOnly: true, // Enable faster transpilation by skipping type checking
-            allowTsInNodeModules: true, // Allows importing TypeScript files from node_modules
-          },
-        },
+        use: "ts-loader",
         exclude: /node_modules/,
-      },
-      {
-        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              outputPath: "fonts/",
-            },
-          },
-        ],
       },
     ],
   },
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-  },
-  mode: "production",
+  devtool: "source-map",
 };
-
-export default config;

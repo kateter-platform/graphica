@@ -40,5 +40,5 @@ next-env.d.ts
 /.parcel-cache
 
 # graphica
-/src/index.ts
+# /src/index.ts
 
