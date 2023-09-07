@@ -1,6 +1,6 @@
 {
   "name": "@kateter-platform/graphica-gemini",
-  "version": "0.0.32",
+  "version": "0.0.4",
   "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
   "license": "MIT",
