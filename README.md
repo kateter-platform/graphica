@@ -1,6 +1,6 @@
 # Graphica
-![graphica](https://github.com/kateter-platform/graphica-gemini/assets/37273026/c6b6e55c-9c6b-48f8-bc65-5d55abbb8c27)
 
+![graphica](https://github.com/kateter-platform/graphica-gemini/assets/37273026/c6b6e55c-9c6b-48f8-bc65-5d55abbb8c27)
 
 A graphical library used for visualising mathematical concepts
 

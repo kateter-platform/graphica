@@ -18,6 +18,8 @@ class Arc extends Component {
   pointB: InputPosition;
   pointC: InputPosition;
   radius: number;
+  hasLabel: boolean;
+  color: number;
 
   _arc: Mesh;
   _text: Text;
@@ -29,13 +31,17 @@ class Arc extends Component {
     pointA: InputPosition,
     pointB: InputPosition,
     pointC: InputPosition,
-    radius = 40
+    radius = 40,
+    hasLabel = true,
+    color = 0xfaa307
   ) {
     super();
     this.pointA = pointA;
     this.pointB = pointB;
     this.pointC = pointC;
     this.radius = radius;
+    this.hasLabel = hasLabel;
+    this.color = color;
 
     this._side1Outline = new Line([0, 0], [0, 0], {
       lineWidth: 4,
@@ -57,14 +63,11 @@ class Arc extends Component {
     this.add(this._side2Outline);
     this.add(this._curvedOutline);
 
-    this._arc = new Mesh(
-      undefined,
-      new MeshBasicMaterial({ color: "#FAA307" })
-    );
+    this._arc = new Mesh(undefined, new MeshBasicMaterial({ color: color }));
     this.add(this._arc);
 
     this._text = new Text("0", {
-      fontSize: 20,
+      fontSize: hasLabel ? 20 : 0,
       anchorY: "middle",
       anchorX: "left",
       position: [0, 0],
