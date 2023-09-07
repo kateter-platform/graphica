@@ -14,6 +14,7 @@ import {
   ConstrainFunction,
   GuiComponent,
 } from "./Components/interfaces";
+import { InputPosition } from "./Components/types";
 import { DragControls } from "./Controls/DragControls";
 
 const ORBIT_CONTROL_OPTIONS = {
@@ -21,6 +22,26 @@ const ORBIT_CONTROL_OPTIONS = {
   MIDDLE: MOUSE.DOLLY,
   RIGHT: MOUSE.ROTATE,
 };
+
+type GraphicaOptions = {
+  root: HTMLElement;
+  disableControls: boolean;
+  defaultZoom: number;
+  defaultPosition: InputPosition;
+  minZoom: number;
+  maxZoom: number;
+};
+
+const defaultGraphicaOptions: GraphicaOptions = {
+  root: document.body,
+  disableControls: false,
+  defaultZoom: 50,
+  defaultPosition: [0, 0],
+  minZoom: 1,
+  maxZoom: 500,
+};
+
+//Note for docs: minZoom is how far you are allowed to zoom IN. MaxZoom is how far you are allowed to zoom OUT.
 
 class Graphica {
   components: Component[];
@@ -30,11 +51,17 @@ class Graphica {
   domRenderer: CSS3DRenderer;
   camera: OrthographicCamera;
   scene: Scene;
+  controls: OrbitControls;
 
   guiRoot: HTMLElement;
   clock: Clock;
 
-  constructor(root: HTMLElement) {
+  constructor(options?: GraphicaOptions) {
+    const { root, disableControls, defaultZoom, minZoom, maxZoom } = {
+      ...defaultGraphicaOptions,
+      ...options,
+    };
+
     this.clock = new Clock();
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
@@ -60,15 +87,21 @@ class Graphica {
       0.1,
       1000
     );
-    this.camera.position.z = 5;
-    this.camera.zoom = 50;
+    // this.camera.position.setX(toVector2(defaultPosition).x);
+    // this.camera.position.setY(toVector2(defaultPosition).y);
+    this.camera.position.setZ(5);
+
+    this.camera.zoom = defaultZoom;
     this.camera.updateProjectionMatrix();
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableRotate = false;
     controls.enablePan = true;
     controls.mouseButtons = ORBIT_CONTROL_OPTIONS;
-
+    controls.minZoom = minZoom;
+    controls.maxZoom = maxZoom;
+    this.controls = controls;
+    if (disableControls) this.controls.enabled = false;
     this.scene = new Scene();
     this.scene.background = new Color(0xffffff);
 
@@ -185,6 +218,14 @@ class Graphica {
 
   removeGui(component: GuiComponent) {
     this.guiRoot.removeChild(component.htmlElement);
+  }
+
+  enableControls() {
+    this.controls.enabled = true;
+  }
+
+  disableControls() {
+    this.controls.enabled = false;
   }
 }
 
