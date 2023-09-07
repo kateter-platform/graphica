@@ -15,5 +15,6 @@ export { default as Shape } from "./Components/Shape";
 export { default as Slider } from "./Components/Slider";
 export { default as Text } from "./Components/Text";
 export { default as Vector } from "./Components/Vector";
+export { default as Fraction } from "./Components/Derived/Fraction";
 
 export * as three from "three";
