@@ -34,7 +34,7 @@ class Line extends Component {
     };
     this.start = start;
     this.end = end;
-    this.arrowhead = arrowhead ? true : false;
+    this.arrowhead = arrowhead ?? false;
 
     this.material = new LineMaterial({
       color: color,
@@ -53,6 +53,7 @@ class Line extends Component {
       arrowheadLine.name = "arrowhead";
       this.add(arrowheadLine);
     }
+    this.updateGeometry(start, end);
   }
 
   public updateGeometry(
