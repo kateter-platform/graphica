@@ -1,4 +1,4 @@
-import { OrthographicCamera, Mesh } from "three";
+import { OrthographicCamera, Mesh, Object3D, Box3, Sphere } from "three";
 
 export class Component extends Mesh {
   draggable: Draggable;
@@ -12,14 +12,16 @@ export class Component extends Mesh {
     this.is_dragged = false;
     this.draggable = undefined;
   }
+}
 
-  checkCollision(other: Component, distance = 0.1): boolean {
-    return other.position.distanceTo(this.position) <= distance;
-  }
+export interface Collider {
+  object: Object3D;
 
-  checkDistance(other: Component): number {
-    return other.position.distanceTo(this.position);
-  }
+  collider: Box3;
+
+  collidesWith(other: Collider): boolean;
+
+  distanceTo(other: Collider): number;
 }
 
 export type ConstrainFunction = (x: number, y: number) => [number, number];

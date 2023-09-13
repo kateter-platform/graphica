@@ -118,6 +118,7 @@ class Grid extends Component {
     });
 
     this.shaderMesh = new Mesh(gridGeometry, gridMaterial);
+
     this.xAxis = new Line(
       new Vector2(-window.innerWidth, 0),
       new Vector2(window.innerWidth - 1000, 0),

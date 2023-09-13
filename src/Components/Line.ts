@@ -11,6 +11,8 @@ export type LineOptions = {
   lineWidth?: number;
   arrowhead?: boolean;
   dashed?: boolean;
+  opacity?: number;
+  transparent?: boolean;
 };
 
 export const defaultLineOptions: LineOptions = {
@@ -18,6 +20,8 @@ export const defaultLineOptions: LineOptions = {
   lineWidth: 4,
   arrowhead: false,
   dashed: false,
+  opacity: 1,
+  transparent: false,
 };
 
 class Line extends Component {
@@ -28,7 +32,7 @@ class Line extends Component {
 
   constructor(start: InputPosition, end: InputPosition, options?: LineOptions) {
     super();
-    const { color, lineWidth, arrowhead, dashed } = {
+    const { color, lineWidth, arrowhead, dashed, opacity, transparent } = {
       ...defaultLineOptions,
       ...options,
     };
@@ -41,6 +45,8 @@ class Line extends Component {
       linewidth: lineWidth,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
       dashed: dashed,
+      opacity: opacity,
+      transparent: transparent,
     });
 
     this.geometry = new LineGeometry();

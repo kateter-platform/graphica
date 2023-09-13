@@ -60,7 +60,7 @@ class Text extends Component {
     this.position.set(pos.x, pos.y, 0.1);
   }
 
-  setText(text: string) {
+  setText(text: string): void {
     this.renderText.text = text;
   }
 
