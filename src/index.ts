@@ -53,13 +53,10 @@ a.add(e);
 a.add(d);
 a.add(c);
 a.add(b);
-// a.add(b1);
-// a.add(b2);
+a.add(b1);
+a.add(b2);
 
 a.run((e: number) => {
-  // b1.setPosition([e, e]);
-  // b2.setPosition([e, e]);
-
-  console.log(c.collidesWith(d));
-  console.log(c.position);
+  b1.setPosition([e, e]);
+  b2.setPosition([e, 0]);
 });
