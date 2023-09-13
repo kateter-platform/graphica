@@ -14,9 +14,7 @@ export class Component extends Mesh {
   }
 }
 
-export interface Collider {
-  object: Object3D;
-
+export interface Collider extends Object3D {
   collidesWith(other: Collider): boolean;
 
   distanceTo(other: Collider): number;

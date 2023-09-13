@@ -33,7 +33,6 @@ class Polygon extends Component {
   vertices: PolygonVertices;
   color: number;
   opacity: number;
-  object: Object3D;
 
   constructor(vertices: PolygonVertices, options?: PolygonOptions) {
     super();
@@ -77,7 +76,6 @@ class Polygon extends Component {
     }
 
     this.add(mesh);
-    this.object = mesh;
     this.geometry = geometry;
     this.vertices = vertices;
     this.color = color ?? 0xfaa307;
@@ -85,7 +83,7 @@ class Polygon extends Component {
   }
 
   setPosition(position: InputPosition) {
-    this.object.position.set(
+    this.position.set(
       toVector2(position).x,
       toVector2(position).y,
       this.position.z

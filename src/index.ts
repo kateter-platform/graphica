@@ -57,6 +57,7 @@ a.add(b1);
 a.add(b2);
 
 a.run((e: number) => {
-  b1.setPosition([e, e]);
-  b2.setPosition([e, 0]);
+  b1.setPosition([e / 4, e / 4]);
+  b2.setPosition([e / 4, e / 4]);
+  console.log(c.collidesWith(d));
 });

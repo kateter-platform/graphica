@@ -21,12 +21,12 @@ class BoundingBox extends Polygon implements Collider {
       super(vertices, defaultBoundingBoxOptions);
     }
 
-    this.object.position.setZ(5);
+    this.position.setZ(-1);
   }
 
   collidesWith(other: Collider): boolean {
-    const collider1 = new Box3().setFromObject(this.object);
-    const collider2 = new Box3().setFromObject(other.object);
+    const collider1 = new Box3().setFromObject(this);
+    const collider2 = new Box3().setFromObject(other);
 
     if (!collider1.intersectsBox(collider2)) {
       return false;
@@ -35,8 +35,8 @@ class BoundingBox extends Polygon implements Collider {
   }
 
   distanceTo(other: Collider): number {
-    const collider1 = new Box3().setFromObject(this.object);
-    const collider2 = new Box3().setFromObject(other.object);
+    const collider1 = new Box3().setFromObject(this);
+    const collider2 = new Box3().setFromObject(other);
 
     const centerA = new Vector3();
     collider1.getCenter(centerA);
@@ -48,11 +48,10 @@ class BoundingBox extends Polygon implements Collider {
   }
 
   update(camera: OrthographicCamera): void {
-    console.log(this);
     if (this.polygon) {
-      this.position.setX(this.polygon.object.position.x);
-      this.position.setY(this.polygon.object.position.y);
-      this.object.position.setZ(5);
+      this.position.setX(this.polygon.position.x * 2);
+      this.position.setY(this.polygon.position.y * 2);
+      this.position.setZ(-1);
     }
   }
 }
