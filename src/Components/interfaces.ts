@@ -1,4 +1,4 @@
-import { OrthographicCamera, Mesh } from "three";
+import { OrthographicCamera, Mesh, Object3D } from "three";
 
 export class Component extends Mesh {
   draggable: Draggable;
@@ -12,14 +12,13 @@ export class Component extends Mesh {
     this.is_dragged = false;
     this.draggable = undefined;
   }
+}
 
-  checkCollision(other: Component, distance = 0.1): boolean {
-    return other.position.distanceTo(this.position) <= distance;
-  }
+export interface Collider extends Object3D {
+  //The bounding box does take into account Z level meaning this is not a fully good solution yet but it works in the meantime
+  collidesWith(other: Object3D): boolean;
 
-  checkDistance(other: Component): number {
-    return other.position.distanceTo(this.position);
-  }
+  distanceTo(other: Object3D): number;
 }
 
 export type ConstrainFunction = (x: number, y: number) => [number, number];

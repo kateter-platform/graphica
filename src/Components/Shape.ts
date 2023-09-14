@@ -1,27 +1,38 @@
 import {
-  Vector2,
   MeshBasicMaterial,
   Shape,
   Mesh,
   Group,
   Object3D,
   ShapeGeometry,
+  Event,
+  Box3,
+  Vector3,
 } from "three";
+import { toVector2 } from "../utils";
 import Line from "./Line";
-import { Component } from "./interfaces";
+import { Collider, Component } from "./interfaces";
+import { InputPosition } from "./types";
 
 export type PolygonOptions = {
   color?: number;
   fill?: boolean;
+  opacity?: number;
 };
 
 export const defaultShapeOptions: PolygonOptions = {
   color: 0xfaa307,
+  opacity: 0.6,
 };
 
-type PolygonVertices = [Vector2, Vector2, Vector2, ...Vector2[]];
+type PolygonVertices = [
+  InputPosition,
+  InputPosition,
+  InputPosition,
+  ...InputPosition[]
+];
 
-class Polygon extends Component {
+class Polygon extends Component implements Collider {
   draggable = undefined;
   vertices: PolygonVertices;
   color: number;
@@ -30,12 +41,12 @@ class Polygon extends Component {
   constructor(vertices: PolygonVertices, options?: PolygonOptions) {
     super();
 
-    const { color } = { ...defaultShapeOptions, ...options };
+    const { color, opacity } = { ...defaultShapeOptions, ...options };
 
-    const shape = new Shape(vertices);
+    const shape = new Shape(vertices.map((e) => toVector2(e)));
     const material = new MeshBasicMaterial({
       color: color,
-      opacity: 0.6,
+      opacity: opacity,
       transparent: true,
     });
     const geometry = new ShapeGeometry(shape);
@@ -57,13 +68,48 @@ class Polygon extends Component {
     lines.push([lastVertex, firstVertex]);
 
     lines.forEach((l) => {
-      group.add(new Line(l[0], l[1], { color: 0x080007 }));
+      group.add(new Line(l[0], l[1], { color: 0x080007, opacity: opacity }));
     });
     this.add(group);
     this.object = group;
-
     this.vertices = vertices;
     this.color = color ?? 0xfaa307;
+  }
+  collidesWith(other: Object3D): boolean {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    return box1.intersectsBox(box2);
+  }
+  distanceTo(other: Object3D<Event>): number {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    const center1 = new Vector3();
+    const center2 = new Vector3();
+    box1.getCenter(center1);
+    box2.getCenter(center2);
+    center1.setZ(0);
+    center2.setZ(0);
+
+    return center1.distanceTo(center2);
+  }
+
+  setPosition(position: InputPosition) {
+    this.position.set(
+      toVector2(position).x,
+      toVector2(position).y,
+      this.position.z
+    );
+    this.children.forEach((child) => {
+      if (child instanceof Object3D) {
+        child.position.set(
+          toVector2(position).x,
+          toVector2(position).y,
+          this.position.z
+        );
+      }
+    });
   }
 
   /*   update(camera: OrthographicCamera) {

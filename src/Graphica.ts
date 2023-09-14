@@ -66,6 +66,7 @@ class Graphica {
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setClearAlpha(0);
 
     this.guiRoot = document.createElement("div");
     this.guiRoot.className = "gui";
