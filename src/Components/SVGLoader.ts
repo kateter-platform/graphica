@@ -1,15 +1,9 @@
 import {
-  Color,
   DoubleSide,
   Group,
   Mesh,
   MeshBasicMaterial,
-  Shape,
   ShapeGeometry,
-  Line,
-  LineBasicMaterial,
-  BufferGeometry,
-  BufferAttribute,
   Vector2,
   Box3,
   Vector3,
@@ -17,7 +11,6 @@ import {
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./interfaces";
-import { InputPosition } from "./types";
 
 class SVG extends Component {
   draggable = undefined;
