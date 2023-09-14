@@ -19,7 +19,6 @@
 
 import { Vector2 } from "three";
 import Grid from "./Components/Grid";
-import BoundingBox from "./Components/Physics/Collision/BoundingBox";
 import Polygon from "./Components/Shape";
 import Graphica from "./Graphica";
 import Point from "./Components/Point";
@@ -43,15 +42,9 @@ const b2 = new Polygon([
   [1, 1],
 ]);
 
-const c = new BoundingBox(b1);
-
-const d = new BoundingBox(b2);
-
 const e = new Point(0, 0, { draggable: "unrestricted" });
 
 a.add(e);
-a.add(d);
-a.add(c);
 a.add(b);
 a.add(b1);
 a.add(b2);
@@ -59,5 +52,4 @@ a.add(b2);
 a.run((e: number) => {
   b1.setPosition([e / 4, e / 4]);
   b2.setPosition([e / 4, e / 4]);
-  console.log(c.collidesWith(d));
 });

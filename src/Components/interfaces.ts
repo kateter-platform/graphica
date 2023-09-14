@@ -15,9 +15,9 @@ export class Component extends Mesh {
 }
 
 export interface Collider extends Object3D {
-  collidesWith(other: Collider): boolean;
+  collidesWith(other: Object3D): boolean;
 
-  distanceTo(other: Collider): number;
+  distanceTo(other: Object3D): number;
 }
 
 export type ConstrainFunction = (x: number, y: number) => [number, number];
