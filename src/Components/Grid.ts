@@ -54,9 +54,10 @@ type GridOptions = {
   cellSize?: number;
   pointRadius?: number;
   pointColor?: Color;
-  labels?: boolean;
+  labels: boolean;
   yLabelText?: string;
   xLabelText?: string;
+  hasAxis?: boolean;
 };
 
 const defaultGridOptions: GridOptions = {
@@ -66,6 +67,7 @@ const defaultGridOptions: GridOptions = {
   labels: true,
   xLabelText: "x",
   yLabelText: "y",
+  hasAxis: true,
 };
 
 const LABELS_LENGTH = 81;
@@ -83,6 +85,8 @@ class Grid extends Component {
   private labelsX: Text[];
   private labelsY: Text[];
 
+  private hasLabels: boolean;
+
   constructor(options?: GridOptions) {
     super();
 
@@ -93,12 +97,13 @@ class Grid extends Component {
       labels,
       xLabelText,
       yLabelText,
+      hasAxis,
     } = {
       ...defaultGridOptions,
       ...options,
     };
     this.cellSize = cellSize ?? 10;
-
+    this.hasLabels = labels;
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
       window.innerHeight
@@ -131,36 +136,42 @@ class Grid extends Component {
     );
     this.xLabel = new Text(xLabelText, { color: "#000000", fontSize: 22 });
     this.yLabel = new Text(yLabelText, { color: "#000000", fontSize: 22 });
+
+    this.add(this.shaderMesh);
+
     if (labels) {
       this.add(this.xLabel, this.yLabel);
     }
 
-    this.add(this.shaderMesh, this.xAxis, this.yAxis);
+    if (hasAxis) {
+      this.add(this.xAxis, this.yAxis);
+    }
 
     // Coordinate labels
     this.labelsX = [];
     this.labelsY = [];
-
-    for (let i = 0; i < LABELS_LENGTH; i++) {
-      const worldIndex = i - LABELS_LENGTH / 2;
-      this.labelsX.push(
-        new Text(worldIndex.toString(), {
-          position: [worldIndex, 0],
-          fontSize: 16,
-          anchorX: "center",
-          anchorY: "top",
-        })
-      );
-      this.labelsY.push(
-        new Text(worldIndex.toString(), {
-          position: [0, worldIndex],
-          fontSize: 16,
-          anchorX: "right",
-          anchorY: "middle",
-        })
-      );
-      this.add(this.labelsX[i]);
-      this.add(this.labelsY[i]);
+    if (labels) {
+      for (let i = 0; i < LABELS_LENGTH; i++) {
+        const worldIndex = i - LABELS_LENGTH / 2;
+        this.labelsX.push(
+          new Text(worldIndex.toString(), {
+            position: [worldIndex, 0],
+            fontSize: 16,
+            anchorX: "center",
+            anchorY: "top",
+          })
+        );
+        this.labelsY.push(
+          new Text(worldIndex.toString(), {
+            position: [0, worldIndex],
+            fontSize: 16,
+            anchorX: "right",
+            anchorY: "middle",
+          })
+        );
+        this.add(this.labelsX[i]);
+        this.add(this.labelsY[i]);
+      }
     }
   }
 
@@ -216,19 +227,21 @@ class Grid extends Component {
       if (numberX === 0) contentX = "";
       if (numberY === 0) contentY = "";
 
-      this.labelsX[i].setText(contentX);
-      this.labelsX[i].position.set(
-        roundedOffsetX + worldX,
-        axisMargin,
-        this.labelsX[i].position.z
-      );
+      if (this.hasLabels) {
+        this.labelsX[i].setText(contentX);
+        this.labelsX[i].position.set(
+          roundedOffsetX + worldX,
+          axisMargin,
+          this.labelsX[i].position.z
+        );
 
-      this.labelsY[i].setText(contentY);
-      this.labelsY[i].position.set(
-        axisMargin,
-        roundedOffsetY + worldY,
-        this.labelsY[i].position.z
-      );
+        this.labelsY[i].setText(contentY);
+        this.labelsY[i].position.set(
+          axisMargin,
+          roundedOffsetY + worldY,
+          this.labelsY[i].position.z
+        );
+      }
     }
   }
 

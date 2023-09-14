@@ -1,8 +1,8 @@
-import { OrthographicCamera } from "three";
+import { Box3, Event, Object3D, OrthographicCamera, Vector3 } from "three";
 import renderToString from "katex";
 import { CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer";
-import { toVector3 } from "../utils";
-import { Component, Draggable } from "./interfaces";
+import { toVector2, toVector3 } from "../utils";
+import { Collider, Component, Draggable } from "./interfaces";
 import { InputPosition } from "./types";
 
 type LatexOptions = {
@@ -14,7 +14,7 @@ type LatexOptions = {
   draggable?: Draggable;
 };
 
-class Latex extends Component {
+class Latex extends Component implements Collider {
   draggable;
 
   constructor(
@@ -58,6 +58,34 @@ class Latex extends Component {
     this.add(container);
   }
 
+  collidesWith(other: Object3D): boolean {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    return box1.intersectsBox(box2);
+  }
+
+  distanceTo(other: Object3D<Event>): number {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    const center1 = new Vector3();
+    const center2 = new Vector3();
+    box1.getCenter(center1);
+    box2.getCenter(center2);
+    center1.setZ(0);
+    center2.setZ(0);
+
+    return center1.distanceTo(center2);
+  }
+
+  setPosition(position: InputPosition) {
+    this.position.set(
+      toVector2(position).x,
+      toVector2(position).y,
+      this.position.z
+    );
+  }
   update(camera: OrthographicCamera) {
     this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
   }

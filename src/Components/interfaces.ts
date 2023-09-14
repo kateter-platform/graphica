@@ -1,4 +1,4 @@
-import { OrthographicCamera, Mesh, Object3D, Box3, Sphere } from "three";
+import { OrthographicCamera, Mesh, Object3D } from "three";
 
 export class Component extends Mesh {
   draggable: Draggable;
@@ -15,6 +15,7 @@ export class Component extends Mesh {
 }
 
 export interface Collider extends Object3D {
+  //The bounding box does take into account Z level meaning this is not a fully good solution yet but it works in the meantime
   collidesWith(other: Object3D): boolean;
 
   distanceTo(other: Object3D): number;
