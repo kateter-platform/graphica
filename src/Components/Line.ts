@@ -59,7 +59,7 @@ class Line extends Component {
       arrowheadLine.name = "arrowhead";
       this.add(arrowheadLine);
     }
-    this.updateGeometry(start, end);
+    this.initialUpdateGeometry(start, end);
   }
 
   public updateGeometry(
@@ -108,6 +108,20 @@ class Line extends Component {
         0,
       ]);
     }
+  }
+
+  private initialUpdateGeometry(start: InputPosition, end: InputPosition) {
+    const startPosition = toVector2(start);
+    const endPosition = toVector2(end);
+
+    (this.geometry as LineGeometry).setPositions([
+      startPosition.x,
+      startPosition.y,
+      1,
+      endPosition.x,
+      endPosition.y,
+      1,
+    ]);
   }
 
   setEnd(end: InputPosition) {

@@ -36,7 +36,7 @@ class SVG extends Component {
               : 0x000000;
 
           const strokeWidth =
-            path.userData.style.strokeWidth !== undefined
+            path.userData?.style.strokeWidth !== undefined
               ? path.userData?.style.strokeWidth
               : 1;
 
