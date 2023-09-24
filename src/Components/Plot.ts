@@ -50,7 +50,7 @@ class Plot extends Component {
       numPoints = 1000,
       dashed = false,
       lineWidth = 1,
-      color = 0xff0000,
+      color = 0xffa500,
       coefficients = {},
       plotBetween = undefined,
     } = { ...defaultPlotOptions, ...options };
