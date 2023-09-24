@@ -17,7 +17,7 @@ const defaultPlotOptions = {
   numPoints: 1500,
   dashed: false,
   lineWidth: 4,
-  color: 0xff0000,
+  color: 0xfaa307,
   coefficients: {},
   plotBetween: undefined,
 };
