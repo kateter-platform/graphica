@@ -11,7 +11,7 @@ export { default as Latex } from "./Components/Latex";
 export { default as Line } from "./Components/Line";
 export { default as Plot } from "./Components/Plot";
 export { default as Point } from "./Components/Point";
-export { default as Shape } from "./Components/Shape";
+export { default as Polygon } from "./Components/Shape";
 export { default as Slider } from "./Components/Slider";
 export { default as Text } from "./Components/Text";
 export { default as Vector } from "./Components/Vector";
