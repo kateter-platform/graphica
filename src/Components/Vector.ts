@@ -68,6 +68,14 @@ class Vector extends Line {
     return toVector2(this.vector).y;
   }
 
+  public getNormalizedX(): number {
+    return toVector2(this.vector).normalize().x;
+  }
+
+  public getNormalizedY(): number {
+    return toVector2(this.vector).normalize().y;
+  }
+
   update(camera: OrthographicCamera) {
     this.end = this.calculateEndPoint(this.start, toVector2(this.vector));
     this.updateGeometry(this.start, this.end, this.arrowhead, camera);
