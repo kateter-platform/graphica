@@ -4,8 +4,12 @@ import {
   CircleGeometry,
   RingGeometry,
   OrthographicCamera,
+  Event,
+  Object3D,
+  Box3,
+  Vector3,
 } from "three";
-import { Component } from "./interfaces";
+import { Collider, Component } from "./interfaces";
 
 export type CircleOptions = {
   color?: number;
@@ -17,7 +21,7 @@ export const defaultShapeOptions: CircleOptions = {
   segments: 64,
 };
 
-class Circle extends Component {
+class Circle extends Component implements Collider {
   radius: number;
   _strokeMesh: Mesh;
 
@@ -44,6 +48,33 @@ class Circle extends Component {
     this.add(this._strokeMesh);
     // set position of the mesh
     this.position.set(x, y, 0);
+  }
+
+  collidesWith(other: Object3D): boolean {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    // Set Z-coordinates to 0 for both boxes
+    box1.min.z = 0;
+    box1.max.z = 0;
+    box2.min.z = 0;
+    box2.max.z = 0;
+
+    return box1.intersectsBox(box2);
+  }
+
+  distanceTo(other: Object3D<Event>): number {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    const center1 = new Vector3();
+    const center2 = new Vector3();
+    box1.getCenter(center1);
+    box2.getCenter(center2);
+    center1.setZ(0);
+    center2.setZ(0);
+
+    return center1.distanceTo(center2);
   }
 
   update(camera: OrthographicCamera) {
