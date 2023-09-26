@@ -1,6 +1,14 @@
-import { CircleGeometry, MeshBasicMaterial, Mesh } from "three";
+import {
+  CircleGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  Event,
+  Object3D,
+  Box3,
+  Vector3,
+} from "three";
 import Text from "./Text";
-import { Component, Draggable } from "./interfaces";
+import { Collider, Component, Draggable } from "./interfaces";
 
 type PointOptions = {
   label?: boolean;
@@ -16,7 +24,7 @@ const defaultPointOptions = {
   label: false,
 };
 
-class Point extends Component {
+class Point extends Component implements Collider {
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
     const { color, draggable, decimals, label } = {
@@ -55,6 +63,32 @@ class Point extends Component {
       text.name = "label";
       this.add(text);
     }
+  }
+
+  collidesWith(other: Object3D): boolean {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    // Set Z-coordinates to 0 for both boxes
+    box1.min.z = 0;
+    box1.max.z = 0;
+    box2.min.z = 0;
+    box2.max.z = 0;
+
+    return box1.intersectsBox(box2);
+  }
+  distanceTo(other: Object3D<Event>): number {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    const center1 = new Vector3();
+    const center2 = new Vector3();
+    box1.getCenter(center1);
+    box2.getCenter(center2);
+    center1.setZ(0);
+    center2.setZ(0);
+
+    return center1.distanceTo(center2);
   }
 
   dragUpdate() {

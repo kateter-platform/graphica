@@ -1,7 +1,14 @@
-import { Vector2, OrthographicCamera } from "three";
+import {
+  Vector2,
+  OrthographicCamera,
+  Event,
+  Object3D,
+  Box3,
+  Vector3,
+} from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { toVector2 } from "../utils";
-import { Component } from "./interfaces";
+import { Collider, Component } from "./interfaces";
 import { InputPosition } from "./types";
 
 const ARROWHEAD_LENGTH = 12;
@@ -24,7 +31,7 @@ export const defaultLineOptions: LineOptions = {
   transparent: false,
 };
 
-class Line extends Component {
+class Line extends Component implements Collider {
   start: InputPosition;
   end: InputPosition;
   draggable = undefined;
@@ -62,6 +69,33 @@ class Line extends Component {
     this.initialUpdateGeometry(start, end);
   }
 
+  collidesWith(other: Object3D): boolean {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    // Set Z-coordinates to 0 for both boxes
+    box1.min.z = 0;
+    box1.max.z = 0;
+    box2.min.z = 0;
+    box2.max.z = 0;
+
+    return box1.intersectsBox(box2);
+  }
+
+  distanceTo(other: Object3D<Event>): number {
+    const box1 = new Box3().setFromObject(this);
+    const box2 = new Box3().setFromObject(other);
+
+    const center1 = new Vector3();
+    const center2 = new Vector3();
+    box1.getCenter(center1);
+    box2.getCenter(center2);
+    center1.setZ(0);
+    center2.setZ(0);
+
+    return center1.distanceTo(center2);
+  }
+
   public updateGeometry(
     start: InputPosition,
     end: InputPosition,
@@ -76,10 +110,10 @@ class Line extends Component {
     (this.geometry as LineGeometry).setPositions([
       startPosition.x,
       startPosition.y,
-      1,
+      1.1,
       endPosition.x,
       endPosition.y,
-      1,
+      1.1,
     ]);
 
     if (arrowhead) {

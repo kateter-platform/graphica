@@ -30,6 +30,7 @@ type GraphicaOptions = {
   defaultPosition: InputPosition;
   minZoom: number;
   maxZoom: number;
+  autoStartClock: boolean;
 };
 
 const defaultGraphicaOptions: GraphicaOptions = {
@@ -39,6 +40,7 @@ const defaultGraphicaOptions: GraphicaOptions = {
   defaultPosition: [0, 0],
   minZoom: 1,
   maxZoom: 500,
+  autoStartClock: true,
 };
 
 //Note for docs: minZoom is how far you are allowed to zoom IN. MaxZoom is how far you are allowed to zoom OUT.
@@ -57,12 +59,19 @@ class Graphica {
   clock: Clock;
 
   constructor(options?: GraphicaOptions) {
-    const { root, disableControls, defaultZoom, minZoom, maxZoom } = {
+    const {
+      root,
+      disableControls,
+      defaultZoom,
+      minZoom,
+      maxZoom,
+      autoStartClock,
+    } = {
       ...defaultGraphicaOptions,
       ...options,
     };
 
-    this.clock = new Clock();
+    this.clock = new Clock(autoStartClock);
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -177,11 +186,18 @@ class Graphica {
     window.addEventListener("resize", onWindowResize);
   }
 
-  run(onUpdate?: (elapsedTime: number) => void) {
-    if (!this.clock.running) {
+  run(
+    onUpdate?: (elapsedTime: number) => void,
+    clockState?: { conditional: boolean }
+  ) {
+    clockState = clockState ?? { conditional: true };
+
+    if (!this.clock.running && clockState.conditional) {
       this.clock.start();
+    } else if (this.clock.running && !clockState.conditional) {
+      this.clock.stop();
     }
-    requestAnimationFrame(this.run.bind(this, onUpdate));
+    requestAnimationFrame(this.run.bind(this, onUpdate, clockState));
     this.scene.traverse((child: Object3D) => {
       if (!(child instanceof Component)) {
         return;
@@ -227,6 +243,10 @@ class Graphica {
 
   disableControls() {
     this.controls.enabled = false;
+  }
+
+  public getClockTime(): number {
+    return this.clock.getElapsedTime();
   }
 }
 

@@ -64,8 +64,15 @@ class Text extends Component implements Collider {
     const box1 = new Box3().setFromObject(this);
     const box2 = new Box3().setFromObject(other);
 
+    // Set Z-coordinates to 0 for both boxes
+    box1.min.z = 0;
+    box1.max.z = 0;
+    box2.min.z = 0;
+    box2.max.z = 0;
+
     return box1.intersectsBox(box2);
   }
+
   distanceTo(other: Object3D<Event>): number {
     const box1 = new Box3().setFromObject(this);
     const box2 = new Box3().setFromObject(other);
