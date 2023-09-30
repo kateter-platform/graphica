@@ -7,6 +7,7 @@ import {
   Object3D,
   Clock,
 } from "three";
+import Stats from "stats.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer";
 import {
@@ -48,7 +49,9 @@ const defaultGraphicaOptions: GraphicaOptions = {
 class Graphica {
   components: Component[];
   draggables: Component[];
+  updateComponents: Component[];
 
+  stats?: Stats;
   renderer: WebGLRenderer;
   domRenderer: CSS3DRenderer;
   camera: OrthographicCamera;
@@ -57,6 +60,8 @@ class Graphica {
 
   guiRoot: HTMLElement;
   clock: Clock;
+
+  onUpdateFunction?: (elapsedTime: number) => void;
 
   constructor(options?: GraphicaOptions) {
     const {
@@ -117,6 +122,12 @@ class Graphica {
 
     this.components = [];
     this.draggables = [];
+    this.updateComponents = [];
+    if (process.env.NODE_ENV === "development") {
+      this.stats = new Stats();
+      this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+      document.body.appendChild(this.stats.dom);
+    }
 
     const dragControls = new DragControls(
       this.draggables,
@@ -186,29 +197,22 @@ class Graphica {
     window.addEventListener("resize", onWindowResize);
   }
 
-  run(
-    onUpdate?: (elapsedTime: number) => void,
-    clockState?: { conditional: boolean }
-  ) {
-    clockState = clockState ?? { conditional: true };
-
-    if (!this.clock.running && clockState.conditional) {
-      this.clock.start();
-    } else if (this.clock.running && !clockState.conditional) {
-      this.clock.stop();
-    }
-    requestAnimationFrame(this.run.bind(this, onUpdate, clockState));
-    this.scene.traverse((child: Object3D) => {
-      if (!(child instanceof Component)) {
-        return;
-      }
-      if (child.update) {
-        child.update(this.camera);
-      }
+  doRun = () => {
+    this.stats?.begin();
+    requestAnimationFrame(this.doRun);
+    this.updateComponents.forEach((component) => {
+      if (component.update) component.update(this.camera);
     });
-    if (onUpdate) onUpdate(this.clock.getElapsedTime());
+    if (this.onUpdateFunction)
+      this.onUpdateFunction(this.clock.getElapsedTime());
     this.domRenderer.render(this.scene, this.camera);
     this.renderer.render(this.scene, this.camera);
+    this.stats?.end();
+  };
+
+  run(onUpdate?: (elapsedTime: number) => void) {
+    this.onUpdateFunction = onUpdate;
+    this.doRun();
   }
 
   add(component: Component) {
@@ -218,6 +222,15 @@ class Graphica {
       this.draggables.push(component);
     }
     this.components.push(component);
+
+    this.scene.traverse((child: Object3D) => {
+      if (!(child instanceof Component)) {
+        return;
+      }
+      if (child.update && !this.updateComponents.includes(child)) {
+        this.updateComponents.push(child);
+      }
+    });
   }
 
   remove(component: Component) {
@@ -235,6 +248,14 @@ class Graphica {
 
   removeGui(component: GuiComponent) {
     this.guiRoot.removeChild(component.htmlElement);
+  }
+
+  startClock(): void {
+    this.clock.start();
+  }
+
+  stopClock(): void {
+    this.clock.stop();
   }
 
   enableControls() {
