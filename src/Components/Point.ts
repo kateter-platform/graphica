@@ -8,13 +8,14 @@ import {
   Vector3,
 } from "three";
 import Text from "./Text";
-import { Collider, Component, Draggable } from "./interfaces";
+import { Collider, Component, DragListener, Draggable } from "./interfaces";
 
 type PointOptions = {
   label?: boolean;
   decimals?: number;
   color?: string;
   draggable?: Draggable;
+  dragListeners?: ((point: Point) => void)[];
 };
 
 const defaultPointOptions = {
@@ -22,12 +23,15 @@ const defaultPointOptions = {
   draggable: undefined,
   decimals: 1,
   label: false,
+  dragListeners: [],
 };
 
-class Point extends Component implements Collider {
+class Point extends Component implements Collider, DragListener<Point> {
+  dragListeners: ((point: Point) => void)[];
+
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
-    const { color, draggable, decimals, label } = {
+    const { color, draggable, decimals, label, dragListeners } = {
       ...defaultPointOptions,
       ...options,
     };
@@ -48,6 +52,7 @@ class Point extends Component implements Collider {
     this.add(strokeMesh);
     // set position of the mesh
     this.position.set(x, y, 2);
+    this.dragListeners = dragListeners ?? [];
 
     if (label) {
       const text = new Text(
@@ -63,6 +68,10 @@ class Point extends Component implements Collider {
       text.name = "label";
       this.add(text);
     }
+  }
+
+  addDragListener(listener: (point: Point) => void) {
+    this.dragListeners.push(listener);
   }
 
   collidesWith(other: Object3D): boolean {
@@ -100,6 +109,7 @@ class Point extends Component implements Collider {
       message: "Point has been moved",
       position: this.position,
     }); // Dispatch the drag event
+    this.dragListeners.forEach((fn) => fn(this));
   }
 
   update(camera: THREE.OrthographicCamera) {

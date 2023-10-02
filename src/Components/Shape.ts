@@ -11,18 +11,22 @@ import {
 } from "three";
 import { toVector2 } from "../utils";
 import Line from "./Line";
-import { Collider, Component } from "./interfaces";
+import { Collider, Component, DragListener, Draggable } from "./interfaces";
 import { InputPosition } from "./types";
 
 export type PolygonOptions = {
   color?: number;
   fill?: boolean;
   opacity?: number;
+  draggable?: Draggable;
+  dragListeners?: ((point: Polygon) => void)[];
 };
 
 export const defaultShapeOptions: PolygonOptions = {
   color: 0xfaa307,
   opacity: 0.6,
+  draggable: undefined,
+  dragListeners: [],
 };
 
 type PolygonVertices = [
@@ -32,16 +36,19 @@ type PolygonVertices = [
   ...InputPosition[]
 ];
 
-class Polygon extends Component implements Collider {
-  draggable = undefined;
+class Polygon extends Component implements Collider, DragListener<Polygon> {
   vertices: PolygonVertices;
   color: number;
   object: Object3D;
+  dragListeners: ((value: Polygon) => void)[];
 
   constructor(vertices: PolygonVertices, options?: PolygonOptions) {
     super();
 
-    const { color, opacity } = { ...defaultShapeOptions, ...options };
+    const { color, opacity, draggable, dragListeners } = {
+      ...defaultShapeOptions,
+      ...options,
+    };
 
     const shape = new Shape(vertices.map((e) => toVector2(e)));
     const material = new MeshBasicMaterial({
@@ -53,8 +60,9 @@ class Polygon extends Component implements Collider {
 
     const mesh = new Mesh(geometry, material);
     mesh.scale.set(1, 1, 1);
-    this.add(mesh);
-    this.object = mesh;
+    this.geometry = mesh.geometry;
+    this.material = mesh.material;
+    this.position.setZ(1.5);
 
     const group = new Group();
     const lines = [];
@@ -74,7 +82,18 @@ class Polygon extends Component implements Collider {
     this.object = group;
     this.vertices = vertices;
     this.color = color ?? 0xfaa307;
+    this.draggable = draggable;
+    this.dragListeners = dragListeners ?? [];
   }
+
+  addDragListener(listener: (value: Polygon) => void) {
+    this.dragListeners.push(listener);
+  }
+
+  dragUpdate(): void {
+    this.dragListeners.forEach((fn) => fn(this));
+  }
+
   collidesWith(other: Object3D): boolean {
     const box1 = new Box3().setFromObject(this);
     const box2 = new Box3().setFromObject(other);
