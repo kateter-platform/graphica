@@ -137,7 +137,6 @@ class Graphica {
 
     dragControls.addEventListener("dragstart", function (event) {
       controls.enabled = false;
-
       const draggedObject = event.object;
       draggedObject.is_dragged = true;
       draggedObject.userData.initialPosition = draggedObject.position.clone();
@@ -170,7 +169,6 @@ class Graphica {
 
     dragControls.addEventListener("dragend", function (event) {
       controls.enabled = true;
-
       const draggedObject = event.object;
       draggedObject.is_dragged = false;
     });

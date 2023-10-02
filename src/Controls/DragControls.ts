@@ -84,7 +84,6 @@ class DragControls extends EventDispatcher {
         }
 
         this.dispatchEvent({ type: "drag", object: _selected });
-
         return;
       }
 

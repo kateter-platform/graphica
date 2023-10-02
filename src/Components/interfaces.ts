@@ -21,6 +21,12 @@ export interface Collider extends Object3D {
   distanceTo(other: Object3D): number;
 }
 
+export interface DragListener<T> {
+  dragListeners: ((value: T) => void)[];
+  dragUpdate(): void;
+  addDragListener: (listener: (value: T) => void) => void;
+}
+
 export type ConstrainFunction = (x: number, y: number) => [number, number];
 
 export type Draggable =
