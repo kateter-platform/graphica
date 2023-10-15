@@ -1,31 +1,39 @@
 import { Vector2, OrthographicCamera } from "three";
 import { toVector2, toVector3 } from "./../utils";
 import Line from "./Line";
+import { Draggable } from "./interfaces";
 import { InputPosition } from "./types";
 
 const defaultVectorOptions = {
   color: 0x000000,
   normalize: true,
+  draggable: undefined,
 };
 
 export type VectorOptions = {
   color?: number;
   normalize?: boolean;
+  draggable?: Draggable;
 };
 
 class Vector extends Line {
   private vector: InputPosition;
 
   constructor(
-    position: InputPosition,
+    origin: InputPosition,
     vector: InputPosition,
     options?: VectorOptions
   ) {
-    const { color, normalize } = {
+    const { color, normalize, draggable } = {
       ...defaultVectorOptions,
       ...options,
     };
-    super(position, position, { lineWidth: 4, arrowhead: true, color: color });
+    super(origin, origin, {
+      lineWidth: 4,
+      arrowhead: true,
+      color: color,
+      draggable: draggable,
+    });
     if (normalize) {
       this.vector = toVector2(vector).normalize();
     } else {
@@ -50,6 +58,10 @@ class Vector extends Line {
 
   public setOriginPoint(position: InputPosition) {
     this.start = position;
+  }
+
+  public getOriginPoint(): InputPosition {
+    return this.start;
   }
 
   public normalize(): void {
