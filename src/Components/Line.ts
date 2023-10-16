@@ -119,10 +119,10 @@ class Line extends Component implements Collider {
     (this.geometry as LineGeometry).setPositions([
       startPosition.x,
       startPosition.y,
-      1.1,
+      this.position.z,
       endPosition.x,
       endPosition.y,
-      1.1,
+      this.position.z,
     ]);
 
     if (arrowhead) {
@@ -160,10 +160,10 @@ class Line extends Component implements Collider {
     (this.geometry as LineGeometry).setPositions([
       startPosition.x,
       startPosition.y,
-      1.1,
+      this.position.z,
       endPosition.x,
       endPosition.y,
-      1.1,
+      this.position.z,
     ]);
   }
 

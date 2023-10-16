@@ -3,6 +3,9 @@ import { OrthographicCamera, Mesh, Object3D } from "three";
 export class Component extends Mesh {
   draggable: Draggable;
   is_dragged: boolean;
+  setZIndex(z: number): void {
+    this.position.setZ(z);
+  }
   update?(camera: OrthographicCamera): void;
   onWindowResize?(): void;
   dragUpdate?(): void;

@@ -104,7 +104,7 @@ class Graphica {
     );
     // this.camera.position.setX(toVector2(defaultPosition).x);
     // this.camera.position.setY(toVector2(defaultPosition).y);
-    this.camera.position.setZ(5);
+    this.camera.position.setZ(100);
 
     this.camera.zoom = defaultZoom;
     this.camera.updateProjectionMatrix();
@@ -214,12 +214,13 @@ class Graphica {
   }
 
   add(component: Component) {
-    this.scene.add(component);
-    // Add draggable functionality to draggable components
+    this.components.push(component);
     if (component.draggable !== undefined) {
       this.draggables.push(component);
     }
-    this.components.push(component);
+    component.setZIndex(this.components.length + 1);
+    this.scene.add(component);
+    // Add draggable functionality to draggable components
 
     this.scene.traverse((child: Object3D) => {
       if (!(child instanceof Component)) {
