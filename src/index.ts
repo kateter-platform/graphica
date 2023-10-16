@@ -17,5 +17,4 @@ export { default as Text } from "./Components/Text";
 export { default as Vector } from "./Components/Vector";
 export { default as Fraction } from "./Components/Derived/Fraction";
 export { default as SVGLoader } from "./Components/SVGLoader";
-
 export * as three from "three";

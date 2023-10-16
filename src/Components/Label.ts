@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Object3D, Group, OrthographicCamera } from "three";
+import { Vector2, Object3D, Group, OrthographicCamera } from "three";
 import { toVector3 } from "../utils";
 import Line from "./Line";
 import Text from "./Text";
@@ -8,26 +8,33 @@ import { InputPosition } from "./types";
 const SCALING_FACTOR = 10;
 
 type LabelOptions = {
-  text: string;
   start: InputPosition;
-  deltaX?: number;
-  deltaY?: number;
+  deltaX: number;
+  deltaY: number;
+};
+
+const defaultLabelOptions: LabelOptions = {
+  start: new Vector2(0, 0),
+  deltaX: 4,
+  deltaY: 20,
 };
 
 class Label extends Component {
-  position: Vector3;
   object: Object3D;
   draggable = undefined;
 
-  constructor({
-    text,
-    start = new Vector2(0, 0),
-    deltaX = 20,
-    deltaY = 4,
-  }: LabelOptions) {
+  constructor(text: string, options?: LabelOptions) {
+    const { start, deltaX, deltaY } = {
+      ...defaultLabelOptions,
+      ...options,
+    };
     super();
     // set position of the point instance
-    this.position = toVector3(start);
+    this.position.set(
+      toVector3(start).x,
+      toVector3(start).y,
+      toVector3(start).z
+    );
 
     // calculate break and end points
     const breakPoint = this.calculateBreakPoint(deltaX, deltaY);
@@ -38,15 +45,14 @@ class Label extends Component {
     const line2 = new Line(breakPoint, endPoint);
     const textComponent = new Text(text, {
       color: "black",
-      fontSize: 22,
+      fontSize: 15,
       anchorY: "middle",
       anchorX: deltaX < 0 ? "right" : "left",
     });
-    textComponent.position.set(
+    textComponent.setPosition([
       endPoint.x + (deltaX < 0 ? -1 : 1) * 10,
       endPoint.y,
-      0.1
-    );
+    ]);
 
     // Create a group to contain both lines and text
     this.object = new Group();
@@ -55,7 +61,7 @@ class Label extends Component {
     this.object.add(textComponent);
 
     // set position of the group
-    this.object.position.set(this.position.x, this.position.y, 0);
+    this.object.position.set(1, 5, 5);
   }
 
   private calculateEndPoint(deltaX: number, deltaY: number) {

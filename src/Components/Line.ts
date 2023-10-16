@@ -8,7 +8,7 @@ import {
 } from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { toVector2 } from "../utils";
-import { Collider, Component } from "./interfaces";
+import { Collider, Component, Draggable } from "./interfaces";
 import { InputPosition } from "./types";
 
 const ARROWHEAD_LENGTH = 12;
@@ -20,6 +20,7 @@ export type LineOptions = {
   dashed?: boolean;
   opacity?: number;
   transparent?: boolean;
+  draggable?: Draggable;
 };
 
 export const defaultLineOptions: LineOptions = {
@@ -29,24 +30,31 @@ export const defaultLineOptions: LineOptions = {
   dashed: false,
   opacity: 1,
   transparent: false,
+  draggable: undefined,
 };
 
 class Line extends Component implements Collider {
   start: InputPosition;
   end: InputPosition;
-  draggable = undefined;
   arrowhead: boolean;
 
   constructor(start: InputPosition, end: InputPosition, options?: LineOptions) {
     super();
-    const { color, lineWidth, arrowhead, dashed, opacity, transparent } = {
+    const {
+      color,
+      lineWidth,
+      arrowhead,
+      dashed,
+      opacity,
+      transparent,
+      draggable,
+    } = {
       ...defaultLineOptions,
       ...options,
     };
     this.start = start;
     this.end = end;
     this.arrowhead = arrowhead ?? false;
-
     this.material = new LineMaterial({
       color: color,
       linewidth: lineWidth,
@@ -67,6 +75,7 @@ class Line extends Component implements Collider {
       this.add(arrowheadLine);
     }
     this.initialUpdateGeometry(start, end);
+    this.draggable = draggable;
   }
 
   collidesWith(other: Object3D): boolean {
@@ -151,22 +160,22 @@ class Line extends Component implements Collider {
     (this.geometry as LineGeometry).setPositions([
       startPosition.x,
       startPosition.y,
-      1,
+      1.1,
       endPosition.x,
       endPosition.y,
-      1,
+      1.1,
     ]);
   }
 
-  setEnd(end: InputPosition) {
+  public setEnd(end: InputPosition) {
     this.end = end;
   }
 
-  setStart(start: InputPosition) {
+  public setStart(start: InputPosition) {
     this.start = start;
   }
 
-  setPosition(start: InputPosition, end: InputPosition) {
+  public setPosition(start: InputPosition, end: InputPosition) {
     this.start = start;
     this.end = end;
   }
