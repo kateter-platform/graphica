@@ -188,5 +188,12 @@ class Arc extends Component {
     this._text.setText(Math.round((angle * 180) / Math.PI).toString() + " °");
     this._text.position.set(-60 / cameraZoom, 0, this._text.position.z);
   }
+
+  public getAngle(unit = "radians"): number {
+    if (unit === "degrees") {
+      return this._calcAngle() * (180 / Math.PI);
+    }
+    return this._calcAngle();
+  }
 }
 export default Arc;

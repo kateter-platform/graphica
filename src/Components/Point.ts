@@ -28,7 +28,6 @@ const defaultPointOptions = {
 
 class Point extends Component implements Collider, DragListener<Point> {
   dragListeners: ((point: Point) => void)[];
-
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
     const { color, draggable, decimals, label, dragListeners } = {
@@ -63,6 +62,7 @@ class Point extends Component implements Collider, DragListener<Point> {
           anchorY: "middle",
           anchorX: "left",
           position: [15, 0],
+          responsiveScale: false,
         }
       );
       text.name = "label";

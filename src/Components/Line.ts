@@ -160,10 +160,10 @@ class Line extends Component implements Collider {
     (this.geometry as LineGeometry).setPositions([
       startPosition.x,
       startPosition.y,
-      1,
+      1.1,
       endPosition.x,
       endPosition.y,
-      1,
+      1.1,
     ]);
   }
 

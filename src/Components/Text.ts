@@ -13,6 +13,7 @@ type TextOptions = {
   anchorY?: "top" | "middle" | "bottom";
   anchorX?: "left" | "center" | "right";
   weight?: fontWeight;
+  responsiveScale?: boolean;
 };
 
 const defaultTextOptions = {
@@ -22,6 +23,7 @@ const defaultTextOptions = {
   anchorX: "left",
   anchorY: "bottom",
   weight: "regular" as fontWeight,
+  responsiveScale: true,
 };
 
 const fontMap = {
@@ -36,11 +38,20 @@ type TroikaTextType = InstanceType<typeof TroikaText>;
 class Text extends Component implements Collider {
   draggable = undefined;
   renderText: TroikaTextType;
+  responsiveScale: boolean;
 
   constructor(text?: string, options?: TextOptions) {
     super();
 
-    const { position, color, fontSize, anchorX, anchorY, weight } = {
+    const {
+      position,
+      color,
+      fontSize,
+      anchorX,
+      anchorY,
+      weight,
+      responsiveScale,
+    } = {
       ...defaultTextOptions,
       ...options,
     };
@@ -58,6 +69,7 @@ class Text extends Component implements Collider {
     this.renderText = renderText;
     this.add(renderText);
     this.position.set(pos.x, pos.y, 0.1);
+    this.responsiveScale = responsiveScale;
   }
 
   collidesWith(other: Object3D): boolean {
@@ -99,7 +111,9 @@ class Text extends Component implements Collider {
   }
 
   update(camera: OrthographicCamera) {
-    this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+    if (this.responsiveScale) {
+      this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+    }
   }
 }
 

@@ -76,7 +76,13 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     lines.push([lastVertex, firstVertex]);
 
     lines.forEach((l) => {
-      group.add(new Line(l[0], l[1], { color: 0x080007, opacity: opacity }));
+      group.add(
+        new Line(l[0], l[1], {
+          color: 0x080007,
+          opacity: opacity,
+          draggable: undefined,
+        })
+      );
     });
     this.add(group);
     this.object = group;
@@ -127,15 +133,6 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
       toVector2(position).y,
       this.position.z
     );
-    this.children.forEach((child) => {
-      if (child instanceof Object3D) {
-        child.position.set(
-          toVector2(position).x,
-          toVector2(position).y,
-          this.position.z
-        );
-      }
-    });
   }
 
   /*   update(camera: OrthographicCamera) {
