@@ -66,8 +66,6 @@ class SVG extends Component {
                 resolution: new Vector2(window.innerWidth, window.innerHeight),
               });
               const line = new Line2(strokeGeometry, material);
-              console.log(shape.getPoints());
-              console.log(strokeWidth);
               group.add(line);
             }
           }

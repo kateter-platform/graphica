@@ -28,17 +28,31 @@ import Point from "./Components/Point";
 import Polygon from "./Components/Shape";
 import Vector from "./Components/Vector";
 import Graphica from "./Graphica";
+import Fraction from "./Components/Derived/Fraction";
+import Circle from "./Components/Circle";
 
 const g = new Graphica();
 const gg = new Grid();
 const line = new Line(new Vector2(2, 2), [5, 5], { draggable: "unrestricted" });
 
-const pp = new Point(0, 0, { draggable: "unrestricted" });
+const pp = new Point(0, 0, { draggable: "unrestricted", label: true });
+const pp2 = new Point(0, 1, { draggable: "unrestricted" });
+const s = new Circle(5, 5, 50);
+const c = new Polygon([
+  [0, 0],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+]);
 
 g.add(gg);
+g.add(s);
+g.add(c);
 g.add(line);
 g.add(pp);
+g.add(pp2);
+
 g.run(() => {
-  console.log("pp" + pp.position.z);
-  console.log("line" + line.position.z);
+  console.log("Sirkel: " + s.position.z);
+  console.log("polygon: " + c.position.z);
 });

@@ -218,7 +218,7 @@ class Graphica {
     if (component.draggable !== undefined) {
       this.draggables.push(component);
     }
-    component.setZIndex(this.components.length + 1);
+    component.setZIndex(this.components.length * 0.1 + 1);
     this.scene.add(component);
     // Add draggable functionality to draggable components
 

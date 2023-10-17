@@ -62,7 +62,6 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     mesh.scale.set(1, 1, 1);
     this.geometry = mesh.geometry;
     this.material = mesh.material;
-    this.position.setZ(1.5);
 
     const group = new Group();
     const lines = [];
@@ -76,13 +75,13 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     lines.push([lastVertex, firstVertex]);
 
     lines.forEach((l) => {
-      group.add(
-        new Line(l[0], l[1], {
-          color: 0x080007,
-          opacity: opacity,
-          draggable: undefined,
-        })
-      );
+      const a = new Line(l[0], l[1], {
+        color: 0x080007,
+        opacity: opacity,
+        draggable: undefined,
+      });
+      a.position.setZ(this.position.z + 0.01);
+      group.add(a);
     });
     this.add(group);
     this.object = group;
