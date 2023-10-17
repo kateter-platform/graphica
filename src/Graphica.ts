@@ -104,7 +104,7 @@ class Graphica {
     );
     // this.camera.position.setX(toVector2(defaultPosition).x);
     // this.camera.position.setY(toVector2(defaultPosition).y);
-    this.camera.position.setZ(100);
+    this.camera.position.setZ(1000);
 
     this.camera.zoom = defaultZoom;
     this.camera.updateProjectionMatrix();
@@ -218,7 +218,7 @@ class Graphica {
     if (component.draggable !== undefined) {
       this.draggables.push(component);
     }
-    component.setZIndex(this.components.length * 0.1 + 1);
+    component.setZIndex(1 + this.components.length);
     this.scene.add(component);
     // Add draggable functionality to draggable components
 
