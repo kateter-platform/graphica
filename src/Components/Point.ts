@@ -115,5 +115,9 @@ class Point extends Component implements Collider, DragListener<Point> {
   update(camera: THREE.OrthographicCamera) {
     this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
   }
+
+  public setPosition(x: number, y: number) {
+    this.position.set(x, y, this.position.z);
+  }
 }
 export default Point;

@@ -180,6 +180,10 @@ class Line extends Component implements Collider {
     this.end = end;
   }
 
+  public setZIndex(z: number): void {
+    this.position.setZ(z - 3);
+  }
+
   update(camera: OrthographicCamera) {
     this.updateGeometry(this.start, this.end, this.arrowhead, camera);
   }

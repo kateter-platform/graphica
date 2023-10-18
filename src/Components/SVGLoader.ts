@@ -35,10 +35,10 @@ class SVG extends Component {
               ? path.userData?.style.stroke
               : 0x000000;
 
-          const strokeWidth =
-            path.userData?.style.strokeWidth !== undefined
-              ? path.userData?.style.strokeWidth
-              : 1;
+          // const strokeWidth =
+          //   path.userData?.style.strokeWidth !== undefined
+          //     ? path.userData?.style.strokeWidth
+          //     : 1;
 
           const shapes = SVGLoader.createShapes(path);
 

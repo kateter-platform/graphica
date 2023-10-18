@@ -81,7 +81,6 @@ class Graphica {
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setClearAlpha(0);
-
     this.guiRoot = document.createElement("div");
     this.guiRoot.className = "gui";
     root.appendChild(this.guiRoot);
@@ -218,7 +217,8 @@ class Graphica {
     if (component.draggable !== undefined) {
       this.draggables.push(component);
     }
-    component.setZIndex(1 + this.components.length);
+    component.setZIndex(2 + this.components.length);
+
     this.scene.add(component);
     // Add draggable functionality to draggable components
 
