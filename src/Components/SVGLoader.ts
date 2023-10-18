@@ -35,10 +35,10 @@ class SVG extends Component {
               ? path.userData?.style.stroke
               : 0x000000;
 
-          const strokeWidth =
-            path.userData?.style.strokeWidth !== undefined
-              ? path.userData?.style.strokeWidth
-              : 1;
+          // const strokeWidth =
+          //   path.userData?.style.strokeWidth !== undefined
+          //     ? path.userData?.style.strokeWidth
+          //     : 1;
 
           const shapes = SVGLoader.createShapes(path);
 
@@ -66,8 +66,6 @@ class SVG extends Component {
                 resolution: new Vector2(window.innerWidth, window.innerHeight),
               });
               const line = new Line2(strokeGeometry, material);
-              console.log(shape.getPoints());
-              console.log(strokeWidth);
               group.add(line);
             }
           }

@@ -290,6 +290,10 @@ class Grid extends Component {
       window.innerHeight
     );
   }
+
+  public setZIndex(): void {
+    this.position.setZ(1);
+  }
 }
 
 export default Grid;

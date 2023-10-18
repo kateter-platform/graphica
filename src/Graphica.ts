@@ -81,7 +81,6 @@ class Graphica {
     this.renderer.setSize(window.innerWidth, window.innerHeight); // TODO: The size should be adaptive
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setClearAlpha(0);
-
     this.guiRoot = document.createElement("div");
     this.guiRoot.className = "gui";
     root.appendChild(this.guiRoot);
@@ -104,7 +103,7 @@ class Graphica {
     );
     // this.camera.position.setX(toVector2(defaultPosition).x);
     // this.camera.position.setY(toVector2(defaultPosition).y);
-    this.camera.position.setZ(5);
+    this.camera.position.setZ(1000);
 
     this.camera.zoom = defaultZoom;
     this.camera.updateProjectionMatrix();
@@ -214,12 +213,14 @@ class Graphica {
   }
 
   add(component: Component) {
-    this.scene.add(component);
-    // Add draggable functionality to draggable components
+    this.components.push(component);
     if (component.draggable !== undefined) {
       this.draggables.push(component);
     }
-    this.components.push(component);
+    component.setZIndex(2 + this.components.length);
+
+    this.scene.add(component);
+    // Add draggable functionality to draggable components
 
     this.scene.traverse((child: Object3D) => {
       if (!(child instanceof Component)) {

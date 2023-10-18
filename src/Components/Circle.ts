@@ -12,18 +12,19 @@ import {
 import { Collider, Component } from "./interfaces";
 
 export type CircleOptions = {
-  color?: number;
-  segments?: number;
+  color: number;
+  segments: number;
 };
 
 export const defaultShapeOptions: CircleOptions = {
   color: 0xfaa307,
-  segments: 64,
+  segments: 128,
 };
 
 class Circle extends Component implements Collider {
   radius: number;
   _strokeMesh: Mesh;
+  segments: number;
 
   constructor(x = 0, y = 0, radius = 30, options?: CircleOptions) {
     super();
@@ -37,7 +38,8 @@ class Circle extends Component implements Collider {
       transparent: true,
       opacity: 0.5,
     });
-    const strokeGeometry = new RingGeometry(radius - 1, radius, 50);
+    this.segments = segments;
+    const strokeGeometry = new RingGeometry(radius - 1, radius, this.segments);
     const strokeMaterial = new MeshBasicMaterial({ color: "#080007" });
     // set mesh of the point instance
     const circleMesh = new Mesh(geometry, material);
@@ -81,7 +83,7 @@ class Circle extends Component implements Collider {
     this._strokeMesh.geometry = new RingGeometry(
       this.radius - 4 / camera.zoom,
       this.radius,
-      50
+      this.segments
     );
   }
 }

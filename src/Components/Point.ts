@@ -45,12 +45,12 @@ class Point extends Component implements Collider, DragListener<Point> {
     // set mesh of the point instance
     const circleMesh = new Mesh(geometry, material);
     const strokeMesh = new Mesh(strokeGeometry, strokeMaterial);
-    strokeMesh.position.set(0, 0, -0.1);
+    strokeMesh.position.set(0, 0, this.position.z - 0.01);
     this.geometry = circleMesh.geometry;
     this.material = circleMesh.material;
     this.add(strokeMesh);
     // set position of the mesh
-    this.position.set(x, y, 2);
+    this.position.set(x, y, this.position.z);
     this.dragListeners = dragListeners ?? [];
 
     if (label) {
@@ -114,6 +114,10 @@ class Point extends Component implements Collider, DragListener<Point> {
 
   update(camera: THREE.OrthographicCamera) {
     this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+  }
+
+  public setPosition(x: number, y: number) {
+    this.position.set(x, y, this.position.z);
   }
 }
 export default Point;
