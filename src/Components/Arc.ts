@@ -3,6 +3,7 @@ import {
   CircleGeometry,
   Mesh,
   MeshBasicMaterial,
+  OrthographicCamera,
   Vector2,
 } from "three";
 import { Line2, LineMaterial } from "three-fatline";
@@ -65,9 +66,9 @@ class Arc extends Component {
     this.add(this._text);
 
     const angle = this._calcAngle();
-    this._updateOutline(angle);
-    this._updateArc(angle);
-    this._updateText(angle);
+    this._updateOutline(angle, 1);
+    this._updateArc(angle, 1);
+    this._updateText(angle, 1);
   }
 
   _calcAngle() {
@@ -89,7 +90,7 @@ class Arc extends Component {
     return angle;
   }
 
-  _updateOutline(angle: number) {
+  _updateOutline(angle: number, cameraZoom: number) {
     const startAngle = 0;
     const endAngle = angle;
     const clockwise = false;
@@ -98,12 +99,11 @@ class Arc extends Component {
     const arcCurve = new ArcCurve(
       0,
       0,
-      this.radius,
+      (this.radius / cameraZoom) * 10,
       startAngle,
       endAngle,
       clockwise
     );
-
     // Generate points on ArcCurve
     const points = arcCurve.getPoints(50);
     this._curvedOutline.geometry.setPositions(
@@ -111,15 +111,20 @@ class Arc extends Component {
     );
   }
 
-  _updateArc(angle: number) {
+  _updateArc(angle: number, cameraZoom: number) {
     this._arc.geometry.dispose();
-    this._arc.geometry = new CircleGeometry(this.radius, 32, 0, angle);
+    this._arc.geometry = new CircleGeometry(
+      (this.radius / cameraZoom) * 10,
+      64,
+      0,
+      angle
+    );
     this._arc.geometry.computeVertexNormals();
   }
 
-  _updateText(angle: number) {
+  _updateText(angle: number, cameraZoom: number) {
     this._text.setText(Math.round((angle * 180) / Math.PI).toString() + "°");
-    this._text.position.set(-60, 0, this._text.position.z);
+    this._text.position.set((-60 / cameraZoom) * 2, 0, this._text.position.z);
   }
 
   public getAngle(unit = "radians"): number {

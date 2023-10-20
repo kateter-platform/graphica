@@ -31,7 +31,7 @@ const a = new Point(0, 0);
 const b = new Point(3, 0);
 const c = new Point(0, 2, { draggable: "unrestricted", label: true });
 
-const arc = new Arc(b, a, c, 30);
+const arc = new Arc(b, a, c, 5);
 
 g.add(a);
 g.add(b);
