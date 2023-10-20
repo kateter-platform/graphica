@@ -115,6 +115,10 @@ class Text extends Component implements Collider {
       this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
     }
   }
+
+  public setZIndex(z: number): void {
+    //Not implemented
+  }
 }
 
 export default Text;
