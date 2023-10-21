@@ -20,6 +20,7 @@ export type PolygonOptions = {
   opacity?: number;
   draggable?: Draggable;
   dragListeners?: ((point: Polygon) => void)[];
+  hasOutline?: boolean;
 };
 
 export const defaultShapeOptions: PolygonOptions = {
@@ -27,6 +28,7 @@ export const defaultShapeOptions: PolygonOptions = {
   opacity: 0.6,
   draggable: undefined,
   dragListeners: [],
+  hasOutline: true,
 };
 
 type PolygonVertices = [
@@ -39,13 +41,12 @@ type PolygonVertices = [
 class Polygon extends Component implements Collider, DragListener<Polygon> {
   vertices: PolygonVertices;
   color: number;
-  object: Object3D;
   dragListeners: ((value: Polygon) => void)[];
 
   constructor(vertices: PolygonVertices, options?: PolygonOptions) {
     super();
 
-    const { color, opacity, draggable, dragListeners } = {
+    const { color, opacity, draggable, dragListeners, hasOutline } = {
       ...defaultShapeOptions,
       ...options,
     };
@@ -62,29 +63,30 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     mesh.scale.set(1, 1, 1);
     this.geometry = mesh.geometry;
     this.material = mesh.material;
+    if (hasOutline) {
+      const group = new Group();
+      const lines = [];
+      for (let i = 0; i < vertices.length - 1; i++) {
+        const startVertex = vertices[i];
+        const endVertex = vertices[i + 1];
+        lines.push([startVertex, endVertex]);
+      }
+      const lastVertex = vertices[vertices.length - 1];
+      const firstVertex = vertices[0];
+      lines.push([lastVertex, firstVertex]);
 
-    const group = new Group();
-    const lines = [];
-    for (let i = 0; i < vertices.length - 1; i++) {
-      const startVertex = vertices[i];
-      const endVertex = vertices[i + 1];
-      lines.push([startVertex, endVertex]);
-    }
-    const lastVertex = vertices[vertices.length - 1];
-    const firstVertex = vertices[0];
-    lines.push([lastVertex, firstVertex]);
-
-    lines.forEach((l) => {
-      const a = new Line(l[0], l[1], {
-        color: 0x080007,
-        opacity: opacity,
-        draggable: undefined,
+      lines.forEach((l) => {
+        const a = new Line(l[0], l[1], {
+          color: 0x080007,
+          opacity: opacity,
+          draggable: undefined,
+        });
+        a.position.setZ(this.position.z + 0.01);
+        group.add(a);
       });
-      a.position.setZ(this.position.z + 0.01);
-      group.add(a);
-    });
-    this.add(group);
-    this.object = group;
+      this.add(group);
+    }
+
     this.vertices = vertices;
     this.color = color ?? 0xfaa307;
     this.draggable = draggable;
