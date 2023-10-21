@@ -12,6 +12,18 @@ import Text from "./Text";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
+export type ArcOptions = {
+  radius: number;
+  hasLabel: boolean;
+  color: number;
+};
+
+export const defaultArcOptions: ArcOptions = {
+  radius: 40,
+  hasLabel: true,
+  color: 0xfaa307,
+};
+
 class Arc extends Component {
   pointA: InputPosition;
   pointB: InputPosition;
@@ -28,11 +40,14 @@ class Arc extends Component {
     pointA: InputPosition,
     pointB: InputPosition,
     pointC: InputPosition,
-    radius = 40,
-    hasLabel = true,
-    color = 0xfaa307
+    options?: ArcOptions
   ) {
     super();
+
+    const { radius, color, hasLabel } = {
+      ...defaultArcOptions,
+      ...options,
+    };
     this.pointA = pointA;
     this.pointB = pointB;
     this.pointC = pointC;
@@ -71,59 +86,69 @@ class Arc extends Component {
   }
 
   _calcAngle() {
-    const pointAvec2 = toVector2(this.pointA);
-    const pointBvec2 = toVector2(this.pointB);
-    const pointCvec2 = toVector2(this.pointC);
+    const A = toVector2(this.pointA);
+    const B = toVector2(this.pointB);
+    const C = toVector2(this.pointC);
 
-    const vectorBtoA = pointAvec2.clone().sub(pointBvec2);
-    const vectorBtoC = pointCvec2.clone().sub(pointBvec2);
+    const BA = A.sub(B);
+    const BC = C.sub(B);
 
-    const dot = vectorBtoA.dot(vectorBtoC);
-    const det = vectorBtoA.x * vectorBtoC.y - vectorBtoA.y * vectorBtoC.x;
-    let angle = Math.atan2(det, dot);
-
-    // Normalize the angle to be between 0 and 2π
-    while (angle < 0) angle += 2 * Math.PI;
-    while (angle > 2 * Math.PI) angle -= 2 * Math.PI;
-
+    let angle = BA.angle() - BC.angle();
+    angle = angle < 0 ? angle + 2 * Math.PI : angle;
     return angle;
   }
 
-  _updateOutline(angle: number, cameraZoom: number) {
-    const startAngle = 0;
-    const endAngle = angle;
-    const clockwise = false;
+  _calcVectorAngle(point1: InputPosition, point2: InputPosition) {
+    const vector = toVector2(point2).sub(toVector2(point1));
+    return Math.atan2(vector.y, vector.x);
+  }
 
-    // Create Arc-curve
+  _updateArc(angle: number, cameraZoom: number) {
+    this._arc.geometry.dispose();
+
+    const B = toVector2(this.pointB);
+    const C = toVector2(this.pointC);
+    const BC = C.sub(B);
+    const startAngle = BC.angle();
+
+    this._arc.geometry = new CircleGeometry(
+      this.radius / cameraZoom,
+      64,
+      startAngle,
+      angle
+    );
+    this._arc.geometry.computeVertexNormals();
+  }
+
+  _updateOutline(angle: number, cameraZoom: number) {
+    const B = toVector2(this.pointB);
+    const C = toVector2(this.pointC);
+    const BC = C.sub(B);
+    const startAngle = BC.angle();
+    const endAngle = startAngle + angle;
+
     const arcCurve = new ArcCurve(
       0,
       0,
-      (this.radius / cameraZoom) * 10,
+      this.radius / cameraZoom,
       startAngle,
       endAngle,
-      clockwise
+      false
     );
-    // Generate points on ArcCurve
+
     const points = arcCurve.getPoints(50);
     this._curvedOutline.geometry.setPositions(
       points.flatMap((v) => [v.x, v.y, 3])
     );
   }
 
-  _updateArc(angle: number, cameraZoom: number) {
-    this._arc.geometry.dispose();
-    this._arc.geometry = new CircleGeometry(
-      (this.radius / cameraZoom) * 10,
-      64,
-      0,
-      angle
-    );
-    this._arc.geometry.computeVertexNormals();
-  }
-
   _updateText(angle: number, cameraZoom: number) {
     this._text.setText(Math.round((angle * 180) / Math.PI).toString() + "°");
-    this._text.position.set((-60 / cameraZoom) * 2, 0, this._text.position.z);
+    this._text.position.set(
+      (-60 / cameraZoom) * 1.75,
+      0,
+      this._text.position.z
+    );
   }
 
   public getAngle(unit = "radians"): number {
@@ -135,7 +160,7 @@ class Arc extends Component {
 
   update(camera: OrthographicCamera) {
     const pointBVec = toVector3(this.pointB);
-    this.position.set(pointBVec.x, pointBVec.y, 0);
+    this.position.set(pointBVec.x, pointBVec.y, this.position.z);
 
     const angle = this._calcAngle();
     this._updateOutline(angle, camera.zoom);
