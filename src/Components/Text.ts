@@ -117,7 +117,7 @@ class Text extends Component implements Collider {
   }
 
   public setZIndex(z: number): void {
-    //Not implemented
+    this.position.setZ(z);
   }
 }
 

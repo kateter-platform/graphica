@@ -8,7 +8,6 @@ import {
 } from "three";
 import { Line2, LineMaterial } from "three-fatline";
 import { toVector2, toVector3 } from "../utils";
-import Line from "./Line";
 import Text from "./Text";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
