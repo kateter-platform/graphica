@@ -11,30 +11,29 @@ type LabelOptions = {
   start: InputPosition;
   deltaX: number;
   deltaY: number;
+  fontSize: number;
 };
 
 const defaultLabelOptions: LabelOptions = {
   start: new Vector2(0, 0),
-  deltaX: 4,
-  deltaY: 20,
+  deltaX: 10,
+  deltaY: -5,
+  fontSize: 30,
 };
 
 class Label extends Component {
-  object: Object3D;
   draggable = undefined;
 
   constructor(text: string, options?: LabelOptions) {
-    const { start, deltaX, deltaY } = {
+    const { start, deltaX, deltaY, fontSize } = {
       ...defaultLabelOptions,
       ...options,
     };
     super();
+
+    const positionVector3 = toVector3(start);
     // set position of the point instance
-    this.position.set(
-      toVector3(start).x,
-      toVector3(start).y,
-      toVector3(start).z
-    );
+    this.position.set(positionVector3.x, positionVector3.y, positionVector3.z);
 
     // calculate break and end points
     const breakPoint = this.calculateBreakPoint(deltaX, deltaY);
@@ -45,23 +44,20 @@ class Label extends Component {
     const line2 = new Line(breakPoint, endPoint);
     const textComponent = new Text(text, {
       color: "black",
-      fontSize: 15,
+      fontSize: fontSize,
       anchorY: "middle",
       anchorX: deltaX < 0 ? "right" : "left",
+      responsiveScale: false,
     });
     textComponent.setPosition([
       endPoint.x + (deltaX < 0 ? -1 : 1) * 10,
       endPoint.y,
     ]);
 
-    // Create a group to contain both lines and text
-    this.object = new Group();
-    this.object.add(line1);
-    this.object.add(line2);
-    this.object.add(textComponent);
-
-    // set position of the group
-    this.object.position.set(1, 5, 5);
+    // Add line and text components to the label
+    this.add(line1);
+    this.add(line2);
+    this.add(textComponent);
   }
 
   private calculateEndPoint(deltaX: number, deltaY: number) {
@@ -95,7 +91,7 @@ class Label extends Component {
   }
 
   update(camera: OrthographicCamera) {
-    this.object.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
+    this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);
   }
 }
 export default Label;

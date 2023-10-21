@@ -80,6 +80,7 @@ class Circle extends Component implements Collider {
   }
 
   update(camera: OrthographicCamera) {
+    this._strokeMesh.geometry.dispose();
     this._strokeMesh.geometry = new RingGeometry(
       this.radius - 4 / camera.zoom,
       this.radius,

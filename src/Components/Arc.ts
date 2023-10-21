@@ -12,6 +12,18 @@ import Text from "./Text";
 import { Component } from "./interfaces";
 import { InputPosition } from "./types";
 
+export type ArcOptions = {
+  radius: number;
+  hasLabel: boolean;
+  color: number;
+};
+
+export const defaultArcOptions: ArcOptions = {
+  radius: 40,
+  hasLabel: true,
+  color: 0xfaa307,
+};
+
 class Arc extends Component {
   pointA: InputPosition;
   pointB: InputPosition;
@@ -28,11 +40,14 @@ class Arc extends Component {
     pointA: InputPosition,
     pointB: InputPosition,
     pointC: InputPosition,
-    radius = 40,
-    hasLabel = true,
-    color = 0xfaa307
+    options?: ArcOptions
   ) {
     super();
+
+    const { radius, color, hasLabel } = {
+      ...defaultArcOptions,
+      ...options,
+    };
     this.pointA = pointA;
     this.pointB = pointB;
     this.pointC = pointC;
@@ -98,7 +113,7 @@ class Arc extends Component {
     const arcCurve = new ArcCurve(
       0,
       0,
-      (this.radius / cameraZoom) * 10,
+      this.radius / cameraZoom,
       startAngle,
       endAngle,
       clockwise
@@ -113,7 +128,7 @@ class Arc extends Component {
   _updateArc(angle: number, cameraZoom: number) {
     this._arc.geometry.dispose();
     this._arc.geometry = new CircleGeometry(
-      (this.radius / cameraZoom) * 10,
+      this.radius / cameraZoom,
       64,
       0,
       angle
@@ -123,7 +138,11 @@ class Arc extends Component {
 
   _updateText(angle: number, cameraZoom: number) {
     this._text.setText(Math.round((angle * 180) / Math.PI).toString() + "°");
-    this._text.position.set((-60 / cameraZoom) * 2, 0, this._text.position.z);
+    this._text.position.set(
+      (-60 / cameraZoom) * 1.75,
+      0,
+      this._text.position.z
+    );
   }
 
   public getAngle(unit = "radians"): number {
