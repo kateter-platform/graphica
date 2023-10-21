@@ -54,14 +54,11 @@ class Fraction extends Component {
       const endX: number = x + radius * Math.cos(endAngleRad);
       const endY: number = y + radius * Math.sin(endAngleRad);
       const color = i <= filled ? 0xfaa307 : 0xfffffff;
-      const a = new Arc(
-        [startX, startY],
-        [x, y],
-        [endX, endY],
-        radius,
-        false,
-        color
-      );
+      const a = new Arc([startX, startY], [x, y], [endX, endY], {
+        radius: radius,
+        hasLabel: false,
+        color: color,
+      });
       this.divisors.add(a);
     }
     this.add(this.divisors);
