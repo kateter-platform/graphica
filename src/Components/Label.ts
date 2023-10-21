@@ -1,4 +1,4 @@
-import { Vector2, Object3D, Group, OrthographicCamera } from "three";
+import { Vector2, OrthographicCamera } from "three";
 import { toVector3 } from "../utils";
 import Line from "./Line";
 import Text from "./Text";
