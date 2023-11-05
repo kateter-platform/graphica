@@ -1,6 +1,9 @@
-import { Group } from "three";
+import { Group, Vector2 } from "three";
+import { Line2, LineGeometry, LineMaterial } from "three-fatline";
+import { toVector2 } from "../../utils";
 import Arc from "../Arc";
 import { Component } from "../interfaces";
+import { InputPosition } from "../types";
 
 export type FractionOptions = {
   color?: number;
@@ -13,51 +16,66 @@ export const defaultShapeOptions: FractionOptions = {
 class Fraction extends Component {
   radius: number;
   divisors: Group;
-  x: number;
-  y: number;
   filled: number;
   divisor: number;
 
-  constructor(x = 0, y = 0, radius = 30, divisor = 2, filled = divisor) {
+  constructor(x = 0, y = 0, radius = 5, divisor = 2, filled = divisor) {
     super();
     if (filled > divisor) {
       throw new Error("Cannot have more filled parts than divisor!");
     }
     this.radius = radius;
-    this.x = x;
-    this.y = y;
+    this.position.set(x, y, this.position.z);
     this.filled = filled;
     this.divisor = divisor;
 
     this.divisors = new Group();
-    this.generateDivisors(x, y, radius, divisor, filled);
+    this.generateDivisors(radius, divisor, filled);
   }
 
-  generateDivisors(
-    x: number,
-    y: number,
-    radius: number,
-    divisor: number,
-    filled: number
-  ): void {
-    const angleStep: number = 360 / divisor;
-    for (let i = 1; i <= divisor; i++) {
+  generateDivisors(radius: number, divisor: number, filled: number): void {
+    const angleStep: number = (2 * Math.PI) / divisor;
+    const lineMaterial = new LineMaterial({
+      color: 0x000000,
+      linewidth: 4,
+      resolution: new Vector2(window.innerWidth, window.innerHeight),
+    });
+    for (let i = 0; i < divisor; i++) {
       const startAngle: number = i * angleStep;
-      const endAngle: number = (i + 1) * angleStep;
+      const endAngle: number = startAngle + angleStep;
 
-      const startAngleRad: number = (startAngle * Math.PI) / 180;
-      const endAngleRad: number = (endAngle * Math.PI) / 180;
+      const startX: number = radius * Math.cos(startAngle);
+      const startY: number = radius * Math.sin(startAngle);
 
-      const startX: number = x + radius * Math.cos(startAngleRad);
-      const startY: number = y + radius * Math.sin(startAngleRad);
+      const endX: number = radius * Math.cos(endAngle);
+      const endY: number = radius * Math.sin(endAngle);
 
-      const endX: number = x + radius * Math.cos(endAngleRad);
-      const endY: number = y + radius * Math.sin(endAngleRad);
-      const color = i <= filled ? 0xfaa307 : 0xfffffff;
-      const a = new Arc([startX, startY], [x, y], [endX, endY], {
+      const color = i < filled ? 0xfaa307 : 0xffffff;
+      console.log(
+        `Filled is ${filled} and i is ${i} and i <= filled is ${
+          i <= filled
+        } so color is ${color}`
+      );
+
+      const lineGeometry = new LineGeometry();
+      lineGeometry.setPositions([
+        0,
+        0,
+        this.position.z + 0.1,
+        0 + radius * Math.cos(startAngle),
+        0 + radius * Math.sin(startAngle),
+        this.position.z + 0.1,
+      ]);
+      const divisionLine = new Line2(lineGeometry, lineMaterial);
+
+      this.divisors.add(divisionLine);
+      const a = new Arc([endX, endY], [0, 0], [startX, startY], {
         radius: radius,
         hasLabel: false,
+        resolution: 128,
+        textOffset: [0, 0],
         color: color,
+        dynamic: false,
       });
       this.divisors.add(a);
     }
@@ -77,13 +95,7 @@ class Fraction extends Component {
 
     this.divisor = divisor;
 
-    this.generateDivisors(
-      this.x,
-      this.y,
-      this.radius,
-      this.divisor,
-      this.filled
-    );
+    this.generateDivisors(this.radius, this.divisor, this.filled);
   }
 
   setFilled(filled: number): void {
@@ -97,13 +109,22 @@ class Fraction extends Component {
 
     this.filled = filled;
     this.divisors.clear();
+    this.generateDivisors(this.radius, this.divisor, this.filled);
+  }
 
-    this.generateDivisors(
-      this.x,
-      this.y,
-      this.radius,
-      this.divisor,
-      this.filled
+  public getFilled(): number {
+    return this.filled;
+  }
+
+  public getDivisor(): number {
+    return this.divisor;
+  }
+
+  public setPosition(position: InputPosition) {
+    this.position.set(
+      toVector2(position).x,
+      toVector2(position).y,
+      this.position.z
     );
   }
 }

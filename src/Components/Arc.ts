@@ -16,12 +16,18 @@ export type ArcOptions = {
   radius: number;
   hasLabel: boolean;
   color: number;
+  textOffset: InputPosition;
+  resolution: number;
+  dynamic: boolean;
 };
 
 export const defaultArcOptions: ArcOptions = {
   radius: 40,
   hasLabel: true,
   color: 0xfaa307,
+  textOffset: [0, 0],
+  resolution: 64,
+  dynamic: true,
 };
 
 class Arc extends Component {
@@ -31,6 +37,9 @@ class Arc extends Component {
   radius: number;
   hasLabel: boolean;
   color: number;
+  textOffset: InputPosition;
+  resolution: number;
+  dynamic: boolean;
 
   _arc: Mesh;
   _text: Text;
@@ -44,7 +53,7 @@ class Arc extends Component {
   ) {
     super();
 
-    const { radius, color, hasLabel } = {
+    const { radius, color, hasLabel, textOffset, resolution, dynamic } = {
       ...defaultArcOptions,
       ...options,
     };
@@ -54,6 +63,9 @@ class Arc extends Component {
     this.radius = radius;
     this.hasLabel = hasLabel;
     this.color = color;
+    this.textOffset = textOffset;
+    this.resolution = resolution;
+    this.dynamic = dynamic;
 
     this._curvedOutline = new Line2(
       undefined,
@@ -112,8 +124,8 @@ class Arc extends Component {
     const startAngle = BC.angle();
 
     this._arc.geometry = new CircleGeometry(
-      this.radius / cameraZoom,
-      64,
+      this.radius / (this.dynamic ? cameraZoom : 1),
+      this.resolution,
       startAngle,
       angle
     );
@@ -130,13 +142,13 @@ class Arc extends Component {
     const arcCurve = new ArcCurve(
       0,
       0,
-      this.radius / cameraZoom,
+      this.radius / (this.dynamic ? cameraZoom : 1),
       startAngle,
       endAngle,
       false
     );
 
-    const points = arcCurve.getPoints(50);
+    const points = arcCurve.getPoints(this.resolution);
     this._curvedOutline.geometry.setPositions(
       points.flatMap((v) => [v.x, v.y, 3])
     );
@@ -145,8 +157,9 @@ class Arc extends Component {
   _updateText(angle: number, cameraZoom: number) {
     this._text.setText(Math.round((angle * 180) / Math.PI).toString() + "°");
     this._text.position.set(
-      (-60 / cameraZoom) * 1.75,
-      0,
+      (-60 / (this.dynamic ? cameraZoom : 1)) * 1.75 +
+        toVector2(this.textOffset).x,
+      0 + toVector2(this.textOffset).y,
       this._text.position.z
     );
   }
