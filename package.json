@@ -1,13 +1,13 @@
 {
   "name": "@kateter-platform/graphica",
-  "version": "1.0.731",
+  "version": "1.0.732",
   "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kateter-platform/graphica.git"
   },
-  "main": "dist/graphica.js",
+  "main": "dist/index.js",
   "devDependencies": {
     "@babel/core": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
