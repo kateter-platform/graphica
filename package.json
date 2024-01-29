@@ -1,17 +1,13 @@
 {
-  "name": "@kateter-platform/graphica-gemini",
-  "version": "1.0.71",
+  "name": "@kateter-platform/graphica",
+  "version": "1.0.734",
   "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
-  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kateter-platform/graphica-gemini.git"
+    "url": "git+https://github.com/kateter-platform/graphica.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/",
-    "access": "restricted"
-  },
+  "main": "dist/index.js",
   "devDependencies": {
     "@babel/core": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
