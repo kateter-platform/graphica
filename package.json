@@ -1,6 +1,6 @@
 {
   "name": "@kateter-platform/graphica",
-  "version": "1.0.732",
+  "version": "1.0.733",
   "source": "./src/index.ts",
   "description": "A tool for advanced graphing and visualization",
   "repository": {
