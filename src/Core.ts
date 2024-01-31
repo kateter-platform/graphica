@@ -46,7 +46,7 @@ const defaultGraphicaOptions: GraphicaOptions = {
 
 //Note for docs: minZoom is how far you are allowed to zoom IN. MaxZoom is how far you are allowed to zoom OUT.
 
-class GraphicaCore {
+class Core {
   components: Component[];
   draggables: Component[];
   updateComponents: Component[];
@@ -270,4 +270,4 @@ class GraphicaCore {
   }
 }
 
-export default GraphicaCore;
+export default Core;

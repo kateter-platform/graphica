@@ -1,4 +1,4 @@
-export { default as GraphicaCore } from "./GraphicaCore";
+export { default as Core } from "./Core";
 export { default as Arc } from "./Components/Arc";
 export { default as Bracket } from "./Components/Bracket";
 export { default as Button } from "./Components/Button";
