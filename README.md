@@ -29,3 +29,7 @@ Or to run both prettier and eslint use:
 ```bash
 yarn lint
 ```
+
+## License
+
+For legal information, please refer to LICENSE.md for information about Attribution-NonCommercial-NoDerivatives 4.0 International which this project is protected by
