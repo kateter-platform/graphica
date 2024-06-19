@@ -7,12 +7,12 @@ import {
   OrthographicCamera,
   Mesh,
 } from "three";
+import { toVector2 } from "../utils";
+import Latex from "./Latex";
 import Line from "./Line";
 import Text from "./Text";
 import { Component } from "./interfaces";
-import Latex from "./Latex";
 import { InputPosition } from "./types";
-import { toVector2 } from "../utils";
 
 const vertexShader = `
   varying vec3 worldPosition;
@@ -308,17 +308,21 @@ class Grid extends Component {
       camera.position.y + (window.innerHeight * 0.5 - PADDING) / camera.zoom
     );
     this.xLabel.position.setX(
-      (camera.position.x + (window.innerWidth * 0.5 - PADDING - 10) / camera.zoom)+ (toVector2(this.xLabelOffset).x *10/(camera.zoom))
+      camera.position.x +
+        (window.innerWidth * 0.5 - PADDING - 10) / camera.zoom +
+        (toVector2(this.xLabelOffset).x * 10) / camera.zoom
     );
     this.xLabel.position.setY(
-      10 / camera.zoom + (toVector2(this.xLabelOffset).y *10/(camera.zoom))
+      10 / camera.zoom + (toVector2(this.xLabelOffset).y * 10) / camera.zoom
     );
     this.yLabel.position.setY(
       camera.position.y +
         (window.innerHeight * 0.5 - PADDING - 15) / camera.zoom +
-        (toVector2(this.yLabelOffset).y*10/(camera.zoom))
+        (toVector2(this.yLabelOffset).y * 10) / camera.zoom
     );
-    this.yLabel.position.setX((20 / camera.zoom)+ (toVector2(this.yLabelOffset).x*10/(camera.zoom)));
+    this.yLabel.position.setX(
+      20 / camera.zoom + (toVector2(this.yLabelOffset).x * 10) / camera.zoom
+    );
 
     this._updateAxisLabels(camera);
   }
