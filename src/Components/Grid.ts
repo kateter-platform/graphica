@@ -109,7 +109,7 @@ class Grid extends Component {
       xLabelText,
       yLabelText,
       hasAxis,
-      latexLabeLtext,
+      latexLabeltext,
       xLabelOffset,
       yLabelOffset,
     } = {
@@ -150,7 +150,7 @@ class Grid extends Component {
       new Vector2(0, window.innerHeight - 1000),
       { arrowhead: true, lineWidth: 3 }
     );
-    if (latexLabeLtext && xLabelText && yLabelText) {
+    if (latexLabeltext && xLabelText && yLabelText) {
       this.xLabel = new Latex(xLabelText, {
         color: "#000000",
         fontSize: 22,
