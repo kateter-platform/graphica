@@ -7,9 +7,12 @@ import {
   OrthographicCamera,
   Mesh,
 } from "three";
+import { toVector2 } from "../utils";
+import Latex from "./Latex";
 import Line from "./Line";
 import Text from "./Text";
 import { Component } from "./interfaces";
+import { InputPosition } from "./types";
 
 const vertexShader = `
   varying vec3 worldPosition;
@@ -58,6 +61,9 @@ type GridOptions = {
   yLabelText?: string;
   xLabelText?: string;
   hasAxis?: boolean;
+  latexLabeltext?: boolean;
+  xLabelOffset?: InputPosition;
+  yLabelOffset?: InputPosition;
 };
 
 const defaultGridOptions: GridOptions = {
@@ -68,6 +74,9 @@ const defaultGridOptions: GridOptions = {
   xLabelText: "x",
   yLabelText: "y",
   hasAxis: true,
+  latexLabeltext: false,
+  xLabelOffset: [0, 0],
+  yLabelOffset: [0, 0],
 };
 
 const LABELS_LENGTH = 81;
@@ -78,14 +87,16 @@ class Grid extends Component {
   private shaderMesh: Mesh;
   private xAxis: Line;
   private yAxis: Line;
-  private xLabel: Text;
-  private yLabel: Text;
+  private xLabel: Text | Latex;
+  private yLabel: Text | Latex;
 
   // Axis labels
   private labelsX: Text[];
   private labelsY: Text[];
 
   private hasLabels: boolean;
+  private xLabelOffset: InputPosition;
+  private yLabelOffset: InputPosition;
 
   constructor(options?: GridOptions) {
     super();
@@ -98,12 +109,17 @@ class Grid extends Component {
       xLabelText,
       yLabelText,
       hasAxis,
+      latexLabeltext,
+      xLabelOffset,
+      yLabelOffset,
     } = {
       ...defaultGridOptions,
       ...options,
     };
     this.cellSize = cellSize ?? 10;
     this.hasLabels = labels;
+    this.xLabelOffset = xLabelOffset ?? [0, 0];
+    this.yLabelOffset = yLabelOffset ?? [0, 0];
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
       window.innerHeight
@@ -134,9 +150,29 @@ class Grid extends Component {
       new Vector2(0, window.innerHeight - 1000),
       { arrowhead: true, lineWidth: 3 }
     );
-    this.xLabel = new Text(xLabelText, { color: "#000000", fontSize: 22 });
-    this.yLabel = new Text(yLabelText, { color: "#000000", fontSize: 22 });
-
+    if (latexLabeltext && xLabelText && yLabelText) {
+      this.xLabel = new Latex(xLabelText, {
+        color: "#000000",
+        fontSize: 22,
+        anchorX: "right",
+      });
+      this.yLabel = new Latex(yLabelText, {
+        color: "#000000",
+        fontSize: 22,
+        anchorX: "left",
+      });
+    } else {
+      this.xLabel = new Text(xLabelText, {
+        color: "#000000",
+        fontSize: 22,
+        anchorX: "right",
+      });
+      this.yLabel = new Text(yLabelText, {
+        color: "#000000",
+        fontSize: 22,
+        anchorX: "left",
+      });
+    }
     this.add(this.shaderMesh);
 
     if (labels) {
@@ -272,14 +308,21 @@ class Grid extends Component {
       camera.position.y + (window.innerHeight * 0.5 - PADDING) / camera.zoom
     );
     this.xLabel.position.setX(
-      camera.position.x + (window.innerWidth * 0.5 - PADDING - 10) / camera.zoom
+      camera.position.x +
+        (window.innerWidth * 0.5 - PADDING - 10) / camera.zoom +
+        (toVector2(this.xLabelOffset).x * 10) / camera.zoom
     );
-    this.xLabel.position.setY(10 / camera.zoom);
+    this.xLabel.position.setY(
+      10 / camera.zoom + (toVector2(this.xLabelOffset).y * 10) / camera.zoom
+    );
     this.yLabel.position.setY(
       camera.position.y +
-        (window.innerHeight * 0.5 - PADDING - 15) / camera.zoom
+        (window.innerHeight * 0.5 - PADDING - 15) / camera.zoom +
+        (toVector2(this.yLabelOffset).y * 10) / camera.zoom
     );
-    this.yLabel.position.setX(20 / camera.zoom);
+    this.yLabel.position.setX(
+      20 / camera.zoom + (toVector2(this.yLabelOffset).x * 10) / camera.zoom
+    );
 
     this._updateAxisLabels(camera);
   }

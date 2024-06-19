@@ -12,10 +12,14 @@ type LatexOptions = {
   anchorY?: "top" | "middle" | "bottom";
   anchorX?: "left" | "center" | "right";
   draggable?: Draggable;
+  offsetX?: number;
+  offsetY?: number;
 };
 
 class Latex extends Component implements Collider {
   draggable;
+  offsetX;
+  offsetY;
 
   constructor(
     latex: string,
@@ -26,6 +30,8 @@ class Latex extends Component implements Collider {
       anchorX = "left",
       anchorY = "bottom",
       draggable = undefined,
+      offsetX = 0,
+      offsetY = 0,
     }: LatexOptions
   ) {
     super();
@@ -42,8 +48,9 @@ class Latex extends Component implements Collider {
 
     // Create a CSS2DObject and set its properties
     const container = new CSS3DObject(htmlElement);
-
-    this.position.set(pos.x, pos.y, 1);
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+    this.position.set(pos.x + offsetX, pos.y + offsetY, 1);
     container.scale.set(fontSize, fontSize, 1);
     container.element.style.color = color;
     container.element.style.fontFamily = "Roboto";
@@ -87,8 +94,8 @@ class Latex extends Component implements Collider {
 
   setPosition(position: InputPosition) {
     this.position.set(
-      toVector2(position).x,
-      toVector2(position).y,
+      toVector2(position).x + this.offsetX,
+      toVector2(position).y + this.offsetY,
       this.position.z
     );
   }

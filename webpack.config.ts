@@ -1,10 +1,8 @@
-import path from "path";
-
 module.exports = {
   entry: "./src/index.ts",
   mode: "production",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: __dirname + "/dist",
     filename: "graphica.js",
     library: "Graphica", // Replace 'YourLibraryName' with your library's global variable name
     libraryTarget: "umd",
