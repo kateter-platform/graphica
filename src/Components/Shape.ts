@@ -8,9 +8,10 @@ import {
   Event,
   Box3,
   Vector3,
+  Vector2,
 } from "three";
+import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { toVector2 } from "../utils";
-import Line from "./Line";
 import { Collider, Component, DragListener, Draggable } from "./interfaces";
 import { InputPosition } from "./types";
 
@@ -21,6 +22,9 @@ export type PolygonOptions = {
   draggable?: Draggable;
   dragListeners?: ((point: Polygon) => void)[];
   hasOutline?: boolean;
+  lineWidth?: number;
+  dashed?: boolean;
+  transparent?: boolean;
 };
 
 export const defaultShapeOptions: PolygonOptions = {
@@ -29,6 +33,9 @@ export const defaultShapeOptions: PolygonOptions = {
   draggable: undefined,
   dragListeners: [],
   hasOutline: true,
+  lineWidth: 4,
+  dashed: false,
+  transparent: true,
 };
 
 type PolygonVertices = [
@@ -42,14 +49,39 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
   vertices: PolygonVertices;
   color: number;
   dragListeners: ((value: Polygon) => void)[];
+  outlineGroup: Group;
+  mesh: Mesh;
+  outlineLines: Line2[];
+  lineWidth: number;
+  dashed: boolean;
+  transparent: boolean;
 
   constructor(vertices: PolygonVertices, options?: PolygonOptions) {
     super();
 
-    const { color, opacity, draggable, dragListeners, hasOutline } = {
+    const {
+      color,
+      opacity,
+      draggable,
+      dragListeners,
+      hasOutline,
+      lineWidth,
+      dashed,
+      transparent,
+    } = {
       ...defaultShapeOptions,
       ...options,
     };
+
+    this.vertices = vertices;
+    this.color = color ?? 0xfaa307;
+    this.draggable = draggable;
+    this.dragListeners = dragListeners ?? [];
+    this.outlineGroup = new Group();
+    this.outlineLines = [];
+    this.lineWidth = lineWidth ?? 4;
+    this.dashed = dashed ?? false;
+    this.transparent = transparent ?? true;
 
     const shape = new Shape(vertices.map((e) => toVector2(e)));
     const material = new MeshBasicMaterial({
@@ -59,38 +91,14 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     });
     const geometry = new ShapeGeometry(shape);
 
-    const mesh = new Mesh(geometry, material);
-    mesh.scale.set(1, 1, 1);
-    this.geometry = mesh.geometry;
-    this.material = mesh.material;
+    this.mesh = new Mesh(geometry, material);
+    this.mesh.scale.set(1, 1, 1);
+    this.add(this.mesh);
+
     if (hasOutline) {
-      const group = new Group();
-      const lines = [];
-      for (let i = 0; i < vertices.length - 1; i++) {
-        const startVertex = vertices[i];
-        const endVertex = vertices[i + 1];
-        lines.push([startVertex, endVertex]);
-      }
-      const lastVertex = vertices[vertices.length - 1];
-      const firstVertex = vertices[0];
-      lines.push([lastVertex, firstVertex]);
-
-      lines.forEach((l) => {
-        const a = new Line(l[0], l[1], {
-          color: 0x080007,
-          opacity: opacity,
-          draggable: undefined,
-        });
-        a.position.setZ(this.position.z + 0.01);
-        group.add(a);
-      });
-      this.add(group);
+      this.createOutline();
+      this.add(this.outlineGroup);
     }
-
-    this.vertices = vertices;
-    this.color = color ?? 0xfaa307;
-    this.draggable = draggable;
-    this.dragListeners = dragListeners ?? [];
   }
 
   addDragListener(listener: (value: Polygon) => void) {
@@ -136,40 +144,82 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     );
   }
 
-  /*   update(camera: OrthographicCamera) {
-    this.remove(this.object);
+  setVertices(newVertices: PolygonVertices) {
+    this.vertices = newVertices;
 
-    if (this.fill) {
-      const shape = new Shape(this.vertices);
-      const material = new MeshBasicMaterial({
-        color: this.color,
-      });
+    // Update the shape geometry
+    const shape = new Shape(newVertices.map((e) => toVector2(e)));
+    const newGeometry = new ShapeGeometry(shape);
 
-      const geometry = new ExtrudeGeometry(shape);
-      const mesh = new Mesh(geometry, material);
-      mesh.scale.set(1, 1, 1);
-      this.add(mesh);
-      this.object = mesh;
-    } else {
-      const group = new Group();
-      const lines = [];
-      for (let i = 0; i < this.vertices.length - 1; i++) {
-        const startVertex = this.vertices[i];
-        const endVertex = this.vertices[i + 1];
-        lines.push([startVertex, endVertex]);
-      }
-      const lastVertex = this.vertices[this.vertices.length - 1];
-      const firstVertex = this.vertices[0];
-      lines.push([lastVertex, firstVertex]);
+    // Dispose of the old geometry and update the mesh
+    this.mesh.geometry.dispose();
+    this.mesh.geometry = newGeometry;
 
-      lines.forEach((l) => {
-        group.add(new Line(l[0], l[1], { color: this.color }));
-      });
-      this.add(group);
-      this.object = group;
-      console.log("rerendering");
+    // Update the outline
+    this.updateOutline();
+  }
+
+  createOutline() {
+    const lines = [];
+    for (let i = 0; i < this.vertices.length - 1; i++) {
+      const startVertex = this.vertices[i];
+      const endVertex = this.vertices[i + 1];
+      lines.push([startVertex, endVertex]);
     }
-  }*/
+    const lastVertex = this.vertices[this.vertices.length - 1];
+    const firstVertex = this.vertices[0];
+    lines.push([lastVertex, firstVertex]);
+
+    lines.forEach((l) => {
+      const geometry = new LineGeometry();
+      geometry.setPositions([
+        toVector2(l[0]).x,
+        toVector2(l[0]).y,
+        0,
+        toVector2(l[1]).x,
+        toVector2(l[1]).y,
+        0,
+      ]);
+      const material = new LineMaterial({
+        color: 0x080007,
+        linewidth: this.lineWidth,
+        resolution: new Vector2(window.innerWidth, window.innerHeight),
+        dashed: this.dashed,
+        opacity: 1,
+        transparent: this.transparent,
+      });
+      const line = new Line2(geometry, material);
+      line.position.setZ(this.position.z + 0.01);
+      this.outlineGroup.add(line);
+      this.outlineLines.push(line);
+    });
+  }
+
+  updateOutline() {
+    const lines = [];
+    for (let i = 0; i < this.vertices.length - 1; i++) {
+      const startVertex = this.vertices[i];
+      const endVertex = this.vertices[i + 1];
+      lines.push([startVertex, endVertex]);
+    }
+    const lastVertex = this.vertices[this.vertices.length - 1];
+    const firstVertex = this.vertices[0];
+    lines.push([lastVertex, firstVertex]);
+
+    lines.forEach((l, i) => {
+      const line = this.outlineLines[i];
+      const positions = [
+        toVector2(l[0]).x,
+        toVector2(l[0]).y,
+        0,
+        toVector2(l[1]).x,
+        toVector2(l[1]).y,
+        0,
+      ];
+      line.geometry.setPositions(positions);
+      line.geometry.attributes.position.needsUpdate = true;
+    });
+  }
 }
 
 export default Polygon;
