@@ -7,7 +7,6 @@ type PlotOptions = {
   numPoints?: number;
   dashed?: boolean;
   lineWidth?: number;
-  color?: number;
   coefficients?: Coefficients;
   plotRange?: number;
   plotBetween: [number, number] | undefined;
@@ -17,7 +16,6 @@ const defaultPlotOptions = {
   numPoints: 1500,
   dashed: false,
   lineWidth: 4,
-  color: 0xfaa307,
   coefficients: {},
   plotBetween: undefined,
 };
@@ -29,12 +27,16 @@ type Coefficients = {
 class Plot extends Component {
   draggable = undefined;
   public func: string;
+  public funcName: string | undefined;
   private numPoints: number;
   private currentMinX: number;
   private currentMaxX: number;
   private currentZoom: number;
   private coefficients: Coefficients;
   private plotBetween: [number, number] | undefined;
+  public color: number | undefined;
+  private static counter = 0;
+  private static colors = [0xeea73c, 0xe15745, 0x4e0da6, 0x874b8];
 
   private RENDERTHRESHOLDX = 1400;
   private RENDERTHRESHOLDZOOM = 2.5;
@@ -45,12 +47,12 @@ class Plot extends Component {
 
   constructor(func: string, options?: PlotOptions) {
     super();
+    this.setColor();
 
     const {
       numPoints = 1000,
       dashed = false,
       lineWidth = 1,
-      color = 0xffa500,
       coefficients = {},
       plotBetween = undefined,
     } = { ...defaultPlotOptions, ...options };
@@ -72,7 +74,7 @@ class Plot extends Component {
       points.flatMap((e) => [e.x, e.y, e.z])
     );
     this.plotMaterial = new LineMaterial({
-      color: color,
+      color: this.color,
       linewidth: lineWidth,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
       dashed: dashed,
@@ -167,6 +169,28 @@ class Plot extends Component {
 
   onWindowResize() {
     this.plotMaterial.resolution.set(window.innerWidth, window.innerHeight);
+  }
+
+  getFunctionString() {
+    return this.func;
+  }
+
+  setFuncName(name: string) {
+    if (this.funcName === undefined) {
+      this.funcName = name;
+    }
+  }
+
+  setColor() {
+    this.color = Plot.colors[Plot.counter % Plot.colors.length];
+    if (this.plotMaterial) {
+      this.plotMaterial.color.set(this.color);
+    }
+    Plot.counter++;
+  }
+
+  getColor() {
+    return this.plotMaterial.color.getHexString();
   }
 }
 

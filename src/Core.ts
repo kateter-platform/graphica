@@ -17,6 +17,8 @@ import {
 } from "./Components/interfaces";
 import { InputPosition } from "./Components/types";
 import { DragControls } from "./Controls/DragControls";
+import LegendBox from "./Components/LegendBox";
+import Plot from "./Components/Plot";
 
 const ORBIT_CONTROL_OPTIONS = {
   LEFT: MOUSE.PAN,
@@ -50,7 +52,7 @@ class Core {
   components: Component[];
   draggables: Component[];
   updateComponents: Component[];
-
+  plotCount: number = 0;
   stats?: Stats;
   renderer: WebGLRenderer;
   domRenderer: CSS3DRenderer;
@@ -230,6 +232,12 @@ class Core {
         this.updateComponents.push(child);
       }
     });
+
+    if (component instanceof Plot) {
+      const name = String.fromCharCode("f".charCodeAt(0) + this.plotCount);
+      component.setFuncName(name);
+      this.plotCount++;
+    }
   }
 
   remove(component: Component) {
@@ -243,10 +251,12 @@ class Core {
 
   addGui(component: GuiComponent) {
     this.guiRoot.appendChild(component.htmlElement);
+    this.updateGuiComponents(component);
   }
 
   removeGui(component: GuiComponent) {
     this.guiRoot.removeChild(component.htmlElement);
+    this.updateGuiComponents(component);
   }
 
   startClock(): void {
@@ -267,6 +277,17 @@ class Core {
 
   public getClockTime(): number {
     return this.clock.getElapsedTime();
+  }
+
+  //TEST
+  public getComponents(): Component[] {
+    return this.components;
+  }
+
+  private updateGuiComponents(guiComponent: GuiComponent) {
+    if (guiComponent instanceof LegendBox) {
+      guiComponent.updatePlots();
+    }
   }
 }
 
