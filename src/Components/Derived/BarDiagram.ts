@@ -20,7 +20,7 @@ type BarDiagramOptions = {
   //   fontSize: number;
   //   widthOfBars: number;
   //   spacingBetweenBars: number;
-  //   basePosition: [number, number];
+  basePositionX?: number;
 };
 
 class BarDiagram extends Component {
@@ -30,6 +30,7 @@ class BarDiagram extends Component {
   yAxisTitle: string;
   xAxisUnit: string | undefined;
   yAxisUnit: string | undefined;
+  basePositionX: number | undefined;
 
   constructor(
     dataForBars: number[],
@@ -47,8 +48,9 @@ class BarDiagram extends Component {
     this.yAxisTitle = yAxisTitle;
     this.xAxisUnit = xAxisUnit ? xAxisUnit : "";
     this.yAxisUnit = yAxisUnit ? yAxisUnit : "";
+    this.basePositionX = options?.basePositionX ? options?.basePositionX : 0;
 
-    this.position.set(0, 0, 0);
+    this.position.set(this.basePositionX, 0, 0);
     this.createBarDiagram();
   }
 
@@ -111,34 +113,39 @@ class BarDiagram extends Component {
 
     const xAxisTitle = new Text(this.xAxisTitle, {
       fontSize: fontSize,
-      position: [basePosition / 2, labelsNextToLinePos * 2],
+      position: [basePosition / 2, labelsNextToLinePos * 2.5],
       anchorX: "center",
     });
     const yAxisTitle = new Text(this.yAxisTitle, {
       fontSize: fontSize,
-      position: [labelsNextToLinePos * 2, yLineEndpoint[1] / 2],
+      position: [labelsNextToLinePos * 2.5, yLineEndpoint[1] / 2],
       anchorX: "center",
       anchorY: "top",
     });
     yAxisTitle.rotateZ(Math.PI / 2);
 
-    const xAxisUnit = new Text(this.xAxisUnit, {
-      fontSize: fontSize,
-      position: [xLineEndpoint[0] + 0.1, 0],
-      anchorX: "left",
-      anchorY: "middle",
-    });
-    const yAxisUnit = new Text(this.yAxisUnit, {
-      fontSize: fontSize,
-      position: [0, yLineEndpoint[1]],
-      anchorX: "center",
-      anchorY: "bottom",
-    });
-
     allLabels.add(xAxisTitle);
     allLabels.add(yAxisTitle);
-    allLabels.add(xAxisUnit);
-    allLabels.add(yAxisUnit);
+
+    if (this.xAxisUnit) {
+      const xAxisUnit = new Text(this.xAxisUnit, {
+        fontSize: fontSize,
+        position: [xLineEndpoint[0] + 0.1, 0],
+        anchorX: "left",
+        anchorY: "middle",
+      });
+      allLabels.add(xAxisUnit);
+    }
+
+    if (this.yAxisUnit) {
+      const yAxisUnit = new Text(this.yAxisUnit, {
+        fontSize: fontSize,
+        position: [0, yLineEndpoint[1]],
+        anchorX: "center",
+        anchorY: "bottom",
+      });
+      allLabels.add(yAxisUnit);
+    }
 
     this.add(allBars);
     this.add(allLabels);
