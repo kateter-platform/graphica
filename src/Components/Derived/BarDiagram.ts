@@ -28,16 +28,16 @@ class BarDiagram extends Component {
   labels: string[];
   xAxisTitle: string;
   yAxisTitle: string;
-  //   xAxisUnit: string;
-  //   yAxisUnit: string;
+  xAxisUnit: string | undefined;
+  yAxisUnit: string | undefined;
 
   constructor(
     dataForBars: number[],
     labelsForBars: string[],
     xAxisTitle: string,
     yAxisTitle: string,
-    // xAxisUnit?: string | undefined,
-    // yAxisUnit?: string | undefined,
+    xAxisUnit?: string,
+    yAxisUnit?: string,
     options?: BarDiagramOptions
   ) {
     super();
@@ -45,8 +45,8 @@ class BarDiagram extends Component {
     this.labels = labelsForBars;
     this.xAxisTitle = xAxisTitle;
     this.yAxisTitle = yAxisTitle;
-    // this.xAxisUnit = xAxisUnit;
-    // this.yAxisUnit = yAxisUnit;
+    this.xAxisUnit = xAxisUnit ? xAxisUnit : "";
+    this.yAxisUnit = yAxisUnit ? yAxisUnit : "";
 
     this.position.set(0, 0, 0);
     this.createBarDiagram();
@@ -68,8 +68,8 @@ class BarDiagram extends Component {
 
     const fontSize = 18;
 
-    const distanceMultiplierForLabel = 0.05;
-    const labelYPos = -fontSize * distanceMultiplierForLabel;
+    const distanceMultiplierForBarLabels = 0.03;
+    const labelsNextToLinePos = -fontSize * distanceMultiplierForBarLabels;
 
     while (counter < this.data.length) {
       const height = this.data[counter];
@@ -83,12 +83,12 @@ class BarDiagram extends Component {
 
       const label = new Text(this.labels[counter], {
         fontSize: fontSize,
-        position: [basePosition + widthOfBars / 2, labelYPos],
+        position: [basePosition + widthOfBars / 2, labelsNextToLinePos],
         anchorX: "center",
       });
       const valueOfBar = new Text("" + this.data[counter], {
         fontSize: fontSize,
-        position: [basePosition + widthOfBars / 2, height + 0.2],
+        position: [basePosition + widthOfBars / 2, height + 0.1],
         anchorX: "center",
       });
       basePosition += widthOfBars + spacingBetweenBars;
@@ -99,8 +99,11 @@ class BarDiagram extends Component {
       counter++;
     }
 
-    const xLine = new Line([0, 0], [basePosition, 0], { arrowhead: true });
-    const yLine = new Line([0, 0], [0, Math.max(...this.data) * 1.25], {
+    const xLineEndpoint: [number, number] = [basePosition, 0];
+    const yLineEndpoint: [number, number] = [0, Math.max(...this.data) * 1.25];
+
+    const xLine = new Line([0, 0], xLineEndpoint, { arrowhead: true });
+    const yLine = new Line([0, 0], yLineEndpoint, {
       arrowhead: true,
     });
     lines.add(xLine);
@@ -108,61 +111,45 @@ class BarDiagram extends Component {
 
     const xAxisTitle = new Text(this.xAxisTitle, {
       fontSize: fontSize,
-      position: [-1, Math.max(...this.data) * 1.2],
+      position: [basePosition / 2, labelsNextToLinePos * 2],
       anchorX: "center",
     });
     const yAxisTitle = new Text(this.yAxisTitle, {
       fontSize: fontSize,
-      position: [basePosition, labelYPos],
+      position: [labelsNextToLinePos * 2, yLineEndpoint[1] / 2],
       anchorX: "center",
+      anchorY: "top",
     });
+    yAxisTitle.rotateZ(Math.PI / 2);
 
-    // const xAxisUnit = new Text(this.xAxisUnit, {
-    //   fontSize: fontSize,
-    //   position: [-1, Math.max(...this.data) * 1.2],
-    //   anchorX: "center",
-    // });
-    // const yAxisUnit = new Text(this.yAxisUnit, {
-    //   fontSize: fontSize,
-    //   position: [basePosition, labelYPos],
-    //   anchorX: "center",
-    // });
+    const xAxisUnit = new Text(this.xAxisUnit, {
+      fontSize: fontSize,
+      position: [xLineEndpoint[0] + 0.1, 0],
+      anchorX: "left",
+      anchorY: "middle",
+    });
+    const yAxisUnit = new Text(this.yAxisUnit, {
+      fontSize: fontSize,
+      position: [0, yLineEndpoint[1]],
+      anchorX: "center",
+      anchorY: "bottom",
+    });
 
     allLabels.add(xAxisTitle);
     allLabels.add(yAxisTitle);
-    // allLabels.add(xAxisUnit);
-    // allLabels.add(yAxisUnit);
-
-    // for (let i = 0; i < this.data.length; i++) {
-    //   const height = this.data[i];
-    //   const offset = 1;
-    //   const basePosition = i;
-    //   const bar = new Polygon([
-    //     [basePosition, height],
-    //     [basePosition + 1, height],
-    //     [basePosition + 1, 0],
-    //     [basePosition, 0],
-    //   ]);
-    //   allBars.add(bar);
-    // }
-    // const allLabels = new Group();
-    // for (let i = 0; i < this.labels.length; i++) {
-    //   const offset = 0.4;
-    //   const pos: [number, number] = [i + offset, this.data[i] + offset];
-    //   const label = new Text(this.labels[i], { fontSize: 18, position: pos });
-    //   allLabels.add(label);
-    // }
+    allLabels.add(xAxisUnit);
+    allLabels.add(yAxisUnit);
 
     this.add(allBars);
     this.add(allLabels);
     this.add(lines);
   }
 
-  //   For å lage noe så må man lage en form/shape OG et materiale som er hvordan det skal se ut.
-  //   For hvert elem i data vil vi lage Shape/Polygon som matcher. Høyden er lik data[i] og bredden er lik 1.
-  // Posisjon må settes bortover, med y=0
-  // Label må over hver bar med teksten labels[i]
-  // Må ha linjer rett opp og rett bortover. Linjen oppover må være like lang som max(data) og linjen bortover må være like lang som data.length
+  //*  For å lage noe så må man lage en form/shape OG et materiale som er hvordan det skal se ut.
+  //*   For hvert elem i data vil vi lage Shape/Polygon som matcher. Høyden er lik data[i] og bredden er lik 1.
+  //* Posisjon må settes bortover, med y=0
+  //* Label må over hver bar med teksten labels[i]
+  //* Må ha linjer rett opp og rett bortover. Linjen oppover må være like lang som max(data) og linjen bortover må være like lang som data.length
 
   //   Kombinasjon av disse: https://www.geeksforgeeks.org/bar-graph-meaning-types-and-examples/ OG https://www.math-only-math.com/bar-graph.html
   //  Aksetitler sentrert basert på lengden av aksen og går henholdsvis loddrett og vannrett
