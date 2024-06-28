@@ -50,6 +50,7 @@ class Plot extends Component {
 
   constructor(func: string, options?: PlotOptions) {
     super();
+    this.setFuncName();
     this.setColor();
 
     const {
@@ -180,10 +181,8 @@ class Plot extends Component {
     return this.func;
   }
 
-  setFuncName(name: string) {
-    if (this.funcName === undefined) {
-      this.funcName = name;
-    }
+  setFuncName() {
+    this.funcName = String.fromCharCode("f".charCodeAt(0) + Plot.counter);
   }
 
   setColor() {

@@ -232,12 +232,6 @@ class Core {
         this.updateComponents.push(child);
       }
     });
-
-    if (component instanceof Plot) {
-      const name = String.fromCharCode("f".charCodeAt(0) + this.plotCount);
-      component.setFuncName(name);
-      this.plotCount++;
-    }
   }
 
   remove(component: Component) {
