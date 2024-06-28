@@ -49,7 +49,7 @@
     "troika-three-text": "^0.47.2"
   },
   "scripts": {
-    "dev": "rm -rf dist && NODE_ENV='development' yarn rollup -c --watch",
+    "dev": "yarn rollup -c --watch",
     "run": "yarn dev",
     "dist": "rm dist -r & yarn tsc && yarn webpack build",
     "prettier": "prettier --write --ignore-path .gitignore .",
