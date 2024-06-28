@@ -5,6 +5,7 @@ import {
   Object3D,
   Box3,
   Vector3,
+  CubicBezierCurve,
 } from "three";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { toVector2 } from "../utils";
@@ -21,6 +22,7 @@ export type LineOptions = {
   opacity?: number;
   transparent?: boolean;
   draggable?: Draggable;
+  curve: number;
 };
 
 export const defaultLineOptions: LineOptions = {
@@ -31,12 +33,14 @@ export const defaultLineOptions: LineOptions = {
   opacity: 1,
   transparent: false,
   draggable: undefined,
+  curve: 0,
 };
 
 class Line extends Component implements Collider {
   start: InputPosition;
   end: InputPosition;
   arrowhead: boolean;
+  curve: number;
 
   constructor(start: InputPosition, end: InputPosition, options?: LineOptions) {
     super();
@@ -48,6 +52,7 @@ class Line extends Component implements Collider {
       opacity,
       transparent,
       draggable,
+      curve,
     } = {
       ...defaultLineOptions,
       ...options,
@@ -55,6 +60,7 @@ class Line extends Component implements Collider {
     this.start = start;
     this.end = end;
     this.arrowhead = arrowhead ?? false;
+    this.curve = curve ?? 0;
     this.material = new LineMaterial({
       color: color,
       linewidth: lineWidth,
@@ -114,16 +120,26 @@ class Line extends Component implements Collider {
     const startPosition = toVector2(start);
     const endPosition = toVector2(end);
 
-    const direction = startPosition.clone().sub(endPosition).normalize();
+    let direction:Vector2;
+    if (this.curve == 0) {
+      direction = startPosition.clone().sub(endPosition).normalize();
 
-    (this.geometry as LineGeometry).setPositions([
-      startPosition.x,
-      startPosition.y,
-      this.position.z,
-      endPosition.x,
-      endPosition.y,
-      this.position.z,
-    ]);
+      (this.geometry as LineGeometry).setPositions([
+        startPosition.x,
+        startPosition.y,
+        this.position.z,
+        endPosition.x,
+        endPosition.y,
+        this.position.z,
+      ]);
+    } else {
+      const curvePoints = this.getCurvePoints(startPosition, endPosition);
+      direction = curvePoints[49].clone().sub(curvePoints[50]).normalize();
+
+      (this.geometry as LineGeometry).setPositions(
+        curvePoints.flatMap(point => [point.x, point.y, this.position.z])
+      );
+    }
 
     if (arrowhead) {
       const arrowheadLine = this.getObjectByName("arrowhead") as Line2;
@@ -157,14 +173,39 @@ class Line extends Component implements Collider {
     const startPosition = toVector2(start);
     const endPosition = toVector2(end);
 
-    (this.geometry as LineGeometry).setPositions([
-      startPosition.x,
-      startPosition.y,
-      this.position.z,
-      endPosition.x,
-      endPosition.y,
-      this.position.z,
-    ]);
+    if (this.curve == 0) {
+      (this.geometry as LineGeometry).setPositions([
+        startPosition.x,
+        startPosition.y,
+        this.position.z,
+        endPosition.x,
+        endPosition.y,
+        this.position.z,
+      ]);
+    } else {
+      const curvePoints = this.getCurvePoints(startPosition, endPosition);
+  
+      (this.geometry as LineGeometry).setPositions(
+        curvePoints.flatMap(point => [point.x, point.y, this.position.z])
+      );
+    }
+  }
+
+  private getCurvePoints(start: Vector2, end: Vector2): Vector2[] {
+    const point1 = start.clone().lerp(end, 0.25);
+    const point2 = start.clone().lerp(end, 0.75);
+
+    const direction1 = point1.clone().sub(start).normalize();
+    const direction2 = end.clone().sub(point2).normalize();
+
+    const normal1 = new Vector2(-direction1.y, direction1.x).normalize().multiplyScalar(this.curve);
+    const normal2 = new Vector2(-direction2.y, direction2.x).normalize().multiplyScalar(this.curve);
+
+    const controlPoint1 = point1.clone().add(normal1);
+    const controlPoint2 = point2.clone().add(normal2);
+
+    const curve = new CubicBezierCurve(start, controlPoint1, controlPoint2, end);
+    return curve.getPoints(50);
   }
 
   public setEnd(end: InputPosition) {
@@ -182,6 +223,10 @@ class Line extends Component implements Collider {
 
   public setZIndex(z: number): void {
     this.position.setZ(z - 3);
+  }
+
+  public setCurve(curve: number): void {
+    this.curve = curve;
   }
 
   update(camera: OrthographicCamera) {
