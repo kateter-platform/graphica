@@ -46,7 +46,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x - cos * other.radius;
         const outlineY2 = other.position.y - sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: "1"});
         this.adjacencyList.push({node: other, line: line});
         this.add(line);
       }
@@ -56,7 +56,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x - cos * other.radius;
         const outlineY2 = other.position.y + sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: "1"});
         this.adjacencyList.push({node: other, line: line});
         this.add(line);
       }
@@ -66,7 +66,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x + cos * other.radius;
         const outlineY2 = other.position.y + sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: "1"});
         this.adjacencyList.push({node: other, line: line});
         this.add(line);
       }
@@ -76,7 +76,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x + cos * other.radius;
         const outlineY2 = other.position.y - sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: "1"});
         this.adjacencyList.push({node: other, line: line});
         this.add(line);
       }

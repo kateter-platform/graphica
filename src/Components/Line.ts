@@ -11,6 +11,7 @@ import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { toVector2 } from "../utils";
 import { Collider, Component, Draggable } from "./interfaces";
 import { InputPosition } from "./types";
+import Text from "./Text"
 
 const ARROWHEAD_LENGTH = 12;
 
@@ -23,6 +24,7 @@ export type LineOptions = {
   transparent?: boolean;
   draggable?: Draggable;
   curve: number;
+  label: string;
 };
 
 export const defaultLineOptions: LineOptions = {
@@ -34,6 +36,7 @@ export const defaultLineOptions: LineOptions = {
   transparent: false,
   draggable: undefined,
   curve: 0,
+  label: "",
 };
 
 class Line extends Component implements Collider {
@@ -41,6 +44,7 @@ class Line extends Component implements Collider {
   end: InputPosition;
   arrowhead: boolean;
   curve: number;
+  label: Text;
 
   constructor(start: InputPosition, end: InputPosition, options?: LineOptions) {
     super();
@@ -53,6 +57,7 @@ class Line extends Component implements Collider {
       transparent,
       draggable,
       curve,
+      label,
     } = {
       ...defaultLineOptions,
       ...options,
@@ -60,7 +65,8 @@ class Line extends Component implements Collider {
     this.start = start;
     this.end = end;
     this.arrowhead = arrowhead ?? false;
-    this.curve = curve ?? 0;
+    this.curve = curve;
+    this.label = new Text(label, {fontSize: 2.5, anchorX: "center", anchorY: "middle", responsiveScale: false});
     this.material = new LineMaterial({
       color: color,
       linewidth: lineWidth,
@@ -141,6 +147,17 @@ class Line extends Component implements Collider {
       );
     }
 
+    const midPoint = new Vector2(startPosition.x+(endPosition.x-startPosition.x)/2, startPosition.y+(endPosition.y-startPosition.y)/2);
+    const dir = midPoint.clone().sub(startPosition).normalize();
+    let normal:Vector2;
+    if (this.arrowhead) {
+      normal = new Vector2(-dir.y, dir.x).normalize().multiplyScalar(this.curve);
+    } else {
+      normal = new Vector2(-dir.y, dir.x).normalize().multiplyScalar(this.curve).addScalar(1);
+    }
+    const labelPoint = midPoint.clone().add(normal);
+    this.label.setPosition([labelPoint.x, labelPoint.y]);
+
     if (arrowhead) {
       const arrowheadLine = this.getObjectByName("arrowhead") as Line2;
       const arrowheadGeometry = arrowheadLine.geometry as LineGeometry;
@@ -189,7 +206,20 @@ class Line extends Component implements Collider {
         curvePoints.flatMap(point => [point.x, point.y, this.position.z])
       );
     }
+
+    const midPoint = new Vector2(startPosition.x+(endPosition.x-startPosition.x)/2, startPosition.y+(endPosition.y-startPosition.y)/2);
+    const direction = midPoint.clone().sub(startPosition).normalize();
+    let normal:Vector2;
+    if (this.arrowhead) {
+      normal = new Vector2(-direction.y, direction.x).normalize().multiplyScalar(this.curve);
+    } else {
+      normal = new Vector2(-direction.y, direction.x).normalize().multiplyScalar(this.curve).addScalar(1);
+    }
+    const labelPoint = midPoint.clone().add(normal);
+    this.label.setPosition([labelPoint.x, labelPoint.y]);
+    this.add(this.label);
   }
+
 
   private getCurvePoints(start: Vector2, end: Vector2): Vector2[] {
     const point1 = start.clone().lerp(end, 0.25);
