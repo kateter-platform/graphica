@@ -133,18 +133,19 @@ body {
 .legendBox-wrapper {
   position: sticky;
   width: 240px;
-  height: 170px;
+  max-height: 170px;
   background-color: #fae493;
   border-radius: 6px;
   border-style: solid;
   border-width: 3px;
   overflow-y: scroll;
   overflow-x: scroll;
+  padding-bottom: 6px;
 }
 
 .legendBox-wrapper.minimized {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 30px;
 }
 
 .legendBox-wrapper.minimized .function-container {
@@ -161,7 +162,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-left: 8px;
+  margin-left: 12px;
   margin-top: 8px;
 }
 

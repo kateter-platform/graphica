@@ -31,17 +31,23 @@ const plot3 = new Plot("x^4");
 const plot4 = new Plot("x^5");
 const plot5 = new Plot("e^x + 2x + log(x)", { hideFromLegend: true });
 const plot6 = new Plot("x^2 + 2x + 1");
+const plot7 = new Plot("x+1");
+const plot8 = new Plot("2x+1");
+const plot9 = new Plot("-4x-1");
 
 const core = new Core();
 const legend = new LegendBox(core);
 
 core.add(grid);
-core.add(plot1);
-core.add(plot2);
-core.add(plot3);
-core.add(plot4);
-core.add(plot5);
-core.add(plot6);
+// core.add(plot1);
+// core.add(plot2);
+// core.add(plot3);
+// core.add(plot4);
+// core.add(plot5);
+// core.add(plot6);
+core.add(plot7);
+core.add(plot8);
+core.add(plot9);
 
 core.addGui(legend); //must be added after plots
 core.run();
