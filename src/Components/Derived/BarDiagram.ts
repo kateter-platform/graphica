@@ -56,7 +56,6 @@ class BarDiagram extends Component {
 
   createBarDiagram() {
     // Lage en gruppe med bars
-    // const allBars = new Group();
 
     const allBars = new Group();
     const allLabels = new Group();
@@ -65,34 +64,52 @@ class BarDiagram extends Component {
     let counter = 0;
 
     let basePosition = 0;
-    const widthOfBars = 1;
-    const spacingBetweenBars = 1;
+    const widthOfBars = 3;
+    const spacingBetweenBars = 3;
 
-    const fontSize = 18;
+    const fontSize = 26;
 
     const distanceMultiplierForBarLabels = 0.03;
     const labelsNextToLinePos = -fontSize * distanceMultiplierForBarLabels;
 
+    const maxData = Math.max(...this.data);
+    const normalizationFactor = maxData / 10;
+
+    this.data = this.data.map((elem) => {
+      // console.log("ELEM FØR: ", elem)
+      elem = elem / normalizationFactor;
+      //   console.log("ELEM ETTER: ", elem);
+      return elem;
+    });
+
+    // console.log("Normalisert data: ", this.data);
+
     while (counter < this.data.length) {
       const height = this.data[counter];
 
-      const bar = new Polygon([
-        [basePosition, height],
-        [basePosition + widthOfBars, height],
-        [basePosition + widthOfBars, 0],
-        [basePosition, 0],
-      ]);
+      const bar = new Polygon(
+        [
+          [basePosition, height],
+          [basePosition + widthOfBars, height],
+          [basePosition + widthOfBars, 0],
+          [basePosition, 0],
+        ],
+        { transparent: false, opacity: 1.0 }
+      );
 
       const label = new Text(this.labels[counter], {
         fontSize: fontSize,
         position: [basePosition + widthOfBars / 2, labelsNextToLinePos],
         anchorX: "center",
       });
-      const valueOfBar = new Text("" + this.data[counter], {
-        fontSize: fontSize,
-        position: [basePosition + widthOfBars / 2, height + 0.1],
-        anchorX: "center",
-      });
+      const valueOfBar = new Text(
+        "" + this.data[counter] * normalizationFactor,
+        {
+          fontSize: fontSize,
+          position: [basePosition + widthOfBars / 2, height + 0.1],
+          anchorX: "center",
+        }
+      );
       basePosition += widthOfBars + spacingBetweenBars;
 
       allBars.add(bar);
@@ -108,8 +125,6 @@ class BarDiagram extends Component {
     const yLine = new Line([0, 0], yLineEndpoint, {
       arrowhead: true,
     });
-    lines.add(xLine);
-    lines.add(yLine);
 
     const xAxisTitle = new Text(this.xAxisTitle, {
       fontSize: fontSize,
@@ -126,6 +141,45 @@ class BarDiagram extends Component {
 
     allLabels.add(xAxisTitle);
     allLabels.add(yAxisTitle);
+
+    // Horizontal lines
+    // const niceInterval = this.calculateNiceInterval(maxData);
+    // const yAxisLabels = this.generateYAxisLabels(maxData, niceInterval);
+
+    // Add horizontal lines and y-axis labels
+    // for (let yCoord of yAxisLabels) {
+    //   const valueLine = new Line([0, yCoord], [xLineEndpoint[0], yCoord], {
+    //     color: 0xaaaaaa,
+    //   });
+    //   lines.add(valueLine);
+    //   const valueOfValueLine = new Text("" + yCoord * normalizationFactor, {
+    //     position: [labelsNextToLinePos, yCoord],
+    //     fontSize: fontSize,
+    //     anchorY: "middle",
+    //     anchorX: "left",
+    //   });
+    //   allLabels.add(valueOfValueLine);
+    // }
+    const numOfLines = 5;
+    for (let i = 1; i < numOfLines + 1; i++) {
+      const yCoord = (maxData / numOfLines) * i;
+      const valueLine = new Line([0, yCoord], [xLineEndpoint[0], yCoord], {
+        color: 0xaaaaaa,
+      });
+      lines.add(valueLine);
+      const valueOfValueLine = new Text("" + Math.round(yCoord), {
+        position: [labelsNextToLinePos, yCoord],
+        fontSize: fontSize,
+        anchorY: "middle",
+        anchorX: "left",
+      });
+      allLabels.add(valueOfValueLine);
+    }
+
+    lines.add(xLine);
+    lines.add(yLine);
+    xLine.setZIndex(10);
+    yLine.setZIndex(10);
 
     if (this.xAxisUnit) {
       const xAxisUnit = new Text(this.xAxisUnit, {
@@ -147,10 +201,32 @@ class BarDiagram extends Component {
       allLabels.add(yAxisUnit);
     }
 
+    this.add(lines);
     this.add(allBars);
     this.add(allLabels);
-    this.add(lines);
   }
+
+  //   // Function to calculate a nice interval
+  //   calculateNiceInterval(maxData: number): number {
+  //     const niceNumbers = [1, 2, 5, 10, 25, 50, 100];
+  //     let interval = 1;
+  //     for (let i = 0; i < niceNumbers.length; i++) {
+  //       if (maxData / niceNumbers[i] <= 5) {
+  //         interval = niceNumbers[i];
+  //         break;
+  //       }
+  //     }
+  //     return interval;
+  //   }
+
+  //   // Function to generate y-axis labels based on the nice interval
+  //   generateYAxisLabels(maxData: number, interval: number): number[] {
+  //     const labels = [];
+  //     for (let i = 0; i <= Math.ceil(maxData / interval); i++) {
+  //       labels.push(i * interval);
+  //     }
+  //     return labels;
+  //   }
 
   //*  For å lage noe så må man lage en form/shape OG et materiale som er hvordan det skal se ut.
   //*   For hvert elem i data vil vi lage Shape/Polygon som matcher. Høyden er lik data[i] og bredden er lik 1.
@@ -162,6 +238,8 @@ class BarDiagram extends Component {
   //  Aksetitler sentrert basert på lengden av aksen og går henholdsvis loddrett og vannrett
   // Benevning av akser rett utenfor pilspissen
   //   Horisontale linjer bortover fra yAxis
+  //  5 linjer uansett. Kan ta max-tallet fra data og rounde av til nærmeste 2, 5, 10, 25, 50, 100, osv.
+  //    Man skal kunne oppdatere søylene med knapper
 }
 
 export default BarDiagram;
