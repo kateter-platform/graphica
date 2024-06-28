@@ -1,25 +1,15 @@
-import { largerEq } from "mathjs";
 import Core from "../Core";
 import renderToString from "katex";
 import Plot from "./Plot";
-import { GuiComponent } from "./interfaces";
+import { Component, GuiComponent } from "./interfaces";
 import "style.css";
-
-//usikker på om denne trengs
-type LegendBoxOptions = {
-  label: string;
-};
-
-const defaultLegendBoxOptions: LegendBoxOptions = {
-  label: "",
-};
+import { OrthographicCamera } from "three";
 
 class LegendBox implements GuiComponent {
   private core: Core;
   htmlElement: HTMLElement;
-  //   observers: (() => void)[];
 
-  constructor(core: Core, options?: LegendBoxOptions) {
+  constructor(core: Core) {
     this.core = core;
     const legendBoxWrapper = document.createElement("div");
     legendBoxWrapper.className = "legendBox-wrapper";
@@ -34,9 +24,14 @@ class LegendBox implements GuiComponent {
 
     legendBoxWrapper.appendChild(button);
     this.updatePlots();
+
+    Plot.emitter.on("expressionUpdated", (plot) => {
+      this.updatePlots();
+    });
   }
 
   updatePlots() {
+    this.htmlElement.innerHTML = "";
     for (const component of this.core.getComponents()) {
       if (!(component instanceof Plot)) {
         continue;

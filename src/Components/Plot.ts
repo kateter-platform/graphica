@@ -2,6 +2,7 @@ import { Vector3, CatmullRomCurve3, Vector2, OrthographicCamera } from "three";
 import { parse } from "mathjs";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./interfaces";
+import { EventEmitter } from "events";
 
 type PlotOptions = {
   hideFromLegend?: boolean;
@@ -47,6 +48,7 @@ class Plot extends Component {
   private DEFAULT_RENDERTHRESHOLD = 1400;
 
   private plotMaterial: LineMaterial;
+  static emitter = new EventEmitter();
 
   constructor(func: string, options?: PlotOptions) {
     super();
@@ -135,6 +137,7 @@ class Plot extends Component {
   public setExpression(expression: string): void {
     this.func = expression;
     this.reRenderPlot(this.currentMinX, this.currentMaxX);
+    Plot.emitter.emit("expressionUpdated", this);
   }
 
   private reRenderPlot(minX: number, maxX: number): void {
