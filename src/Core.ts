@@ -52,6 +52,7 @@ class Core {
   components: Component[];
   draggables: Component[];
   updateComponents: Component[];
+  updateGuiComponents: GuiComponent[];
   plotCount: number = 0;
   stats?: Stats;
   renderer: WebGLRenderer;
@@ -124,6 +125,7 @@ class Core {
     this.components = [];
     this.draggables = [];
     this.updateComponents = [];
+    this.updateGuiComponents = [];
     if (process.env.NODE_ENV === "development") {
       this.stats = new Stats();
       this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -202,6 +204,9 @@ class Core {
     this.updateComponents.forEach((component) => {
       if (component.update) component.update(this.camera);
     });
+    this.updateGuiComponents.forEach((component) => {
+      if (component.update) component.update(this.camera);
+    });
     if (this.onUpdateFunction)
       this.onUpdateFunction(this.clock.getElapsedTime());
     this.domRenderer.render(this.scene, this.camera);
@@ -245,12 +250,16 @@ class Core {
 
   addGui(component: GuiComponent) {
     this.guiRoot.appendChild(component.htmlElement);
-    this.updateGuiComponents(component);
+    this.updateLegend(component);
+
+    if (component.update && !this.updateGuiComponents.includes(component)) {
+      this.updateGuiComponents.push(component);
+    }
   }
 
   removeGui(component: GuiComponent) {
     this.guiRoot.removeChild(component.htmlElement);
-    this.updateGuiComponents(component);
+    this.updateLegend(component);
   }
 
   startClock(): void {
@@ -278,7 +287,7 @@ class Core {
     return this.components;
   }
 
-  private updateGuiComponents(guiComponent: GuiComponent) {
+  private updateLegend(guiComponent: GuiComponent) {
     if (guiComponent instanceof LegendBox) {
       guiComponent.updatePlots();
     }

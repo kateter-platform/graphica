@@ -50,4 +50,5 @@ export type Draggable =
 
 export interface GuiComponent {
   htmlElement: HTMLElement;
+  update?(camera?: OrthographicCamera): void;
 }
