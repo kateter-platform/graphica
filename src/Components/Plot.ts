@@ -4,12 +4,13 @@ import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./interfaces";
 
 type PlotOptions = {
+  hideFromLegend?: boolean;
   numPoints?: number;
   dashed?: boolean;
   lineWidth?: number;
   coefficients?: Coefficients;
   plotRange?: number;
-  plotBetween: [number, number] | undefined;
+  plotBetween?: [number, number] | undefined;
 };
 
 const defaultPlotOptions = {
@@ -18,6 +19,7 @@ const defaultPlotOptions = {
   lineWidth: 4,
   coefficients: {},
   plotBetween: undefined,
+  hideFromLegend: false,
 };
 
 type Coefficients = {
@@ -28,6 +30,7 @@ class Plot extends Component {
   draggable = undefined;
   public func: string;
   public funcName: string | undefined;
+  public hideFromLegend: boolean;
   private numPoints: number;
   private currentMinX: number;
   private currentMaxX: number;
@@ -36,7 +39,7 @@ class Plot extends Component {
   private plotBetween: [number, number] | undefined;
   public color: number | undefined;
   private static counter = 0;
-  private static colors = [0xeea73c, 0xe15745, 0x4e0da6, 0x874b8];
+  private static colors = [0xeea73c, 0xe15745, 0x4e0da6, 0x3874b8];
 
   private RENDERTHRESHOLDX = 1400;
   private RENDERTHRESHOLDZOOM = 2.5;
@@ -55,6 +58,7 @@ class Plot extends Component {
       lineWidth = 1,
       coefficients = {},
       plotBetween = undefined,
+      hideFromLegend,
     } = { ...defaultPlotOptions, ...options };
 
     const minX = (-this.PLOTRANGE / 1) * 2 + 0;
@@ -92,6 +96,7 @@ class Plot extends Component {
     this.coefficients = coefficients;
     this.plotBetween = plotBetween;
     plot.name = "plot";
+    this.hideFromLegend = hideFromLegend;
     this.add(plot);
   }
 

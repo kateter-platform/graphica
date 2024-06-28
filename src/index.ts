@@ -29,6 +29,10 @@ const plot1 = new Plot("x^2");
 const plot2 = new Plot("x^3");
 const plot3 = new Plot("x^4");
 const plot4 = new Plot("x^5");
+const plot5 = new Plot("e^x + 2x + log(x)", { hideFromLegend: true });
+const plot6 = new Plot("x^2 + 2x + 1");
+const plot7 = new Plot("e^(log(x)) + 2x + 1/2");
+
 const core = new Core();
 const legend = new LegendBox(core);
 
@@ -37,11 +41,11 @@ core.add(plot1);
 core.add(plot2);
 core.add(plot3);
 core.add(plot4);
+core.add(plot5);
+core.add(plot6);
+core.add(plot7);
 
 core.addGui(legend);
-
 console.log("hei");
-// console.log(core.getComponents());
-console.log(plot1.getColor());
-console.log(plot2.getColor());
+
 core.run();
