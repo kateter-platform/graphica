@@ -31,7 +31,11 @@ class LegendBox implements GuiComponent {
   }
 
   updatePlots() {
-    this.htmlElement.innerHTML = "";
+    Array.from(this.htmlElement.children).forEach((child) => {
+      if (child.className !== "size-adjust-button") {
+        this.htmlElement.removeChild(child);
+      }
+    });
     for (const component of this.core.getComponents()) {
       if (!(component instanceof Plot)) {
         continue;

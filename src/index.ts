@@ -43,9 +43,9 @@ core.add(plot4);
 core.add(plot5);
 core.add(plot6);
 
-core.addGui(legend);
-//core.run();
+core.addGui(legend); //must be added after plots
+core.run();
 
-core.run((t) => {
-  plot1.setExpression(`x^2+${(t / 10).toFixed(2)}`);
-});
+// core.run((t) => {
+//   plot1.setExpression(`x^2+${(t / 10).toFixed(2)}`);
+// });
