@@ -18,6 +18,9 @@ export class Component extends Mesh {
   getName(): string {
     return this.name ?? "";
   }
+  hover?(): void;
+  unhover?(): void;
+
   update?(camera: OrthographicCamera): void;
   onWindowResize?(): void;
   dragUpdate?(): void;

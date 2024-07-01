@@ -21,6 +21,18 @@ export const defaultShapeOptions: CircleOptions = {
   segments: 128,
 };
 
+const defaultMaterial = new MeshBasicMaterial({
+  color: 0xfaa307,
+  transparent: true,
+  opacity: 0.5,
+});
+
+const hoverMaterial = new MeshBasicMaterial({
+  color: 0xfaa307,
+  transparent: true,
+  opacity: 0.6,
+});
+
 class Circle extends Component implements Collider {
   radius: number;
   _strokeMesh: Mesh;
@@ -33,16 +45,11 @@ class Circle extends Component implements Collider {
     const { color, segments } = { ...defaultShapeOptions, ...options };
 
     const geometry = new CircleGeometry(radius, segments);
-    const material = new MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 0.5,
-    });
     this.segments = segments;
     const strokeGeometry = new RingGeometry(radius - 1, radius, this.segments);
     const strokeMaterial = new MeshBasicMaterial({ color: "#080007" });
     // set mesh of the point instance
-    const circleMesh = new Mesh(geometry, material);
+    const circleMesh = new Mesh(geometry, defaultMaterial);
     this._strokeMesh = new Mesh(strokeGeometry, strokeMaterial);
     this._strokeMesh.position.set(0, 0, 1);
     this.geometry = circleMesh.geometry;
@@ -87,6 +94,14 @@ class Circle extends Component implements Collider {
       this.radius,
       this.segments
     );
+  }
+
+  hover() {
+    this.material = hoverMaterial;
+  }
+
+  unhover() {
+    this.material = defaultMaterial;
   }
 }
 

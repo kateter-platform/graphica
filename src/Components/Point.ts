@@ -6,6 +6,7 @@ import {
   Object3D,
   Box3,
   Vector3,
+  RingGeometry,
 } from "three";
 import Text from "./Text";
 import { Collider, Component, DragListener, Draggable } from "./interfaces";
@@ -74,6 +75,17 @@ class Point extends Component implements Collider, DragListener<Point> {
       text.name = "label";
       this.add(text);
     }
+
+    const nameText = new Text(this.pointName, {
+      color: "black",
+      fontSize: 18,
+      anchorY: "middle",
+      anchorX: "left",
+      position: [15, 0],
+      responsiveScale: false,
+    });
+    nameText.name = "name";
+    this.add(nameText);
   }
 
   addDragListener(listener: (point: Point) => void) {
@@ -139,6 +151,24 @@ class Point extends Component implements Collider, DragListener<Point> {
     return (
       "(" + this.position.x.toFixed(1) + ", " + this.position.y.toFixed(1) + ")"
     );
+  }
+  hover() {
+    const hoverStrokeGeometry = new RingGeometry(8, 8 + 2, 32);
+    const hoverStrokeMaterial = new MeshBasicMaterial({
+      color: "#080007",
+      opacity: 0.4,
+      transparent: true,
+    });
+    const hoverStrokeMesh = new Mesh(hoverStrokeGeometry, hoverStrokeMaterial);
+    hoverStrokeMesh.name = "hoverStrokeMesh";
+    this.add(hoverStrokeMesh);
+  }
+
+  unhover() {
+    const hoverStrokeMesh = this.getObjectByName(
+      "hoverStrokeMesh"
+    ) as Object3D<Event>;
+    this.remove(hoverStrokeMesh);
   }
 }
 export default Point;

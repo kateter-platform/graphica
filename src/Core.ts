@@ -281,7 +281,6 @@ class Core {
     return this.clock.getElapsedTime();
   }
 
-  //TEST
   public getComponents(): Component[] {
     return this.components;
   }

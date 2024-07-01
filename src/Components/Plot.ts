@@ -3,6 +3,7 @@ import { parse } from "mathjs";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./interfaces";
 import { EventEmitter } from "events";
+import Text from "./Text";
 
 type PlotOptions = {
   numPoints?: number;
@@ -201,6 +202,13 @@ class Plot extends Component {
 
   getDisplayText(): string {
     return this.func;
+  }
+  hover() {
+    this.plotMaterial.linewidth = 7;
+  }
+
+  unhover() {
+    this.plotMaterial.linewidth = 4;
   }
 }
 

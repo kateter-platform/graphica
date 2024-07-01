@@ -14,6 +14,9 @@ class LegendBox implements GuiComponent {
     this.components = components || [];
     const legendBoxWrapper = document.createElement("div");
     legendBoxWrapper.className = "legendBox-wrapper";
+    this.components.length === 0
+      ? (legendBoxWrapper.style.display = "none")
+      : (legendBoxWrapper.style.display = "block");
     this.htmlElement = legendBoxWrapper;
     const button = document.createElement("button");
     button.className = "size-adjust-button";
@@ -44,6 +47,10 @@ class LegendBox implements GuiComponent {
     if (!this.components) {
       return;
     }
+    this.components.length === 0
+      ? (this.htmlElement.style.display = "none")
+      : (this.htmlElement.style.display = "block");
+
     for (const component of this.components) {
       const functionContainer = document.createElement("div");
       functionContainer.className = "function-container";
@@ -67,6 +74,21 @@ class LegendBox implements GuiComponent {
 
       const htmlElementText = document.createElement("div");
       htmlElementText.innerHTML = renderedEquation;
+
+      //HOVER
+      htmlElementText.addEventListener("mouseover", function () {
+        if (component.hover) {
+          htmlElementText.style.cursor = "pointer";
+          component.hover();
+        }
+      });
+
+      //UNHOVER
+      htmlElementText.addEventListener("mouseout", function () {
+        if (component.unhover) {
+          component.unhover();
+        }
+      });
 
       functionContainer.appendChild(htmlElementText);
       this.htmlElement.appendChild(functionContainer);
