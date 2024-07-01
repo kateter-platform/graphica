@@ -63,9 +63,21 @@ class BarDiagram extends Component {
 
     let counter = 0;
 
-    let basePosition = 0;
-    const widthOfBars = 3;
-    const spacingBetweenBars = 3;
+    const widthOfDiagram = 15; //Width for bars and spacing (not counting the xLine)
+    const maxLength = 36; //Max length of the xLine
+
+    // Want the spacing to be 2/3 of the width of the bars
+    // maxLength = numOfBars * width + (numOfBars + 1) * spacingBetweenBars
+
+    const numOfBars = this.data.length;
+    // const widthOfBars = 108 / (5 * numOfBars);
+    // const spacingBetweenBars = (2 / 3) * widthOfBars;
+    const widthOfBars = maxLength / ((5 / 3) * numOfBars + 2 / 3);
+    const spacingBetweenBars = (2 / 3) * widthOfBars;
+    let basePosition = 0 + spacingBetweenBars;
+
+    // const widthOfBars = 3;
+    // const spacingBetweenBars = 3;
 
     const fontSize = 26;
 
@@ -117,6 +129,7 @@ class BarDiagram extends Component {
       allLabels.add(valueOfBar);
       counter++;
     }
+    console.log(basePosition);
 
     const xLineEndpoint: [number, number] = [basePosition, 0];
     const yLineEndpoint: [number, number] = [0, Math.max(...this.data) * 1.25];
@@ -250,6 +263,8 @@ class BarDiagram extends Component {
   //   Horisontale linjer bortover fra yAxis
   //  5 linjer uansett. Kan ta max-tallet fra data og rounde av til nærmeste 2, 5, 10, 25, 50, 100, osv.
   //   Man skal kunne oppdatere søylene med knapper
+
+  // Vil ha bredde på BarDiagram lik 5*(3+3) = 15
 }
 
 export default BarDiagram;
