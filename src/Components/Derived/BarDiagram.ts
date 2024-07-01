@@ -208,16 +208,16 @@ class BarDiagram extends Component {
     });
 
     const xAxisTitle = new Text(this.xAxisTitle, {
-      fontSize: this.fontSize,
+      fontSize: this.fontSize + 6,
       position: [basePosition / 2, this.labelsNextToLinePosition * 2.5],
       anchorX: "center",
     });
     const yAxisTitle = new Text(this.yAxisTitle, {
-      fontSize: this.fontSize,
+      fontSize: this.fontSize + 6,
       position: [
         this.labelsNextToLinePosition * 2.5 -
-          this.maxData.toString().length * stringLengthMultiplier,
-        yLineCoord[1][1] / 2,
+          this.maxData.toString().length * 2 * stringLengthMultiplier,
+        (yLineCoord[1][1] + yLineCoord[0][1]) / 2,
       ],
       anchorX: "center",
       anchorY: "top",
@@ -239,7 +239,7 @@ class BarDiagram extends Component {
   addTitle(position: [number, number]) {
     if (this.diagramTitle) {
       const title = new Text(this.diagramTitle, {
-        fontSize: this.fontSize + 8,
+        fontSize: this.fontSize + 12,
         position: [position[0] / 2, position[1] + 0.5],
         anchorX: "center",
       });
@@ -278,6 +278,7 @@ class BarDiagram extends Component {
     const horizontalLines = new Group();
     const lineLabels = new Group();
     const gray = 0xaaaaaa;
+    const opacity = 0.8;
 
     // Lines above y = 0
     for (let i = 1; i < numOfLines + 1; i++) {
@@ -288,7 +289,8 @@ class BarDiagram extends Component {
         yCoordForLine,
         length,
         stringLengthMultiplier,
-        gray
+        gray,
+        opacity
       );
       lineLabels.add(valueLabel);
       horizontalLines.add(horizontalLine);
@@ -303,7 +305,8 @@ class BarDiagram extends Component {
         yForLine,
         length,
         stringLengthMultiplier,
-        gray
+        gray,
+        opacity
       );
       lineLabels.add(valueLabel);
       horizontalLines.add(horizontalLine);
@@ -318,10 +321,12 @@ class BarDiagram extends Component {
     yCoordForLine: number,
     length: number,
     stringLengthMultiplier: number,
-    color: number
+    color: number,
+    opacity: number
   ): [Text, Line] {
     const line = new Line([0, yCoordForLine], [length, yCoordForLine], {
       color: color,
+      opacity: opacity,
     });
 
     const valueUsedInLabel = Math.round(
