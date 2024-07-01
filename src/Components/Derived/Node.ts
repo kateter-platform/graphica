@@ -1,6 +1,9 @@
+import { colors } from "@mui/material";
 import Circle, { CircleOptions, defaultShapeOptions } from "../Circle";
 import Line from "../Line";
 import Text from "../Text"
+import { Color, MeshBasicMaterial } from "three";
+import { LineMaterial } from "three-fatline";
 
 export type NodeOptions =  CircleOptions & {
   label?: string;
@@ -142,7 +145,7 @@ class Node extends Circle {
     }
   }
 
-  setLabel(label: string) {
+  setLabel(label: string): void {
     if (this.label !== undefined) {
       this.label.setText(label);
       this.label.setFontSize(this.calculateFontSize(label, this.radius));
@@ -150,6 +153,23 @@ class Node extends Circle {
     else {
       this.label = new Text(label, {position: [0,0], fontSize: this.calculateFontSize(label, this.radius), anchorX: "center", anchorY: "middle", responsiveScale: false});
       this.add(this.label)
+    }
+  }
+
+  setColor(color: number): void {
+    this.material = new MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.5,
+    });
+  }
+
+  setEdgeColor(other: Node, color: number): void {
+    const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
+    if (index > -1) {
+      (this.adjacencyList[index].line.material as LineMaterial).color = new Color(color);
+      //(this.adjacencyList[index].line.material as LineMaterial).linewidth = 8;
+      //(this.adjacencyList[index].line.material as LineMaterial).opacity = 0.5;
     }
   }
 

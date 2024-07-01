@@ -23,8 +23,8 @@ export type LineOptions = {
   opacity?: number;
   transparent?: boolean;
   draggable?: Draggable;
-  curve: number;
-  label: string;
+  curve?: number;
+  label?: string;
 };
 
 export const defaultLineOptions: LineOptions = {
@@ -65,7 +65,7 @@ class Line extends Component implements Collider {
     this.start = start;
     this.end = end;
     this.arrowhead = arrowhead ?? false;
-    this.curve = curve;
+    this.curve = curve ?? 0;
     this.label = new Text(label, {fontSize: 2.5, anchorX: "center", anchorY: "middle", responsiveScale: false});
     this.material = new LineMaterial({
       color: color,

@@ -19,21 +19,15 @@ export { default as Fraction } from "./Components/Derived/Fraction";
 export { default as SVGLoader } from "./Components/SVGLoader";
 export * as three from "three"; */
 
-import Grid from "./Components/Grid";
 import Core from "./Core";
 import Node from "./Components/Derived/Node"
-import Line from "./Components/Line";
-import { disconnect } from "process";
-import Arc from "./Components/Arc";
-import THREE, { Curve } from "three";
-import Bracket from "./Components/Bracket";
-import { falseDependencies } from "mathjs";
+import OperationButtonPanel from "./Components/Derived/OperationButtonPanel";
 
 
 const core = new Core();
 //const grid = new Grid();
 const node = new Node(-20,20,5,[],{label: "Node 123456789"});
-const node2 = new Node(0,-20,5,[],{label: "Node 2 Mer tekst"}));
+const node2 = new Node(0,-20,5,[],{label: "Node 2 Mer tekst"});
 const node3 = new Node(40,20,5,[],{label: "3"});
 const node4 = new Node(30,-40,5,[],{label: "4"});
 const node5 = new Node(-50,20,5,[]);
@@ -42,15 +36,36 @@ node2.connectTo(node3, true, 5);
 node2.connectTo(node4, true, 5);
 node4.connectTo(node2, true, 20);
 node.connectTo(node5, true);
-node5.connectTo(node, true);
-node.setLabel("Hei");
-node5.setLabel("5");
-//node3.connectTo(node2, true);
-//core.add(grid);
 core.add(node);
 core.add(node2);
 core.add(node3);
 core.add(node4);
 core.add(node5);
+
+const op1 = () => {
+    node.setColor(0xff0000);
+}
+const op2 = () => {
+    node2.setEdgeColor(node3, 0xff0000);
+}
+const op3 = () => {
+    node3.setColor(0xff0000);
+}
+
+const op12 = () => {
+    node.setColor(0xfaa307);
+}
+const op22 = () => {
+    node2.setEdgeColor(node3, 0x000000);
+}
+const op32 = () => {
+    node3.setColor(0xfaa307);
+}
+const lst = [op1, op2, op3];
+const lst2 = [op12, op22, op32];
+
+const operationButtonPanel = new OperationButtonPanel(lst, lst2);
+
+core.addGui(operationButtonPanel);
 
 core.run();
