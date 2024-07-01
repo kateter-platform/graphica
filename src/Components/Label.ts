@@ -53,6 +53,7 @@ class Label extends Component {
       endPoint.x + (deltaX < 0 ? -1 : 1) * 10,
       endPoint.y,
     ]);
+    this.name = "Label";
 
     // Add line and text components to the label
     this.add(line1);

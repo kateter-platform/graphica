@@ -42,6 +42,7 @@ class Text extends Component implements Collider {
 
   constructor(text?: string, options?: TextOptions) {
     super();
+    this.name = "Text";
 
     const {
       position,

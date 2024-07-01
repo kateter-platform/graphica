@@ -66,6 +66,7 @@ class Arc extends Component {
     this.textOffset = textOffset;
     this.resolution = resolution;
     this.dynamic = dynamic;
+    this.name = "Arc";
 
     this._curvedOutline = new Line2(
       undefined,

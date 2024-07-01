@@ -50,6 +50,7 @@ class Circle extends Component implements Collider {
     this.add(this._strokeMesh);
     // set position of the mesh
     this.position.set(x, y, 0);
+    this.name = "Circle";
   }
 
   collidesWith(other: Object3D): boolean {
