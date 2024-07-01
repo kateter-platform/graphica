@@ -120,6 +120,7 @@ class BarDiagram extends Component {
 
     const xLineEndpoint: [number, number] = [basePosition, 0];
     const yLineEndpoint: [number, number] = [0, Math.max(...this.data) * 1.25];
+    const stringLengthMultiplier = 0.2; //For distributing the yAxisTitle and horizontal line-labels
 
     const xLine = new Line([0, 0], xLineEndpoint, { arrowhead: true });
     const yLine = new Line([0, 0], yLineEndpoint, {
@@ -133,7 +134,11 @@ class BarDiagram extends Component {
     });
     const yAxisTitle = new Text(this.yAxisTitle, {
       fontSize: fontSize,
-      position: [labelsNextToLinePos * 2.5, yLineEndpoint[1] / 2],
+      position: [
+        labelsNextToLinePos * 2.5 -
+          maxData.toString().length * stringLengthMultiplier,
+        yLineEndpoint[1] / 2,
+      ],
       anchorX: "center",
       anchorY: "top",
     });
@@ -162,13 +167,18 @@ class BarDiagram extends Component {
     // }
     const numOfLines = 5;
     for (let i = 1; i < numOfLines + 1; i++) {
-      const yCoord = (maxData / numOfLines) * i;
+      const yCoord = (maxData / normalizationFactor / numOfLines) * i;
       const valueLine = new Line([0, yCoord], [xLineEndpoint[0], yCoord], {
         color: 0xaaaaaa,
       });
       lines.add(valueLine);
-      const valueOfValueLine = new Text("" + Math.round(yCoord), {
-        position: [labelsNextToLinePos, yCoord],
+      const yValue = Math.round(yCoord * normalizationFactor);
+      const valueOfValueLine = new Text("" + yValue, {
+        position: [
+          labelsNextToLinePos -
+            yValue.toString().length * stringLengthMultiplier,
+          yCoord,
+        ],
         fontSize: fontSize,
         anchorY: "middle",
         anchorX: "left",
@@ -239,7 +249,7 @@ class BarDiagram extends Component {
   // Benevning av akser rett utenfor pilspissen
   //   Horisontale linjer bortover fra yAxis
   //  5 linjer uansett. Kan ta max-tallet fra data og rounde av til nærmeste 2, 5, 10, 25, 50, 100, osv.
-  //    Man skal kunne oppdatere søylene med knapper
+  //   Man skal kunne oppdatere søylene med knapper
 }
 
 export default BarDiagram;
