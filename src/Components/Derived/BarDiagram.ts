@@ -20,7 +20,7 @@ type BarDiagramOptions = {
   //   fontSize: number;
   //   widthOfBars: number;
   //   spacingBetweenBars: number;
-  basePositionX?: number;
+  basePosition?: [number, number];
 };
 
 class BarDiagram extends Component {
@@ -28,29 +28,32 @@ class BarDiagram extends Component {
   labels: string[];
   xAxisTitle: string;
   yAxisTitle: string;
+  diagramTitle: string | undefined;
   xAxisUnit: string | undefined;
   yAxisUnit: string | undefined;
-  basePositionX: number | undefined;
+  basePosition: [number, number] | undefined;
 
   constructor(
-    dataForBars: number[],
-    labelsForBars: string[],
+    data: number[],
+    labels: string[],
     xAxisTitle: string,
     yAxisTitle: string,
+    diagramTitle?: string,
     xAxisUnit?: string,
     yAxisUnit?: string,
     options?: BarDiagramOptions
   ) {
     super();
-    this.data = dataForBars;
-    this.labels = labelsForBars;
+    this.data = data;
+    this.labels = labels;
     this.xAxisTitle = xAxisTitle;
     this.yAxisTitle = yAxisTitle;
+    this.diagramTitle = diagramTitle ? diagramTitle : "";
     this.xAxisUnit = xAxisUnit ? xAxisUnit : "";
     this.yAxisUnit = yAxisUnit ? yAxisUnit : "";
-    this.basePositionX = options?.basePositionX ? options?.basePositionX : 0;
+    this.basePosition = options?.basePosition ? options?.basePosition : [0, 0];
 
-    this.position.set(this.basePositionX, 0, 0);
+    this.position.set(this.basePosition[0], this.basePosition[1], 0);
     this.createBarDiagram();
   }
 
@@ -204,6 +207,15 @@ class BarDiagram extends Component {
     xLine.setZIndex(10);
     yLine.setZIndex(10);
 
+    if (this.diagramTitle) {
+      const title = new Text(this.diagramTitle, {
+        fontSize: fontSize + 8,
+        position: [basePosition / 2, yLineEndpoint[1] + 0.5],
+        anchorX: "center",
+      });
+      allLabels.add(title);
+    }
+
     if (this.xAxisUnit) {
       const xAxisUnit = new Text(this.xAxisUnit, {
         fontSize: fontSize,
@@ -256,6 +268,7 @@ class BarDiagram extends Component {
   //* Posisjon må settes bortover, med y=0
   //* Label må over hver bar med teksten labels[i]
   //* Må ha linjer rett opp og rett bortover. Linjen oppover må være like lang som max(data) og linjen bortover må være like lang som data.length
+  //* Vil ha bredde på BarDiagram lik en maxLengde (nå på 36)
 
   //   Kombinasjon av disse: https://www.geeksforgeeks.org/bar-graph-meaning-types-and-examples/ OG https://www.math-only-math.com/bar-graph.html
   //  Aksetitler sentrert basert på lengden av aksen og går henholdsvis loddrett og vannrett
@@ -263,8 +276,6 @@ class BarDiagram extends Component {
   //   Horisontale linjer bortover fra yAxis
   //  5 linjer uansett. Kan ta max-tallet fra data og rounde av til nærmeste 2, 5, 10, 25, 50, 100, osv.
   //   Man skal kunne oppdatere søylene med knapper
-
-  // Vil ha bredde på BarDiagram lik 5*(3+3) = 15
 }
 
 export default BarDiagram;
