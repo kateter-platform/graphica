@@ -88,25 +88,6 @@ class BarDiagram extends Component {
 
     const stringLengthMultiplier = 0.2; //For distributing the yAxisTitle and horizontal line-labels
 
-    // Horizontal lines
-    // const niceInterval = this.calculateNiceInterval(maxData);
-    // const yAxisLabels = this.generateYAxisLabels(maxData, niceInterval);
-
-    // Add horizontal lines and y-axis labels
-    // for (let yCoord of yAxisLabels) {
-    //   const valueLine = new Line([0, yCoord], [xLineEndpoint[0], yCoord], {
-    //     color: 0xaaaaaa,
-    //   });
-    //   lines.add(valueLine);
-    //   const valueOfValueLine = new Text("" + yCoord * normalizationFactor, {
-    //     position: [labelsNextToLinePos, yCoord],
-    //     fontSize: fontSize,
-    //     anchorY: "middle",
-    //     anchorX: "left",
-    //   });
-    //   allLabels.add(valueOfValueLine);
-    // }
-
     const [xLineCoord, yLineCoord] = this.addAxes(
       basePosition,
       stringLengthMultiplier
@@ -116,11 +97,12 @@ class BarDiagram extends Component {
 
     this.addAxisUnits(xLineCoord, yLineCoord);
     const numOfLines = 5;
+    const length = xLineCoord[1][0];
     this.addHorizontalLines(
       numOfLines,
       stringLengthMultiplier,
-      xLineCoord,
-      yLineCoord
+      length,
+      yLineCoord[0][1]
     );
   }
 
@@ -140,13 +122,9 @@ class BarDiagram extends Component {
     let basePosition = 0 + spacingBetweenBars;
 
     const normalizedData = this.data.map((elem) => {
-      // console.log("ELEM FØR: ", elem)
       elem = elem / this.normalizationFactor;
-      //   console.log("ELEM ETTER: ", elem);
       return elem;
     });
-
-    // console.log("Normalisert data: ", this.data);
 
     while (counter < normalizedData.length) {
       const height = normalizedData[counter];
@@ -161,25 +139,32 @@ class BarDiagram extends Component {
         { transparent: false, opacity: 1.0 }
       );
 
+      const barIsPositive = this.data[counter] >= 0;
+
+      const textLabelPos = barIsPositive
+        ? this.labelsNextToLinePosition
+        : -this.labelsNextToLinePosition;
+
       const label = new Text(this.labels[counter], {
         fontSize: this.fontSize,
-        position: [
-          basePosition + widthOfBars / 2,
-          this.labelsNextToLinePosition,
-        ],
+        position: [basePosition + widthOfBars / 2, textLabelPos],
         anchorX: "center",
+        anchorY: barIsPositive ? "bottom" : "top",
       });
+
+      const addMargin = barIsPositive ? 0.1 : -0.1;
       const valueOfBar = new Text("" + this.data[counter], {
         fontSize: this.fontSize,
-        position: [basePosition + widthOfBars / 2, height + 0.1],
+        position: [basePosition + widthOfBars / 2, height + addMargin],
         anchorX: "center",
+        anchorY: barIsPositive ? "bottom" : "top",
       });
-      basePosition += widthOfBars + spacingBetweenBars;
 
+      basePosition += widthOfBars + spacingBetweenBars;
+      counter++;
       allBars.add(bar);
       allBarsLabels.add(label);
       allBarsLabels.add(valueOfBar);
-      counter++;
     }
     this.add(allBars);
     this.add(allBarsLabels);
@@ -189,12 +174,31 @@ class BarDiagram extends Component {
   addAxes(basePosition: number, stringLengthMultiplier: number) {
     const axes = new Group();
 
+    const maxNegativeElement = this.data.reduce((a, b) => {
+      if (a < b) {
+        return a;
+      } else {
+        return b;
+      }
+    });
+
+    let isOnlyPositives = true;
+    this.data.forEach((elem) => {
+      if (elem < 0) {
+        isOnlyPositives = false;
+      }
+    });
+
+    const minY = isOnlyPositives
+      ? 0
+      : (maxNegativeElement / this.normalizationFactor) * 1.25;
+
     const xLineCoord: Position = [
       [0, 0],
       [basePosition, 0],
     ];
     const yLineCoord: Position = [
-      [0, 0],
+      [0, minY],
       [0, this.maxHeight * 1.25],
     ];
 
@@ -268,34 +272,73 @@ class BarDiagram extends Component {
   addHorizontalLines(
     numOfLines: number,
     stringLengthMultiplier: number,
-    xLineCoord: Position,
-    yLineCoord: Position
+    length: number,
+    minYForYLine: number
   ) {
     const horizontalLines = new Group();
     const lineLabels = new Group();
     const gray = 0xaaaaaa;
 
+    // Lines above y = 0
     for (let i = 1; i < numOfLines + 1; i++) {
-      const yCoord = (this.maxData / this.normalizationFactor / numOfLines) * i;
-      const valueLine = new Line([0, yCoord], [xLineCoord[1][0], yCoord], {
-        color: gray,
-      });
-      horizontalLines.add(valueLine);
-      const yValue = Math.round(yCoord * this.normalizationFactor);
-      const valueOfValueLine = new Text("" + yValue, {
-        position: [
-          this.labelsNextToLinePosition -
-            yValue.toString().length * stringLengthMultiplier,
-          yCoord,
-        ],
-        fontSize: this.fontSize,
-        anchorY: "middle",
-        anchorX: "left",
-      });
-      lineLabels.add(valueOfValueLine);
-      this.add(horizontalLines);
-      this.add(lineLabels);
+      const yCoordForLine =
+        (this.maxData / this.normalizationFactor / numOfLines) * i;
+
+      const [valueLabel, horizontalLine] = this.addHorizontalLine(
+        yCoordForLine,
+        length,
+        stringLengthMultiplier,
+        gray
+      );
+      lineLabels.add(valueLabel);
+      horizontalLines.add(horizontalLine);
     }
+
+    // Lines below x = 0
+    const spaceBetweenLines =
+      this.maxData / this.normalizationFactor / numOfLines;
+    let yForLine = -spaceBetweenLines;
+    while (yForLine > minYForYLine) {
+      const [valueLabel, horizontalLine] = this.addHorizontalLine(
+        yForLine,
+        length,
+        stringLengthMultiplier,
+        gray
+      );
+      lineLabels.add(valueLabel);
+      horizontalLines.add(horizontalLine);
+
+      yForLine -= spaceBetweenLines;
+    }
+    this.add(horizontalLines);
+    this.add(lineLabels);
+  }
+
+  addHorizontalLine(
+    yCoordForLine: number,
+    length: number,
+    stringLengthMultiplier: number,
+    color: number
+  ): [Text, Line] {
+    const line = new Line([0, yCoordForLine], [length, yCoordForLine], {
+      color: color,
+    });
+
+    const valueUsedInLabel = Math.round(
+      yCoordForLine * this.normalizationFactor
+    );
+    const valueLabel = new Text("" + valueUsedInLabel, {
+      position: [
+        this.labelsNextToLinePosition -
+          valueUsedInLabel.toString().length * stringLengthMultiplier,
+        yCoordForLine,
+      ],
+      fontSize: this.fontSize,
+      anchorY: "middle",
+      anchorX: "left",
+    });
+
+    return [valueLabel, line];
   }
 
   //   // Function to calculate a nice interval
