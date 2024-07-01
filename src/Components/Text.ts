@@ -110,6 +110,10 @@ class Text extends Component implements Collider {
     this.renderText.text = text;
   }
 
+  setFontSize(fontSize: number): void {
+    this.renderText.fontSize = fontSize;
+  }
+
   update(camera: OrthographicCamera) {
     if (this.responsiveScale) {
       this.scale.set(1 / camera.zoom, 1 / camera.zoom, 1);

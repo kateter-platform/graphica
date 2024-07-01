@@ -151,9 +151,9 @@ class Line extends Component implements Collider {
     const dir = midPoint.clone().sub(startPosition).normalize();
     let normal:Vector2;
     if (this.arrowhead) {
-      normal = new Vector2(-dir.y, dir.x).normalize().multiplyScalar(this.curve);
+      normal = new Vector2(-dir.y, dir.x).normalize().multiplyScalar(this.curve).multiplyScalar(1.1);
     } else {
-      normal = new Vector2(-dir.y, dir.x).normalize().multiplyScalar(this.curve).addScalar(1);
+      normal = new Vector2(-dir.y, dir.x).normalize().multiplyScalar(1.1);
     }
     const labelPoint = midPoint.clone().add(normal);
     this.label.setPosition([labelPoint.x, labelPoint.y]);
@@ -210,10 +210,11 @@ class Line extends Component implements Collider {
     const midPoint = new Vector2(startPosition.x+(endPosition.x-startPosition.x)/2, startPosition.y+(endPosition.y-startPosition.y)/2);
     const direction = midPoint.clone().sub(startPosition).normalize();
     let normal:Vector2;
+    this.label
     if (this.arrowhead) {
-      normal = new Vector2(-direction.y, direction.x).normalize().multiplyScalar(this.curve);
+      normal = new Vector2(-direction.y, direction.x).normalize().multiplyScalar(this.curve).multiplyScalar(1.1);
     } else {
-      normal = new Vector2(-direction.y, direction.x).normalize().multiplyScalar(this.curve).addScalar(1);
+      normal = new Vector2(-direction.y, direction.x).normalize().multiplyScalar(1.1);
     }
     const labelPoint = midPoint.clone().add(normal);
     this.label.setPosition([labelPoint.x, labelPoint.y]);
@@ -257,6 +258,10 @@ class Line extends Component implements Collider {
 
   public setCurve(curve: number): void {
     this.curve = curve;
+  }
+
+  public setLabel(label: string): void {
+    this.label.setText(label);
   }
 
   update(camera: OrthographicCamera) {
