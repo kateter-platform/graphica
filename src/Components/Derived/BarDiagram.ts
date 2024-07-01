@@ -16,11 +16,9 @@ import Text from "../Text";
 import Line from "../Line";
 
 type BarDiagramOptions = {
-  //Kan bestemme bredde, farger
-  //   fontSize: number;
-  //   widthOfBars: number;
-  //   spacingBetweenBars: number;
   basePosition?: [number, number];
+  xAxisUnit?: string;
+  yAxisUnit?: string;
 };
 
 type Position = [[number, number], [number, number]];
@@ -45,14 +43,15 @@ class BarDiagram extends Component {
   maxData: number;
   normalizationFactor: number;
 
+  // For sorting
+  // barsObjects: [[Polygon, Text, Text]];
+
   constructor(
     data: number[],
     labels: string[],
     xAxisTitle: string,
     yAxisTitle: string,
     diagramTitle?: string,
-    xAxisUnit?: string,
-    yAxisUnit?: string,
     options?: BarDiagramOptions
   ) {
     super();
@@ -61,12 +60,12 @@ class BarDiagram extends Component {
     this.xAxisTitle = xAxisTitle;
     this.yAxisTitle = yAxisTitle;
     this.diagramTitle = diagramTitle ? diagramTitle : "";
-    this.xAxisUnit = xAxisUnit ? xAxisUnit : "";
-    this.yAxisUnit = yAxisUnit ? yAxisUnit : "";
+    this.xAxisUnit = options?.xAxisUnit ? options?.xAxisUnit : "";
+    this.yAxisUnit = options?.yAxisUnit ? options?.yAxisUnit : "";
     this.basePosition = options?.basePosition ? options?.basePosition : [0, 0];
 
     this.maxLength = 36;
-    this.maxHeight = 10;
+    this.maxHeight = 15;
 
     // Extra fields
     this.fontSize = 26;
@@ -74,8 +73,9 @@ class BarDiagram extends Component {
     this.labelsNextToLinePosition =
       -this.fontSize * this.distanceMultiplierBarLabels;
 
-    this.maxData = Math.max(...this.data);
-    this.normalizationFactor = this.maxData / 10;
+    this.maxData = Math.max(...this.data.map(Math.abs));
+    // this.maxData = Math.max(...this.data);
+    this.normalizationFactor = this.maxData / this.maxHeight;
 
     this.position.set(this.basePosition[0], this.basePosition[1], 0);
     this.createBarDiagram();
@@ -98,12 +98,7 @@ class BarDiagram extends Component {
     this.addAxisUnits(xLineCoord, yLineCoord);
     const numOfLines = 5;
     const length = xLineCoord[1][0];
-    this.addHorizontalLines(
-      numOfLines,
-      stringLengthMultiplier,
-      length,
-      yLineCoord[0][1]
-    );
+    this.addHorizontalLines(stringLengthMultiplier, length, yLineCoord[0][1]);
   }
 
   makeBars(data: number[], labels: string[]): number {
@@ -270,7 +265,6 @@ class BarDiagram extends Component {
   }
 
   addHorizontalLines(
-    numOfLines: number,
     stringLengthMultiplier: number,
     length: number,
     minYForYLine: number
@@ -281,9 +275,37 @@ class BarDiagram extends Component {
     const opacity = 0.8;
 
     // Lines above y = 0
+    // Finne "fineste tallet" rundt det maksimale tallet (bruke lengden av tallet til å runde av til nærmeste)
+    // finne heltallsdivisor på 3, 4, 5
+    // lage linjer over og under x = 0 basert på disse
+    // const roundToNDigits =
+    //   this.maxData.toString().length - 1 >= 0
+    //     ? this.maxData.toString().length - 1
+    //     : 0;
+
+    const maxNiceNumber = this.roundNumberToNearestDigit(
+      this.maxData,
+      this.maxData.toString().length - 1
+    );
+    // console.log(Math.round(1203 / roundingMultiplier) * roundingMultiplier);
+    console.log(maxNiceNumber);
+    // Choose best distribution of lines based on maxNiceNumber
+    const numOfLines =
+      maxNiceNumber % 5 === 0
+        ? 5
+        : maxNiceNumber % 4 === 0
+        ? 4
+        : maxNiceNumber % 3 === 0
+        ? 3
+        : 4;
+
+    // const numOfLines = 5;
     for (let i = 1; i < numOfLines + 1; i++) {
-      const yCoordForLine =
-        (this.maxData / this.normalizationFactor / numOfLines) * i;
+      // const yCoordForLine =
+      //   (this.maxData / this.normalizationFactor / numOfLines) * i;
+
+      const yCoordForLine = (maxNiceNumber / numOfLines) * i;
+      // console.log(yCoordForLine);
 
       const [valueLabel, horizontalLine] = this.addHorizontalLine(
         yCoordForLine,
@@ -297,76 +319,61 @@ class BarDiagram extends Component {
     }
 
     // Lines below x = 0
-    const spaceBetweenLines =
-      this.maxData / this.normalizationFactor / numOfLines;
-    let yForLine = -spaceBetweenLines;
-    while (yForLine > minYForYLine) {
-      const [valueLabel, horizontalLine] = this.addHorizontalLine(
-        yForLine,
+    const spaceBetweenLines = maxNiceNumber / numOfLines;
+    let y = -spaceBetweenLines;
+
+    while (y > minYForYLine) {
+      const [label, line] = this.addHorizontalLine(
+        y,
         length,
         stringLengthMultiplier,
         gray,
         opacity
       );
-      lineLabels.add(valueLabel);
-      horizontalLines.add(horizontalLine);
+      lineLabels.add(label);
+      horizontalLines.add(line);
 
-      yForLine -= spaceBetweenLines;
+      y -= spaceBetweenLines;
     }
     this.add(horizontalLines);
     this.add(lineLabels);
   }
 
   addHorizontalLine(
-    yCoordForLine: number,
+    y: number,
     length: number,
     stringLengthMultiplier: number,
     color: number,
     opacity: number
   ): [Text, Line] {
-    const line = new Line([0, yCoordForLine], [length, yCoordForLine], {
-      color: color,
-      opacity: opacity,
-    });
-
-    const valueUsedInLabel = Math.round(
-      yCoordForLine * this.normalizationFactor
+    const line = new Line(
+      [0, y / this.normalizationFactor],
+      [length, y / this.normalizationFactor],
+      {
+        color: color,
+        opacity: opacity,
+      }
     );
-    const valueLabel = new Text("" + valueUsedInLabel, {
+
+    const label = new Text("" + y, {
       position: [
         this.labelsNextToLinePosition -
-          valueUsedInLabel.toString().length * stringLengthMultiplier,
-        yCoordForLine,
+          y.toString().length * stringLengthMultiplier,
+        y / this.normalizationFactor,
       ],
       fontSize: this.fontSize,
       anchorY: "middle",
       anchorX: "left",
     });
 
-    return [valueLabel, line];
+    return [label, line];
   }
 
-  //   // Function to calculate a nice interval
-  //   calculateNiceInterval(maxData: number): number {
-  //     const niceNumbers = [1, 2, 5, 10, 25, 50, 100];
-  //     let interval = 1;
-  //     for (let i = 0; i < niceNumbers.length; i++) {
-  //       if (maxData / niceNumbers[i] <= 5) {
-  //         interval = niceNumbers[i];
-  //         break;
-  //       }
-  //     }
-  //     return interval;
-  //   }
-
-  //   // Function to generate y-axis labels based on the nice interval
-  //   generateYAxisLabels(maxData: number, interval: number): number[] {
-  //     const labels = [];
-  //     for (let i = 0; i <= Math.ceil(maxData / interval); i++) {
-  //       labels.push(i * interval);
-  //     }
-  //     return labels;
-  //   }
+  roundNumberToNearestDigit(numberToRound: number, numDigits: number) {
+    const roundingMultiplier = Math.pow(10, numDigits);
+    return Math.round(numberToRound / roundingMultiplier) * roundingMultiplier;
+  }
+  setColorForBar() {}
 
   //*  For å lage noe så må man lage en form/shape OG et materiale som er hvordan det skal se ut.
   //*   For hvert elem i data vil vi lage Shape/Polygon som matcher. Høyden er lik data[i] og bredden er lik 1.
@@ -375,11 +382,17 @@ class BarDiagram extends Component {
   //* Må ha linjer rett opp og rett bortover. Linjen oppover må være like lang som max(data) og linjen bortover må være like lang som data.length
   //* Vil ha bredde på BarDiagram lik en maxLengde (nå på 36)
 
+  // Funksjon for å bytte om på søyler
+  // setColor()
+  // swapColumns() (fargelagte søyler når de byttes)
+  // Linjer: runde av til nærmeste "fine tall" for den høyeste verdien
+  // Fastsette maxHeight for diagrammet
+  //
+
   //   Kombinasjon av disse: https://www.geeksforgeeks.org/bar-graph-meaning-types-and-examples/ OG https://www.math-only-math.com/bar-graph.html
   //  Aksetitler sentrert basert på lengden av aksen og går henholdsvis loddrett og vannrett
   // Benevning av akser rett utenfor pilspissen
   //   Horisontale linjer bortover fra yAxis
-  //  5 linjer uansett. Kan ta max-tallet fra data og rounde av til nærmeste 2, 5, 10, 25, 50, 100, osv.
   //   Man skal kunne oppdatere søylene med knapper
 }
 
