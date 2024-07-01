@@ -15,9 +15,14 @@ export class Component extends Mesh {
   getZIndex(): number {
     return this.position.z;
   }
+  getName(): string {
+    return this.name ?? "";
+  }
   update?(camera: OrthographicCamera): void;
   onWindowResize?(): void;
   dragUpdate?(): void;
+  getColor?(): string;
+  getDisplayText?(): string;
 
   constructor() {
     super();

@@ -4,13 +4,14 @@ import Plot from "./Plot";
 import { Component, GuiComponent } from "./interfaces";
 import "style.css";
 import { OrthographicCamera } from "three";
+import Point from "./Point";
 
 class LegendBox implements GuiComponent {
-  private core: Core;
+  components: Component[];
   htmlElement: HTMLElement;
 
-  constructor(core: Core) {
-    this.core = core;
+  constructor(components?: Component[]) {
+    this.components = components || [];
     const legendBoxWrapper = document.createElement("div");
     legendBoxWrapper.className = "legendBox-wrapper";
     this.htmlElement = legendBoxWrapper;
@@ -23,39 +24,41 @@ class LegendBox implements GuiComponent {
     this.updateButton(legendBoxWrapper, button);
 
     legendBoxWrapper.appendChild(button);
-    this.updatePlots();
+    this.updateComponents();
 
-    Plot.emitter.on("expressionUpdated", (plot) => {
-      this.updatePlots();
+    Plot.emitter.on("plotUpdated", (plot) => {
+      this.updateComponents();
+    });
+
+    Point.emitter.on("pointUpdated", (point) => {
+      this.updateComponents();
     });
   }
 
-  updatePlots() {
+  updateComponents() {
     Array.from(this.htmlElement.children).forEach((child) => {
       if (child.className !== "size-adjust-button") {
         this.htmlElement.removeChild(child);
       }
     });
-    for (const component of this.core.getComponents()) {
-      if (!(component instanceof Plot)) {
-        continue;
-      }
-      if (component.hideFromLegend) {
-        continue;
-      }
-
+    if (!this.components) {
+      return;
+    }
+    for (const component of this.components) {
       const functionContainer = document.createElement("div");
       functionContainer.className = "function-container";
 
-      //FARGEDOTT
+      //FARGEPUNKT
       const colorDot = document.createElement("span");
       colorDot.className = "color-dot";
-      colorDot.style.backgroundColor = "#" + component.getColor();
+      colorDot.style.backgroundColor =
+        "#" + (component.getColor ? component.getColor() : "000000");
       functionContainer.appendChild(colorDot);
 
-      //FUNKSJONSNAVN OG FUNKSJON I LATEX
-      const textToDisplay =
-        component.funcName + ": " + component.getFunctionString();
+      //NAVN OG DISPLAYTEXT I LATEX
+      const textToDisplay = component.getDisplayText
+        ? component.getName() + ": " + component.getDisplayText()
+        : component.getName();
       const renderedEquation = renderToString.renderToString(textToDisplay, {
         output: "mathml",
         strict: false,
@@ -76,6 +79,14 @@ class LegendBox implements GuiComponent {
     } else {
       button.innerHTML = "&#8599;";
     }
+  }
+
+  addElement(component: Component) {
+    if (this.components.includes(component)) {
+      return;
+    }
+    this.components.push(component);
+    this.updateComponents();
   }
 }
 

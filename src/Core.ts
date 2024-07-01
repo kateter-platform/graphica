@@ -18,7 +18,6 @@ import {
 import { InputPosition } from "./Components/types";
 import { DragControls } from "./Controls/DragControls";
 import LegendBox from "./Components/LegendBox";
-import Plot from "./Components/Plot";
 
 const ORBIT_CONTROL_OPTIONS = {
   LEFT: MOUSE.PAN,
@@ -289,7 +288,7 @@ class Core {
 
   private updateLegend(guiComponent: GuiComponent) {
     if (guiComponent instanceof LegendBox) {
-      guiComponent.updatePlots();
+      guiComponent.updateComponents();
     }
   }
 }

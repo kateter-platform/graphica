@@ -5,7 +5,6 @@ import { Component } from "./interfaces";
 import { EventEmitter } from "events";
 
 type PlotOptions = {
-  hideFromLegend?: boolean;
   numPoints?: number;
   dashed?: boolean;
   lineWidth?: number;
@@ -20,7 +19,6 @@ const defaultPlotOptions = {
   lineWidth: 4,
   coefficients: {},
   plotBetween: undefined,
-  hideFromLegend: false,
 };
 
 type Coefficients = {
@@ -31,7 +29,6 @@ class Plot extends Component {
   draggable = undefined;
   public func: string;
   public funcName: string | undefined;
-  public hideFromLegend: boolean;
   private numPoints: number;
   private currentMinX: number;
   private currentMaxX: number;
@@ -61,7 +58,6 @@ class Plot extends Component {
       lineWidth = 1,
       coefficients = {},
       plotBetween = undefined,
-      hideFromLegend,
     } = { ...defaultPlotOptions, ...options };
 
     const minX = (-this.PLOTRANGE / 1) * 2 + 0;
@@ -99,7 +95,6 @@ class Plot extends Component {
     this.coefficients = coefficients;
     this.plotBetween = plotBetween;
     plot.name = "plot";
-    this.hideFromLegend = hideFromLegend;
     this.add(plot);
   }
 
@@ -137,7 +132,7 @@ class Plot extends Component {
   public setExpression(expression: string): void {
     this.func = expression;
     this.reRenderPlot(this.currentMinX, this.currentMaxX);
-    Plot.emitter.emit("expressionUpdated", this);
+    Plot.emitter.emit("plotUpdated", this);
   }
 
   private reRenderPlot(minX: number, maxX: number): void {
@@ -198,6 +193,14 @@ class Plot extends Component {
 
   getColor() {
     return this.plotMaterial.color.getHexString();
+  }
+
+  getName(): string {
+    return this.funcName as string;
+  }
+
+  getDisplayText(): string {
+    return this.func;
   }
 }
 

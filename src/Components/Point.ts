@@ -9,6 +9,7 @@ import {
 } from "three";
 import Text from "./Text";
 import { Collider, Component, DragListener, Draggable } from "./interfaces";
+import { EventEmitter } from "events";
 
 type PointOptions = {
   label?: boolean;
@@ -27,6 +28,9 @@ const defaultPointOptions = {
 };
 
 class Point extends Component implements Collider, DragListener<Point> {
+  private pointName: string | undefined;
+  private static pointCounter = 0;
+  static emitter = new EventEmitter();
   dragListeners: ((point: Point) => void)[];
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
@@ -34,6 +38,8 @@ class Point extends Component implements Collider, DragListener<Point> {
       ...defaultPointOptions,
       ...options,
     };
+    //set point name
+    this.setPointName();
 
     // set position of the point instance
     this.draggable = draggable;
@@ -109,6 +115,7 @@ class Point extends Component implements Collider, DragListener<Point> {
       message: "Point has been moved",
       position: this.position,
     }); // Dispatch the drag event
+    Point.emitter.emit("pointUpdated", this);
     this.dragListeners.forEach((fn) => fn(this));
   }
 
@@ -118,6 +125,20 @@ class Point extends Component implements Collider, DragListener<Point> {
 
   public setPosition(x: number, y: number) {
     this.position.set(x, y, this.position.z);
+  }
+  setPointName() {
+    this.pointName = String.fromCharCode(
+      "A".charCodeAt(0) + Point.pointCounter
+    );
+    Point.pointCounter++;
+  }
+  public getName(): string {
+    return this.pointName as string;
+  }
+  getDisplayText(): string {
+    return (
+      "(" + this.position.x.toFixed(1) + ", " + this.position.y.toFixed(1) + ")"
+    );
   }
 }
 export default Point;
