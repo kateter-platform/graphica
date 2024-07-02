@@ -49,9 +49,6 @@ class BarDiagram extends Component {
 
   barsObject: { [key: number]: [Polygon, Text, Text] };
 
-  // For sorting
-  // barsObjects: [[Polygon, Text, Text]];
-
   constructor(
     data: number[],
     labels: string[],
@@ -97,8 +94,6 @@ class BarDiagram extends Component {
 
     this.position.set(this.basePosition[0], this.basePosition[1], 0);
     this.createBarDiagram();
-
-    // this.switchBars(11, 33);
   }
 
   createBarDiagram() {
@@ -406,7 +401,10 @@ class BarDiagram extends Component {
     const roundingMultiplier = Math.pow(10, numDigits);
     return Math.round(numberToRound / roundingMultiplier) * roundingMultiplier;
   }
-  setColorForBar() {}
+  setColorForBar(barID: number, color?: number) {
+    const bar = this.barsObject[barID][0];
+    bar.setColor(color);
+  }
 
   switchBars(barID1: number, barID2: number) {
     // Må flytte om på polygon, label og tall
