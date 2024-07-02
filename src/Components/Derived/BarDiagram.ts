@@ -14,6 +14,8 @@ import { Component } from "../interfaces";
 import Polygon from "../Shape";
 import Text from "../Text";
 import Line from "../Line";
+import { InputPosition } from "../types";
+import { toVector2 } from "../../utils";
 
 type BarDiagramOptions = {
   basePosition?: [number, number];
@@ -43,6 +45,10 @@ class BarDiagram extends Component {
   maxData: number;
   normalizationFactor: number;
 
+  maxNegativeElement: number;
+
+  barsObject: { [key: number]: [Polygon, Text, Text] };
+
   // For sorting
   // barsObjects: [[Polygon, Text, Text]];
 
@@ -65,7 +71,7 @@ class BarDiagram extends Component {
     this.basePosition = options?.basePosition ? options?.basePosition : [0, 0];
 
     this.maxLength = 36;
-    this.maxHeight = 15;
+    this.maxHeight = 20;
 
     // Extra fields
     this.fontSize = 26;
@@ -75,15 +81,27 @@ class BarDiagram extends Component {
 
     this.maxData = Math.max(...this.data.map(Math.abs));
     // this.maxData = Math.max(...this.data);
-    this.normalizationFactor = this.maxData / this.maxHeight;
+    this.maxNegativeElement = this.data.reduce((a, b) => {
+      if (a < b) {
+        return a;
+      } else {
+        return b;
+      }
+    });
+
+    const totalHeightOfBars =
+      1.25 * (Math.max(...this.data) + -this.maxNegativeElement);
+    this.normalizationFactor = totalHeightOfBars / this.maxHeight;
+
+    this.barsObject = {};
 
     this.position.set(this.basePosition[0], this.basePosition[1], 0);
     this.createBarDiagram();
+
+    // this.switchBars(11, 33);
   }
 
   createBarDiagram() {
-    // Lage en gruppe med bars
-
     const basePosition = this.makeBars(this.data, this.labels);
 
     const stringLengthMultiplier = 0.2; //For distributing the yAxisTitle and horizontal line-labels
@@ -98,6 +116,7 @@ class BarDiagram extends Component {
     this.addAxisUnits(xLineCoord, yLineCoord);
     const numOfLines = 5;
     const length = xLineCoord[1][0];
+    // console.log("LENGDE NEDOVER:", yLineCoord[0][1]);
     this.addHorizontalLines(stringLengthMultiplier, length, yLineCoord[0][1]);
   }
 
@@ -126,13 +145,16 @@ class BarDiagram extends Component {
 
       const bar = new Polygon(
         [
-          [basePosition, height],
-          [basePosition + widthOfBars, height],
-          [basePosition + widthOfBars, 0],
-          [basePosition, 0],
+          [0, height],
+          [widthOfBars, height],
+          [widthOfBars, 0],
+          [0, 0],
         ],
         { transparent: false, opacity: 1.0 }
       );
+      bar.setPosition([basePosition, 0]);
+
+      // console.log("BAR HAR ID: ", bar.id);
 
       const barIsPositive = this.data[counter] >= 0;
 
@@ -160,22 +182,18 @@ class BarDiagram extends Component {
       allBars.add(bar);
       allBarsLabels.add(label);
       allBarsLabels.add(valueOfBar);
+
+      this.barsObject[bar.id] = [bar, label, valueOfBar];
     }
     this.add(allBars);
     this.add(allBarsLabels);
+    console.log(this.barsObject);
     return basePosition;
   }
 
   addAxes(basePosition: number, stringLengthMultiplier: number) {
     const axes = new Group();
-
-    const maxNegativeElement = this.data.reduce((a, b) => {
-      if (a < b) {
-        return a;
-      } else {
-        return b;
-      }
-    });
+    // console.log("HEI");
 
     let isOnlyPositives = true;
     this.data.forEach((elem) => {
@@ -184,17 +202,17 @@ class BarDiagram extends Component {
       }
     });
 
-    const minY = isOnlyPositives
-      ? 0
-      : (maxNegativeElement / this.normalizationFactor) * 1.25;
+    // const minY = isOnlyPositives
+    //   ? 0
+    //   : (maxNegativeElement / normalizeFactorHeight) * 1.25;
 
     const xLineCoord: Position = [
       [0, 0],
       [basePosition, 0],
     ];
     const yLineCoord: Position = [
-      [0, minY],
-      [0, this.maxHeight * 1.25],
+      [0, (1.25 * this.maxNegativeElement) / this.normalizationFactor],
+      [0, (1.25 * Math.max(...this.data)) / this.normalizationFactor],
     ];
 
     const xLine = new Line(xLineCoord[0], xLineCoord[1], { arrowhead: true });
@@ -288,7 +306,7 @@ class BarDiagram extends Component {
       this.maxData.toString().length - 1
     );
     // console.log(Math.round(1203 / roundingMultiplier) * roundingMultiplier);
-    console.log(maxNiceNumber);
+    // console.log(maxNiceNumber);
     // Choose best distribution of lines based on maxNiceNumber
     const numOfLines =
       maxNiceNumber % 5 === 0
@@ -300,15 +318,13 @@ class BarDiagram extends Component {
         : 4;
 
     // const numOfLines = 5;
-    for (let i = 1; i < numOfLines + 1; i++) {
-      // const yCoordForLine =
-      //   (this.maxData / this.normalizationFactor / numOfLines) * i;
-
-      const yCoordForLine = (maxNiceNumber / numOfLines) * i;
-      // console.log(yCoordForLine);
-
+    const spacing = maxNiceNumber / numOfLines;
+    let yUp = spacing;
+    const yMax = maxNiceNumber;
+    const yMin = minYForYLine;
+    while (yUp < yMax) {
       const [valueLabel, horizontalLine] = this.addHorizontalLine(
-        yCoordForLine,
+        yUp,
         length,
         stringLengthMultiplier,
         gray,
@@ -316,15 +332,32 @@ class BarDiagram extends Component {
       );
       lineLabels.add(valueLabel);
       horizontalLines.add(horizontalLine);
+      yUp += spacing;
     }
+    // for (let i = 1; i < numOfLines + 1; i++) {
+    //   // const yCoordForLine =
+    //   //   (this.maxData / this.normalizationFactor / numOfLines) * i;
+
+    //   const yCoordForLine = (maxNiceNumber / numOfLines) * i;
+    //   // console.log(yCoordForLine);
+
+    //   const [valueLabel, horizontalLine] = this.addHorizontalLine(
+    //     yCoordForLine,
+    //     length,
+    //     stringLengthMultiplier,
+    //     gray,
+    //     opacity
+    //   );
+    //   lineLabels.add(valueLabel);
+    //   horizontalLines.add(horizontalLine);
+    // }
 
     // Lines below x = 0
-    const spaceBetweenLines = maxNiceNumber / numOfLines;
-    let y = -spaceBetweenLines;
 
-    while (y > minYForYLine) {
+    let yDown = -spacing;
+    while (yDown / this.normalizationFactor > minYForYLine) {
       const [label, line] = this.addHorizontalLine(
-        y,
+        yDown,
         length,
         stringLengthMultiplier,
         gray,
@@ -333,7 +366,7 @@ class BarDiagram extends Component {
       lineLabels.add(label);
       horizontalLines.add(line);
 
-      y -= spaceBetweenLines;
+      yDown -= spacing;
     }
     this.add(horizontalLines);
     this.add(lineLabels);
@@ -375,6 +408,29 @@ class BarDiagram extends Component {
   }
   setColorForBar() {}
 
+  switchBars(barID1: number, barID2: number) {
+    // Må flytte om på polygon, label og tall
+    const bar1 = this.barsObject[barID1];
+    const bar2 = this.barsObject[barID2];
+
+    const newX1 = bar1[0].position.x;
+    const newX2 = bar2[0].position.x;
+
+    const label1Pos = [bar1[1].position.x, bar1[1].position.y];
+    const value1Pos = [bar1[2].position.x, bar1[2].position.y];
+
+    const label2Pos = [bar2[1].position.x, bar2[1].position.y];
+    const value2Pos = [bar2[2].position.x, bar2[2].position.y];
+
+    bar1[0].setPosition([newX2, 0]);
+    bar1[1].setPosition([label2Pos[0], label1Pos[1]]);
+    bar1[2].setPosition([value2Pos[0], value1Pos[1]]);
+
+    bar2[0].setPosition([newX1, 0]);
+    bar2[1].setPosition([label1Pos[0], label2Pos[1]]);
+    bar2[2].setPosition([value1Pos[0], value2Pos[1]]);
+  }
+
   //*  For å lage noe så må man lage en form/shape OG et materiale som er hvordan det skal se ut.
   //*   For hvert elem i data vil vi lage Shape/Polygon som matcher. Høyden er lik data[i] og bredden er lik 1.
   //* Posisjon må settes bortover, med y=0
@@ -394,6 +450,9 @@ class BarDiagram extends Component {
   // Benevning av akser rett utenfor pilspissen
   //   Horisontale linjer bortover fra yAxis
   //   Man skal kunne oppdatere søylene med knapper
+
+  //! OBS: Makshøyde funker ikke med negative tall
+  // ! Endre bars til å lage i origo og så sette posisjon (?)
 }
 
 export default BarDiagram;
