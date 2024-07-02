@@ -32,6 +32,7 @@ class Point extends Component implements Collider, DragListener<Point> {
   private pointName: string | undefined;
   private static pointCounter = 0;
   static emitter = new EventEmitter();
+  private color: string;
   dragListeners: ((point: Point) => void)[];
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
@@ -39,8 +40,9 @@ class Point extends Component implements Collider, DragListener<Point> {
       ...defaultPointOptions,
       ...options,
     };
-    //set point name
+    //set point name and color
     this.setPointName();
+    this.color = color;
 
     // set position of the point instance
     this.draggable = draggable;
@@ -152,6 +154,7 @@ class Point extends Component implements Collider, DragListener<Point> {
       "(" + this.position.x.toFixed(1) + ", " + this.position.y.toFixed(1) + ")"
     );
   }
+
   hover() {
     const hoverStrokeGeometry = new RingGeometry(8, 8 + 2, 32);
     const hoverStrokeMaterial = new MeshBasicMaterial({

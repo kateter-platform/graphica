@@ -166,12 +166,43 @@ body {
   margin-top: 8px;
 }
 
-.color-dot {
+.point-icon {
   border-radius: 50%;
   width: 8px;
   height: 8px;
   display: inline-block;
   margin-right: 8px;
+  border: #000 solid 1px;
+}
+
+.plot-icon {
+  width: 13px;
+  height: 2px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.triangle-icon {
+  position: relative;
+  width: 0;
+  height: 0;
+  border-left: 5.5px solid transparent;
+  border-right: 5.5px solid transparent;
+  border-bottom: 11px solid;
+  margin-right: 7px;
+}
+
+.triangle-icon::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -6.5px;
+  width: 0;
+  height: 0;
+  border-left: 6.5px solid transparent;
+  border-right: 6.5px solid transparent;
+  border-bottom: 12.5px solid #000; /* This will be the color of the border */
+  z-index: -1;
 }
 
 .size-adjust-button {

@@ -55,12 +55,21 @@ class LegendBox implements GuiComponent {
       const functionContainer = document.createElement("div");
       functionContainer.className = "function-container";
 
-      //FARGEPUNKT
-      const colorDot = document.createElement("span");
-      colorDot.className = "color-dot";
-      colorDot.style.backgroundColor =
-        "#" + (component.getColor ? component.getColor() : "000000");
-      functionContainer.appendChild(colorDot);
+      //IKON
+      const icon = document.createElement("span");
+
+      if (component instanceof Plot) {
+        icon.className = "plot-icon";
+        icon.style.backgroundColor = "#" + component.getColor();
+      } else if (component instanceof Point) {
+        icon.className = "point-icon";
+        icon.style.backgroundColor = "#" + component.getColor();
+      } else {
+        icon.className = "triangle-icon";
+        icon.style.borderBottomColor = "#" + component.getColor();
+      }
+
+      functionContainer.appendChild(icon);
 
       //NAVN OG DISPLAYTEXT I LATEX
       const textToDisplay = component.getDisplayText

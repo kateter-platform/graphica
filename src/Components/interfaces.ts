@@ -1,4 +1,4 @@
-import { OrthographicCamera, Mesh, Object3D } from "three";
+import { OrthographicCamera, Mesh, Object3D, MeshBasicMaterial } from "three";
 
 export class Component extends Mesh {
   draggable: Draggable;
@@ -24,7 +24,12 @@ export class Component extends Mesh {
   update?(camera: OrthographicCamera): void;
   onWindowResize?(): void;
   dragUpdate?(): void;
-  getColor?(): string;
+
+  getColor() {
+    const color = (this.material as MeshBasicMaterial).color.getHexString();
+    return color === "ffffff" ? "faa307" : color;
+  }
+
   getDisplayText?(): string;
 
   constructor() {
