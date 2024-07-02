@@ -90,7 +90,7 @@ class Circle extends Component implements Collider {
   }
 
   hover() {
-    const color = this.getColor();
+    const color = this.getColorAsNumber();
     this.material = new MeshBasicMaterial({
       color: color,
       transparent: true,
@@ -99,7 +99,7 @@ class Circle extends Component implements Collider {
   }
 
   unhover() {
-    const color = this.getColor();
+    const color = this.getColorAsNumber();
     this.material = new MeshBasicMaterial({
       color: color,
       transparent: true,

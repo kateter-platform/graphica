@@ -63,10 +63,10 @@ class LegendBox implements GuiComponent {
         icon.style.backgroundColor = "#" + component.getColor();
       } else if (component instanceof Point) {
         icon.className = "point-icon";
-        icon.style.backgroundColor = "#" + component.getColor();
+        icon.style.backgroundColor = "#" + component.getColorAsString();
       } else {
         icon.className = "triangle-icon";
-        icon.style.borderBottomColor = "#" + component.getColor();
+        icon.style.borderBottomColor = "#" + component.getColorAsString();
       }
 
       functionContainer.appendChild(icon);
