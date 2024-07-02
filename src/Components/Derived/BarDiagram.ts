@@ -45,6 +45,7 @@ class BarDiagram extends Component {
   maxData: number;
   normalizationFactor: number;
 
+  maxPositiveElement: number;
   maxNegativeElement: number;
 
   barsObject: { [key: number]: [Polygon, Text, Text] };
@@ -68,7 +69,7 @@ class BarDiagram extends Component {
     this.basePosition = options?.basePosition ? options?.basePosition : [0, 0];
 
     this.maxLength = 36;
-    this.maxHeight = 20;
+    this.maxHeight = 15;
 
     // Extra fields
     this.fontSize = 26;
@@ -77,6 +78,7 @@ class BarDiagram extends Component {
       -this.fontSize * this.distanceMultiplierBarLabels;
 
     this.maxData = Math.max(...this.data.map(Math.abs));
+    this.maxPositiveElement = Math.max(...this.data);
     // this.maxData = Math.max(...this.data);
     this.maxNegativeElement = this.data.reduce((a, b) => {
       if (a < b) {
@@ -86,8 +88,7 @@ class BarDiagram extends Component {
       }
     });
 
-    const totalHeightOfBars =
-      1.25 * (Math.max(...this.data) + -this.maxNegativeElement);
+    const totalHeightOfBars = Math.max(...this.data) + -this.maxNegativeElement;
     this.normalizationFactor = totalHeightOfBars / this.maxHeight;
 
     this.barsObject = {};
@@ -97,7 +98,7 @@ class BarDiagram extends Component {
   }
 
   createBarDiagram() {
-    const basePosition = this.makeBars(this.data, this.labels);
+    const basePosition = this.addBars(this.data, this.labels);
 
     const stringLengthMultiplier = 0.2; //For distributing the yAxisTitle and horizontal line-labels
 
@@ -109,13 +110,12 @@ class BarDiagram extends Component {
     this.addTitle([basePosition, yLineCoord[1][1]]);
 
     this.addAxisUnits(xLineCoord, yLineCoord);
-    const numOfLines = 5;
+
     const length = xLineCoord[1][0];
-    // console.log("LENGDE NEDOVER:", yLineCoord[0][1]);
     this.addHorizontalLines(stringLengthMultiplier, length, yLineCoord[0][1]);
   }
 
-  makeBars(data: number[], labels: string[]): number {
+  addBars(data: number[], labels: string[]): number {
     const allBars = new Group();
     const allBarsLabels = new Group();
 
@@ -149,10 +149,9 @@ class BarDiagram extends Component {
       );
       bar.setPosition([basePosition, 0]);
 
-      // console.log("BAR HAR ID: ", bar.id);
-
       const barIsPositive = this.data[counter] >= 0;
 
+      // If the bar is positive the text label should be below the line, if negative it should be above
       const textLabelPos = barIsPositive
         ? this.labelsNextToLinePosition
         : -this.labelsNextToLinePosition;
@@ -164,6 +163,7 @@ class BarDiagram extends Component {
         anchorY: barIsPositive ? "bottom" : "top",
       });
 
+      // If the bar is positive the value of the bar should be displayed above the bar, otherwise it should be below the bar
       const addMargin = barIsPositive ? 0.1 : -0.1;
       const valueOfBar = new Text("" + this.data[counter], {
         fontSize: this.fontSize,
@@ -174,6 +174,7 @@ class BarDiagram extends Component {
 
       basePosition += widthOfBars + spacingBetweenBars;
       counter++;
+
       allBars.add(bar);
       allBarsLabels.add(label);
       allBarsLabels.add(valueOfBar);
@@ -182,24 +183,11 @@ class BarDiagram extends Component {
     }
     this.add(allBars);
     this.add(allBarsLabels);
-    console.log(this.barsObject);
     return basePosition;
   }
 
   addAxes(basePosition: number, stringLengthMultiplier: number) {
     const axes = new Group();
-    // console.log("HEI");
-
-    let isOnlyPositives = true;
-    this.data.forEach((elem) => {
-      if (elem < 0) {
-        isOnlyPositives = false;
-      }
-    });
-
-    // const minY = isOnlyPositives
-    //   ? 0
-    //   : (maxNegativeElement / normalizeFactorHeight) * 1.25;
 
     const xLineCoord: Position = [
       [0, 0],
@@ -215,10 +203,25 @@ class BarDiagram extends Component {
       arrowhead: true,
     });
 
+    let hasNegativeBar = false;
+    this.data.forEach((elem) => {
+      if (elem < 0) {
+        hasNegativeBar = true;
+      }
+    });
+
+    // Change the position of the xAxisTitle based on if there are negative bars
+    const xAxisPosition: [number, number] = !hasNegativeBar
+      ? [basePosition / 2, this.labelsNextToLinePosition * 2.5]
+      : [xLineCoord[1][0] + 0.1, 0];
+    const anchorX = !hasNegativeBar ? "center" : "left";
+    const anchorY = !hasNegativeBar ? "bottom" : "middle";
+
     const xAxisTitle = new Text(this.xAxisTitle, {
       fontSize: this.fontSize + 6,
-      position: [basePosition / 2, this.labelsNextToLinePosition * 2.5],
-      anchorX: "center",
+      position: xAxisPosition,
+      anchorX: anchorX,
+      anchorY: anchorY,
     });
     const yAxisTitle = new Text(this.yAxisTitle, {
       fontSize: this.fontSize + 6,
@@ -287,21 +290,19 @@ class BarDiagram extends Component {
     const gray = 0xaaaaaa;
     const opacity = 0.8;
 
-    // Lines above y = 0
-    // Finne "fineste tallet" rundt det maksimale tallet (bruke lengden av tallet til å runde av til nærmeste)
-    // finne heltallsdivisor på 3, 4, 5
-    // lage linjer over og under x = 0 basert på disse
-    // const roundToNDigits =
-    //   this.maxData.toString().length - 1 >= 0
-    //     ? this.maxData.toString().length - 1
-    //     : 0;
-
-    const maxNiceNumber = this.roundNumberToNearestDigit(
-      this.maxData,
-      this.maxData.toString().length - 1
+    const maxNicePositiveNumber = this.roundNumberToNearestDigit(
+      this.maxPositiveElement,
+      this.maxPositiveElement.toString().length - 1
     );
-    // console.log(Math.round(1203 / roundingMultiplier) * roundingMultiplier);
-    // console.log(maxNiceNumber);
+    const maxNiceNegativeNumber = this.roundNumberToNearestDigit(
+      this.maxNegativeElement,
+      this.maxNegativeElement.toString().length - 1
+    );
+    const maxNiceNumber = maxNicePositiveNumber + -maxNiceNegativeNumber;
+
+    console.log("maxNiceNumber: ", maxNiceNumber);
+    console.log(maxNicePositiveNumber, maxNiceNegativeNumber);
+
     // Choose best distribution of lines based on maxNiceNumber
     const numOfLines =
       maxNiceNumber % 5 === 0
@@ -312,14 +313,18 @@ class BarDiagram extends Component {
         ? 3
         : 4;
 
-    // const numOfLines = 5;
     const spacing = maxNiceNumber / numOfLines;
-    let yUp = spacing;
-    const yMax = maxNiceNumber;
-    const yMin = minYForYLine;
-    while (yUp < yMax) {
+    let y = maxNiceNegativeNumber;
+    const yMin = minYForYLine * this.normalizationFactor * 1.25;
+
+    while (y <= maxNicePositiveNumber) {
+      console.log(y);
+      if (y === 0) {
+        y += spacing;
+        continue;
+      }
       const [valueLabel, horizontalLine] = this.addHorizontalLine(
-        yUp,
+        y,
         length,
         stringLengthMultiplier,
         gray,
@@ -327,42 +332,9 @@ class BarDiagram extends Component {
       );
       lineLabels.add(valueLabel);
       horizontalLines.add(horizontalLine);
-      yUp += spacing;
+      y += spacing;
     }
-    // for (let i = 1; i < numOfLines + 1; i++) {
-    //   // const yCoordForLine =
-    //   //   (this.maxData / this.normalizationFactor / numOfLines) * i;
 
-    //   const yCoordForLine = (maxNiceNumber / numOfLines) * i;
-    //   // console.log(yCoordForLine);
-
-    //   const [valueLabel, horizontalLine] = this.addHorizontalLine(
-    //     yCoordForLine,
-    //     length,
-    //     stringLengthMultiplier,
-    //     gray,
-    //     opacity
-    //   );
-    //   lineLabels.add(valueLabel);
-    //   horizontalLines.add(horizontalLine);
-    // }
-
-    // Lines below x = 0
-
-    let yDown = -spacing;
-    while (yDown / this.normalizationFactor > minYForYLine) {
-      const [label, line] = this.addHorizontalLine(
-        yDown,
-        length,
-        stringLengthMultiplier,
-        gray,
-        opacity
-      );
-      lineLabels.add(label);
-      horizontalLines.add(line);
-
-      yDown -= spacing;
-    }
     this.add(horizontalLines);
     this.add(lineLabels);
   }
@@ -398,6 +370,9 @@ class BarDiagram extends Component {
   }
 
   roundNumberToNearestDigit(numberToRound: number, numDigits: number) {
+    if (numberToRound < 0) {
+      numDigits -= 1;
+    }
     const roundingMultiplier = Math.pow(10, numDigits);
     return Math.round(numberToRound / roundingMultiplier) * roundingMultiplier;
   }
