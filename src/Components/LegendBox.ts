@@ -7,11 +7,11 @@ import Point from "./Point";
 import State from "./State";
 
 class LegendBox implements GuiComponent {
-  elements: (Component | String | State<string>)[];
-  states: { [key: string]: State<string> };
+  elements: (Component | String | State<number>)[];
+  states: { [key: string]: State<number> };
   htmlElement: HTMLElement;
 
-  constructor(elements?: (Component | String | State<string>)[]) {
+  constructor(elements?: (Component | String | State<number>)[]) {
     this.elements = elements || [];
     this.states = {};
     const legendBoxWrapper = document.createElement("div");
@@ -140,7 +140,7 @@ class LegendBox implements GuiComponent {
     }
   }
 
-  addElement(element: Component | String | State<string>) {
+  addElement(element: Component | String | State<number>) {
     if (this.elements.includes(element)) {
       return;
     }

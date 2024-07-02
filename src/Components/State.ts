@@ -5,17 +5,20 @@ const STATE_CHANGE_EVENT = "stateChange";
 
 class State<T> {
   private stateName: string;
-  private state: number;
+  private state: T;
   private emitter: EventEmitter;
 
-  constructor(stateName: string, initialState: number) {
+  constructor(stateName: string, initialState: T) {
     this.stateName = stateName;
     this.state = initialState;
     this.emitter = new EventEmitter();
   }
 
-  getState(): number {
-    return parseFloat(this.state.toFixed(1));
+  getState(): T {
+    if (typeof this.state === "number") {
+      return parseFloat(this.state.toFixed(1)) as T;
+    }
+    return this.state;
   }
 
   getStateName(): string {
@@ -23,7 +26,7 @@ class State<T> {
   }
 
   // Method to set a new state and notify observers
-  setState(newState: number): void {
+  setState(newState: T): void {
     this.state = newState;
     this.emitter.emit(STATE_CHANGE_EVENT, this.state);
   }
