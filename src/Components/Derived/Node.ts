@@ -49,7 +49,7 @@ class Node extends Circle {
     return this.adjacencyList.map((edge) => edge.node).includes(node);
   }
 
-  connectTo(other: Node, directed: boolean, value?: number): void {
+  connectTo(other: Node, directed=false, value?: number): void {
     if (!this.isAdjacentTo(other) && !(!directed && other.isAdjacentTo(this))) {
       const dx = other.position.x - this.position.x;
       const dy = other.position.y - this.position.y;
@@ -63,7 +63,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x - cos * other.radius;
         const outlineY2 = other.position.y - sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: value !== undefined ? value.toString() : ""});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
         this.adjacencyList.push({node: other, line: line, weight: value});
         this.add(line);
       }
@@ -73,7 +73,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x - cos * other.radius;
         const outlineY2 = other.position.y + sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: value !== undefined ? value.toString() : ""});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
         this.adjacencyList.push({node: other, line: line, weight: value});
         this.add(line);
       }
@@ -83,7 +83,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x + cos * other.radius;
         const outlineY2 = other.position.y + sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: value !== undefined ? value.toString() : ""});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
         this.adjacencyList.push({node: other, line: line, weight: value});
         this.add(line);
       }
@@ -93,7 +93,7 @@ class Node extends Circle {
         const outlineX2 = other.position.x + cos * other.radius;
         const outlineY2 = other.position.y - sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 5 : 0, label: value !== undefined ? value.toString() : ""});
+        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
         this.adjacencyList.push({node: other, line: line, weight: value});
         this.add(line);
       }
@@ -116,7 +116,7 @@ class Node extends Circle {
     }
   }
 
-  getWeight(other: Node): (number | undefined) {
+  getEdgeWeight(other: Node): (number | undefined) {
     const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
       return this.adjacencyList[index].weight;
@@ -125,23 +125,23 @@ class Node extends Circle {
     }
   }
 
-  addWeight(other: Node, value: number): void {
-    const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
+  static addEdgeWeight(node: Node, other: Node, value: number): void {
+    const index = node.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
-      if (this.adjacencyList[index].weight !== undefined) {
-        this.adjacencyList[index].weight! += value;
+      if (node.adjacencyList[index].weight !== undefined) {
+        node.adjacencyList[index].weight! += value;
       } else {
-        this.adjacencyList[index].weight = value;
+        node.adjacencyList[index].weight = value;
       }
-      this.adjacencyList[index].line.setLabel(this.adjacencyList[index].weight?.toString()!);
+      node.adjacencyList[index].line.setLabel(node.adjacencyList[index].weight?.toString()!);
     }
   }
 
-  setWeight(other: Node, value: number): void {
-    const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
+  static setEdgeWeight(node: Node, other: Node, value: number): void {
+    const index = node.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
-      this.adjacencyList[index].weight = value;
-      this.adjacencyList[index].line.setLabel(value.toString());
+      node.adjacencyList[index].weight = value;
+      node.adjacencyList[index].line.setLabel(value.toString());
     }
   }
 
@@ -156,20 +156,29 @@ class Node extends Circle {
     }
   }
 
-  setColor(color: number): void {
-    this.material = new MeshBasicMaterial({
+  static setColor(node: Node, color: number): void {
+    node.material = new MeshBasicMaterial({
       color: color,
       transparent: true,
       opacity: 0.5,
     });
   }
 
-  setEdgeColor(other: Node, color: number): void {
+  static setEdgeColor(node: Node, other: Node, color: number): void {
+    const index = node.adjacencyList.map((edge) => edge.node).indexOf(other);
+    if (index > -1) {
+      (node.adjacencyList[index].line.material as LineMaterial).color = new Color(color);
+      /* (node.adjacencyList[index].line.material as LineMaterial).linewidth = linewidth;
+      (node.adjacencyList[index].line.material as LineMaterial).opacity = opacity; */
+    }
+  }
+
+  getEdge(other: Node): (Edge | null) {
     const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
-      (this.adjacencyList[index].line.material as LineMaterial).color = new Color(color);
-      //(this.adjacencyList[index].line.material as LineMaterial).linewidth = 8;
-      //(this.adjacencyList[index].line.material as LineMaterial).opacity = 0.5;
+      return this.adjacencyList[index];
+    } else {
+      return null;
     }
   }
 

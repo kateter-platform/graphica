@@ -1,23 +1,25 @@
+import { LineMaterial } from "three-fatline";
 import Core from "../../Core";
 import Button from "../Button";
 import { GuiComponent } from "../interfaces";
+import Node from "./Node";
 
 class OperationButtonPanel implements GuiComponent {
   htmlElement: HTMLElement;
   counter: number;
-  operationList: (() => void)[];
+  operationList: {type: "setColor" | "setEdgeColor" | "setEdgeWeight" | "addEdgeWeight", args: any[]}[];
   reverseOperationList: (() => void)[];
   backButton: Button;
   fourthButton: Button;
 
-  constructor(operationList: (() => void)[], reverseOperationList: (() => void)[]) {
+  constructor(operationList: {type: "setColor" | "setEdgeColor" | "setEdgeWeight" | "addEdgeWeight", args: any[]}[]) {
     const panelWrapper = document.createElement("div");
     panelWrapper.className = "panel-wrapper";
     this.htmlElement = panelWrapper;
 
     this.counter = 0;
     this.operationList = operationList;
-    this.reverseOperationList = reverseOperationList;
+    this.reverseOperationList = [];
     this.backButton = new Button({label: "<"});
     this.backButton.addObserver(() => this.executePreviousOperation());
     this.backButton.htmlElement
@@ -26,16 +28,58 @@ class OperationButtonPanel implements GuiComponent {
 
     this.htmlElement.appendChild(this.backButton.htmlElement );
     this.htmlElement.appendChild(this.fourthButton.htmlElement);
-    
-    /* core.addGui(this.backButton);
-    core.addGui(this.fourthButton); */
   }
 
   executeNextOperation(): void {
     if (this.counter < this.operationList.length) {
         const nextOperation = this.operationList[this.counter];
-        nextOperation();
-        this.counter++;
+        if (nextOperation.type === "setColor") {
+          if (this.counter >= this.reverseOperationList.length) {
+            const color = nextOperation.args[0].material.color.getHex();
+            this.reverseOperationList.push(
+              () => {
+                Node.setColor(nextOperation.args[0], color);
+              }
+            )
+          }
+          Node.setColor(nextOperation.args[0], nextOperation.args[1]);
+          this.counter++;         
+        }
+        else if (nextOperation.type === "setEdgeColor") {
+          if (this.counter >= this.reverseOperationList.length) {
+            const color = nextOperation.args[0].getEdge(nextOperation.args[1]).line.material.color.getHex();
+            this.reverseOperationList.push(
+              () => {
+                Node.setEdgeColor(nextOperation.args[0], nextOperation.args[1], color);
+              }
+            )
+          }
+          Node.setEdgeColor(nextOperation.args[0], nextOperation.args[1], nextOperation.args[2]);
+          this.counter++;   
+        } 
+        else if (nextOperation.type === "setEdgeWeight") {
+          if (this.counter >= this.reverseOperationList.length) {
+            const prevEdgeWeight = nextOperation.args[0].getEdgeWeight(nextOperation.args[1]);
+            this.reverseOperationList.push(
+              () => {
+                Node.setEdgeWeight(nextOperation.args[0], nextOperation.args[1], prevEdgeWeight);
+              }
+            )
+          }
+          Node.setEdgeWeight(nextOperation.args[0], nextOperation.args[1], nextOperation.args[2]);
+          this.counter++; 
+        }
+        else if (nextOperation.type === "addEdgeWeight") {
+          if (this.counter >= this.reverseOperationList.length) {
+            this.reverseOperationList.push(
+              () => {
+                Node.addEdgeWeight(nextOperation.args[0], nextOperation.args[1], -nextOperation.args[2]);
+              }
+            )
+          }
+          Node.addEdgeWeight(nextOperation.args[0], nextOperation.args[1], nextOperation.args[2]);
+          this.counter++; 
+        }
     } else {
         console.log("No more operations to perform");
     }
@@ -45,6 +89,8 @@ class OperationButtonPanel implements GuiComponent {
     if (this.counter > 0) {
       this.counter--;
       const prevOperation = this.reverseOperationList[this.counter];
+      console.log("HEI");
+      console.log(prevOperation);
       prevOperation();
     } else {
         console.log("No earlier operations to perform");

@@ -22,50 +22,70 @@ export * as three from "three"; */
 import Core from "./Core";
 import Node from "./Components/Derived/Node"
 import OperationButtonPanel from "./Components/Derived/OperationButtonPanel";
+import { Color } from "three";
+import Grid from "./Components/Grid";
 
 
-const core = new Core();
-//const grid = new Grid();
-const node = new Node(-20,20,5,[],{label: "Node 123456789"});
-const node2 = new Node(0,-20,5,[],{label: "Node 2 Mer tekst"});
-const node3 = new Node(40,20,5,[],{label: "3"});
-const node4 = new Node(30,-40,5,[],{label: "4"});
-const node5 = new Node(-50,20,5,[]);
-node.connectTo(node2, false, 10);
-node2.connectTo(node3, true, 5);
-node2.connectTo(node4, true, 5);
-node4.connectTo(node2, true, 20);
-node.connectTo(node5, true);
-core.add(node);
-core.add(node2);
-core.add(node3);
-core.add(node4);
-core.add(node5);
+const graphica = new Core();
+const grid = new Grid();
 
-const op1 = () => {
-    node.setColor(0xff0000);
-}
-const op2 = () => {
-    node2.setEdgeColor(node3, 0xff0000);
-}
-const op3 = () => {
-    node3.setColor(0xff0000);
-}
+// Create nodes
+// First two parameters decide node position
+// Third parameter decides node radius
+// Fourth parameter is an optional adjacency list
+// Fifth parameter contains optional paramaters, like label, color and segemnts
+const node1 = new Node(-5, 0, 1, [], { label: "Node 1" });
+const node2 = new Node(0, 5, 1, [], { label: "Node 2" });
+const node3 = new Node(5, 5, 1, [], { label: "Node 3" });
+const node4 = new Node(0, -5, 1, [], { label: "Node 4" });
+const node5 = new Node(5, 0, 1, [], { label: "Node 5" });
+const node6 = new Node(5, -10, 1, [], { label: "Node 6" });
 
-const op12 = () => {
-    node.setColor(0xfaa307);
-}
-const op22 = () => {
-    node2.setEdgeColor(node3, 0x000000);
-}
-const op32 = () => {
-    node3.setColor(0xfaa307);
-}
-const lst = [op1, op2, op3];
-const lst2 = [op12, op22, op32];
+// Connect nodes with edges
+// First parameter decides which node to connect to with an edge
+// Second parameter (optional) decides wether edge is directed or not (default false)
+// Third parameter (optional) gived the edge a weight/value
+node1.connectTo(node2, false);
+node1.connectTo(node4, false);
+node2.connectTo(node3, false);
+node4.connectTo(node5, false);
+node4.connectTo(node6, false);
 
-const operationButtonPanel = new OperationButtonPanel(lst, lst2);
+// Add nodes to the graphica instance
+graphica.add(node1);
+graphica.add(node2);
+graphica.add(node3);
+graphica.add(node4);
+graphica.add(node5);
+graphica.add(node6);
+graphica.add(grid);
 
-core.addGui(operationButtonPanel);
+// Define the BFS traversal steps
+// type decides the node operation and can be "setColor" | "setEdgeColor" | "setEdgeWeight" | "addEdgeWeight"
+// args specifies arguments for the operation given in type
+const steps = [
+    { type: "setColor", args: [node1, 0xaaaaaa] },
+    { type: "setEdgeColor", args: [node1, node2, 0xff0000] },
+    { type: "setColor", args: [node2, 0xaaaaaa] },
+    { type: "setEdgeColor", args: [node1, node4, 0xff0000] },
+    { type: "setColor", args: [node4, 0xaaaaaa] },
+    { type: "setColor", args: [node1, 0x000000] },
+    { type: "setEdgeColor", args: [node2, node3, 0xff0000] },
+    { type: "setColor", args: [node3, 0xaaaaaa] },
+    { type: "setColor", args: [node2, 0x000000] },
+    { type: "setEdgeColor", args: [node4, node5, 0xff0000] },
+    { type: "setColor", args: [node5, 0xaaaaaa] },
+    { type: "setEdgeColor", args: [node4, node6, 0xff0000] },
+    { type: "setColor", args: [node6, 0xaaaaaa] },
+    { type: "setColor", args: [node4, 0x000000] },
+    { type: "setColor", args: [node3, 0x000000] },
+    { type: "setColor", args: [node5, 0x000000] },
+    { type: "setColor", args: [node6, 0x000000] },
+];
 
-core.run();
+// Create an OperationButtonPanel to step through the BFS traversal steps
+const operationButtonPanel = new OperationButtonPanel(steps);
+graphica.addGui(operationButtonPanel);
+
+// Run the graphica instance
+graphica.run();
