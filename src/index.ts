@@ -19,6 +19,7 @@
 // export { default as SVGLoader } from "./Components/SVGLoader";
 // export * as three from "three";
 
+import { Shape, Vector2 } from "three";
 import Arc from "./Components/Arc";
 import Circle from "./Components/Circle";
 import Grid from "./Components/Grid";
@@ -37,9 +38,9 @@ const plot4 = new Plot("-3x+5");
 // const plot7 = new Plot("x+1");
 // const plot8 = new Plot("2x+1");
 // const plot9 = new Plot("-4x-1");
-const point1 = new Point(4, 2, { draggable: "unrestricted", color: "#e15745" });
+const point1 = new Point(4, 2, { draggable: "unrestricted", color: "#AA74B8" });
 const point2 = new Point(3, 5);
-const circle1 = new Circle(0, 0, 2);
+const circle1 = new Circle(0, 0, 2, { color: 0xaa74b8, segments: 32 });
 const arc1 = new Arc([6, 2], [8, 5], [6, 6]);
 
 const core = new Core();
