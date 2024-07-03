@@ -1,14 +1,13 @@
-import { colors } from "@mui/material";
-import Circle, { CircleOptions, defaultShapeOptions } from "../Circle";
-import Line from "../Line";
-import Text from "../Text"
 import { Color, MeshBasicMaterial } from "three";
 import { LineMaterial } from "three-fatline";
+import Circle, { CircleOptions, defaultShapeOptions } from "../Circle";
+import Line from "../Line";
+import Text from "../Text";
 
-export type NodeOptions =  CircleOptions & {
+export type NodeOptions = CircleOptions & {
   label?: string;
 };
-  
+
 const defaultNodeOptions: NodeOptions = {
   ...defaultShapeOptions,
   label: "",
@@ -18,25 +17,37 @@ type Edge = {
   node: Node;
   line: Line;
   weight?: number;
-}
+};
 
-class Node extends Circle {  
+class Node extends Circle {
   adjacencyList: Edge[];
   label?: Text;
 
-  constructor(x = 0, y = 0, radius = 5, adjacencyList:Edge[] = [], options?: NodeOptions) {
+  constructor(
+    x = 0,
+    y = 0,
+    radius = 5,
+    adjacencyList: Edge[] = [],
+    options?: NodeOptions
+  ) {
     super(x, y, radius, options);
     const { label } = { ...defaultNodeOptions, ...options };
     if (label) {
-      this.label = new Text(label, {position: [0,0], fontSize: this.calculateFontSize(label, radius), anchorX: "center", anchorY: "middle", responsiveScale: false});
-      this.add(this.label)
+      this.label = new Text(label, {
+        position: [0, 0],
+        fontSize: this.calculateFontSize(label, radius),
+        anchorX: "center",
+        anchorY: "middle",
+        responsiveScale: false,
+      });
+      this.add(this.label);
     }
     this.adjacencyList = [...adjacencyList];
   }
 
   /**
    * Help function to avoid node label from going outside of the node
-   * 
+   *
    * @param text - Node label
    * @param radius - Radius of the node
    * @returns FontSize which will keep the node label within the node
@@ -48,7 +59,7 @@ class Node extends Circle {
     while (fontSize > 0 && text.length * fontSize * 0.6 > maxDiameter) {
       fontSize -= 0.25;
     }
-    
+
     return fontSize;
   }
 
@@ -59,12 +70,12 @@ class Node extends Circle {
   /**
    * Adds an edge from this node to the other node given and updates adjacencyList accordingly.
    * Calculations are made in order to have the edge go to/from the circle arc.
-   * 
+   *
    * @param other - Node to connect with edge
    * @param directed - Booleean for whether the edge is directed (directed edges will also have curve)
    * @param value - Number for eeight/value of the edge
    */
-  connectTo(other: Node, directed=false, value?: number): void {
+  connectTo(other: Node, directed = false, value?: number): void {
     if (!this.isAdjacentTo(other) && !(!directed && other.isAdjacentTo(this))) {
       const dx = other.position.x - this.position.x;
       const dy = other.position.y - this.position.y;
@@ -78,38 +89,67 @@ class Node extends Circle {
         const outlineX2 = other.position.x - cos * other.radius;
         const outlineY2 = other.position.y - sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
-        this.adjacencyList.push({node: other, line: line, weight: value});
+        const line = new Line(
+          [outlineX1, outlineY1],
+          [outlineX2 - this.position.x, outlineY2 - this.position.y],
+          {
+            arrowhead: directed,
+            curve: directed ? 2 : 0,
+            label: value !== undefined ? value.toString() : "",
+          }
+        );
+        this.adjacencyList.push({ node: other, line: line, weight: value });
         this.add(line);
-      }
-      else if (dx >= 0 && dy < 0) {
+      } else if (dx >= 0 && dy < 0) {
         const outlineX1 = cos * this.radius;
         const outlineY1 = -sin * this.radius;
         const outlineX2 = other.position.x - cos * other.radius;
         const outlineY2 = other.position.y + sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
-        this.adjacencyList.push({node: other, line: line, weight: value});
+        const line = new Line(
+          [outlineX1, outlineY1],
+          [outlineX2 - this.position.x, outlineY2 - this.position.y],
+          {
+            arrowhead: directed,
+            curve: directed ? 2 : 0,
+            label: value !== undefined ? value.toString() : "",
+          }
+        );
+        this.adjacencyList.push({ node: other, line: line, weight: value });
         this.add(line);
-      }
-      else if (dx < 0 && dy < 0) {
+      } else if (dx < 0 && dy < 0) {
         const outlineX1 = -cos * this.radius;
         const outlineY1 = -sin * this.radius;
         const outlineX2 = other.position.x + cos * other.radius;
         const outlineY2 = other.position.y + sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
-        this.adjacencyList.push({node: other, line: line, weight: value});
+        const line = new Line(
+          [outlineX1, outlineY1],
+          [outlineX2 - this.position.x, outlineY2 - this.position.y],
+          {
+            arrowhead: directed,
+            curve: directed ? 2 : 0,
+            label: value !== undefined ? value.toString() : "",
+          }
+        );
+        this.adjacencyList.push({ node: other, line: line, weight: value });
         this.add(line);
-      }
-      else {
+      } else {
         const outlineX1 = -cos * this.radius;
         const outlineY1 = sin * this.radius;
         const outlineX2 = other.position.x + cos * other.radius;
         const outlineY2 = other.position.y - sin * other.radius;
 
-        const line = new Line([outlineX1, outlineY1], [outlineX2-this.position.x, outlineY2-this.position.y], {arrowhead: directed, curve: directed ? 2 : 0, label: value !== undefined ? value.toString() : ""});
-        this.adjacencyList.push({node: other, line: line, weight: value});
+        const line = new Line(
+          [outlineX1, outlineY1],
+          [outlineX2 - this.position.x, outlineY2 - this.position.y],
+          {
+            arrowhead: directed,
+            curve: directed ? 2 : 0,
+            label: value !== undefined ? value.toString() : "",
+          }
+        );
+        this.adjacencyList.push({ node: other, line: line, weight: value });
         this.add(line);
       }
 
@@ -131,7 +171,7 @@ class Node extends Circle {
     }
   }
 
-  getEdgeWeight(other: Node): (number | undefined) {
+  getEdgeWeight(other: Node): number | undefined {
     const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
       return this.adjacencyList[index].weight;
@@ -143,12 +183,13 @@ class Node extends Circle {
   static addEdgeWeight(node: Node, other: Node, value: number): void {
     const index = node.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
-      if (node.adjacencyList[index].weight !== undefined) {
-        node.adjacencyList[index].weight! += value;
+      const edge = node.adjacencyList[index];
+      if (edge.weight !== undefined) {
+        edge.weight += value;
       } else {
-        node.adjacencyList[index].weight = value;
+        edge.weight = value;
       }
-      node.adjacencyList[index].line.setLabel(node.adjacencyList[index].weight?.toString()!);
+      edge.line.setLabel(edge.weight.toString());
     }
   }
 
@@ -164,10 +205,15 @@ class Node extends Circle {
     if (this.label !== undefined) {
       this.label.setText(label);
       this.label.setFontSize(this.calculateFontSize(label, this.radius));
-    }
-    else {
-      this.label = new Text(label, {position: [0,0], fontSize: this.calculateFontSize(label, this.radius), anchorX: "center", anchorY: "middle", responsiveScale: false});
-      this.add(this.label)
+    } else {
+      this.label = new Text(label, {
+        position: [0, 0],
+        fontSize: this.calculateFontSize(label, this.radius),
+        anchorX: "center",
+        anchorY: "middle",
+        responsiveScale: false,
+      });
+      this.add(this.label);
     }
   }
 
@@ -182,11 +228,12 @@ class Node extends Circle {
   static setEdgeColor(node: Node, other: Node, color: number): void {
     const index = node.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
-      (node.adjacencyList[index].line.material as LineMaterial).color = new Color(color);
+      (node.adjacencyList[index].line.material as LineMaterial).color =
+        new Color(color);
     }
   }
 
-  getEdge(other: Node): (Edge | null) {
+  getEdge(other: Node): Edge | null {
     const index = this.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
       return this.adjacencyList[index];
@@ -194,7 +241,6 @@ class Node extends Circle {
       return null;
     }
   }
-
 }
 
 export default Node;
