@@ -213,6 +213,7 @@ body {
   border: none;
   cursor: pointer;
   font-size: 20px;
+}
 
 .panel-wrapper {
   position: absolute;
@@ -223,5 +224,4 @@ body {
   bottom: 0;
   right: 0;
   z-index: 999;
-
 }
