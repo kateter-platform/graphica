@@ -156,22 +156,24 @@ class Point extends Component implements Collider, DragListener<Point> {
   }
 
   hover() {
-    const hoverStrokeGeometry = new RingGeometry(8, 8 + 2, 32);
-    const hoverStrokeMaterial = new MeshBasicMaterial({
-      color: "#080007",
-      opacity: 0.4,
-      transparent: true,
-    });
-    const hoverStrokeMesh = new Mesh(hoverStrokeGeometry, hoverStrokeMaterial);
-    hoverStrokeMesh.name = "hoverStrokeMesh";
-    this.add(hoverStrokeMesh);
+    let hoverStrokeMesh = this.getObjectByName("hoverStrokeMesh");
+    if (!hoverStrokeMesh) {
+      const hoverStrokeGeometry = new RingGeometry(8, 8 + 2, 32);
+      const hoverStrokeMaterial = new MeshBasicMaterial({
+        color: "#080007",
+        opacity: 0.4,
+        transparent: true,
+      });
+      hoverStrokeMesh = new Mesh(hoverStrokeGeometry, hoverStrokeMaterial);
+      hoverStrokeMesh.name = "hoverStrokeMesh";
+      this.add(hoverStrokeMesh);
+    }
   }
-
   unhover() {
-    const hoverStrokeMesh = this.getObjectByName(
-      "hoverStrokeMesh"
-    ) as Object3D<Event>;
-    this.remove(hoverStrokeMesh);
+    const hoverStrokeMesh = this.getObjectByName("hoverStrokeMesh");
+    if (hoverStrokeMesh) {
+      this.remove(hoverStrokeMesh);
+    }
   }
 }
 export default Point;
