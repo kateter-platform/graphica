@@ -1,10 +1,10 @@
 import { Group } from "three";
+import { toVector2 } from "../../utils";
+import Line from "../Line";
 import Polygon from "../Shape";
 import Text from "../Text";
-import Line from "../Line";
 import { Component } from "../interfaces";
 import { InputPosition } from "../types";
-import { toVector2 } from "../../utils";
 
 type BarDiagramOptions = {
   basePosition?: InputPosition;
