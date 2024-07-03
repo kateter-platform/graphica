@@ -19,4 +19,6 @@ export { default as Text } from "./Components/Text";
 export { default as Vector } from "./Components/Vector";
 export { default as Fraction } from "./Components/Derived/Fraction";
 export { default as SVGLoader } from "./Components/SVGLoader";
+export { default as Node } from "./Components/Derived/Node";
+export { default as OperationButtonPanel } from "./Components/Derived/OperationButtonPanel";
 export * as three from "three";

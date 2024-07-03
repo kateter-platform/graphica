@@ -8,7 +8,7 @@ body {
   font-family: Avinir, sans-serif;
 }
 
-.gui {
+.gui:not("panel-wrapper") {
   position: absolute;
   display: flex;
   gap: 15px;
@@ -213,4 +213,15 @@ body {
   border: none;
   cursor: pointer;
   font-size: 20px;
+
+.panel-wrapper {
+  position: absolute;
+  display: flex;
+  gap: 5px;
+  margin: 25px;
+  flex-direction: row;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+
 }
