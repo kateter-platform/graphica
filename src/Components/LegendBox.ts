@@ -14,37 +14,45 @@ class LegendBox implements GuiComponent {
   constructor(elements?: (Component | String | State<number>)[]) {
     this.elements = elements || [];
     this.states = {};
+    this.htmlElement = this.createLegendBoxWrapper();
+    const button = this.createSizeAdjustButton();
+    this.htmlElement.appendChild(button);
+    this.registerEventListeners();
+    this.initializeStatesAndStrings();
+    this.updateComponents();
+  }
+
+  createLegendBoxWrapper(): HTMLElement {
     const legendBoxWrapper = document.createElement("div");
     legendBoxWrapper.className = "legendBox-wrapper";
+    legendBoxWrapper.style.display =
+      this.elements.length === 0 ? "none" : "block";
+    return legendBoxWrapper;
+  }
 
-    //Sjekker for om det er noen elementer i legendBox
-    this.elements.length === 0
-      ? (legendBoxWrapper.style.display = "none")
-      : (legendBoxWrapper.style.display = "block");
-
-    this.htmlElement = legendBoxWrapper;
-
-    //Collapse/expand knapp
+  createSizeAdjustButton(): HTMLButtonElement {
     const button = document.createElement("button");
     button.className = "size-adjust-button";
     button.addEventListener("click", () => {
-      legendBoxWrapper.classList.toggle("minimized");
-      this.updateButton(legendBoxWrapper, button);
+      this.htmlElement.classList.toggle("minimized");
+      this.updateButton(button);
     });
-    this.updateButton(legendBoxWrapper, button);
+    this.updateButton(button);
+    return button;
+  }
 
-    legendBoxWrapper.appendChild(button);
-    this.updateComponents();
+  updateButton(button: HTMLButtonElement): void {
+    button.innerHTML = this.htmlElement.classList.contains("minimized")
+      ? "&#8599;"
+      : "&#8601;";
+  }
+  registerEventListeners(): void {
+    Plot.emitter.on("plotUpdated", () => this.updateComponents());
+    Point.emitter.on("pointUpdated", () => this.updateComponents());
+  }
 
-    //Emitters
-    Plot.emitter.on("plotUpdated", (plot) => {
-      this.updateComponents();
-    });
-
-    Point.emitter.on("pointUpdated", (point) => {
-      this.updateComponents();
-    });
-
+  //States and strings given in the constructor are initialized (states are added to states-dictionary and strings are added as observers to the states they contain)
+  initializeStatesAndStrings(): void {
     this.elements.forEach((element) => {
       if (element instanceof State) {
         this.states[element.getStateName()] = element;
@@ -55,88 +63,125 @@ class LegendBox implements GuiComponent {
   }
 
   updateComponents() {
+    this.clearChildren();
+    if (!this.elements) {
+      return;
+    }
+    this.updateDisplay();
+    this.elements.forEach((element) => this.processElement(element));
+  }
+
+  clearChildren() {
     Array.from(this.htmlElement.children).forEach((child) => {
       if (child.className !== "size-adjust-button") {
         this.htmlElement.removeChild(child);
       }
     });
-    if (!this.elements) {
-      return;
+  }
+
+  updateDisplay() {
+    this.htmlElement.style.display =
+      this.elements.length === 0 ? "none" : "block";
+  }
+
+  processElement(element: Component | String | State<number>) {
+    const functionContainer = document.createElement("div");
+    functionContainer.className = "function-container";
+    const icon = this.createIcon(element);
+    functionContainer.appendChild(icon);
+
+    const textToDisplay = this.getTextToDisplay(element);
+    const renderedEquation = renderToString.renderToString(textToDisplay, {
+      output: "mathml",
+      strict: false,
+      trust: true,
+    });
+    const htmlElementText = this.createHtmlElementText(
+      renderedEquation,
+      element
+    );
+
+    functionContainer.appendChild(htmlElementText);
+    this.htmlElement.appendChild(functionContainer);
+  }
+
+  createIcon(element: Component | String | State<number>) {
+    const icon = document.createElement("span");
+    icon.className = this.getIconClass(element);
+    if (icon.className === "triangle-icon") {
+      icon.style.borderBottomColor = this.getIconColor(element);
+    } else {
+      icon.style.backgroundColor = this.getIconColor(element);
     }
-    this.elements.length === 0
-      ? (this.htmlElement.style.display = "none")
-      : (this.htmlElement.style.display = "block");
+    return icon;
+  }
 
-    for (const element of this.elements) {
-      const functionContainer = document.createElement("div");
-      functionContainer.className = "function-container";
+  getTextToDisplay(element: Component | String | State<number>) {
+    let textToDisplay = "";
 
-      const icon = document.createElement("span");
+    if (typeof element === "string") {
+      textToDisplay =
+        element + ": " + this.replaceStateNamesWithValues(element);
+    } else if (element instanceof State) {
+      textToDisplay = element.getStateName() + ": " + element.getState();
+    } else if (element instanceof Component) {
+      textToDisplay = element.getDisplayText
+        ? element.getName() + ": " + element.getDisplayText()
+        : element.getName();
+    }
 
-      functionContainer.appendChild(icon);
+    return textToDisplay;
+  }
 
-      let textToDisplay = "";
+  createHtmlElementText(
+    renderedEquation: string,
+    element: Component | String | State<number>
+  ) {
+    const htmlElementText = document.createElement("div");
+    htmlElementText.innerHTML = renderedEquation;
 
-      if (typeof element === "string") {
-        textToDisplay =
-          element + ": " + this.replaceStateNamesWithValues(element);
-        icon.className = "point-icon";
-        icon.style.backgroundColor = "#faa307";
-      } else if (element instanceof State) {
-        textToDisplay = element.getStateName() + ": " + element.getState();
-        icon.className = "point-icon";
-        icon.style.backgroundColor = "#faa307";
-      } else if (element instanceof Component) {
-        if (element instanceof Plot) {
-          icon.className = "plot-icon";
-          icon.style.backgroundColor = "#" + element.getColor();
-        } else if (element instanceof Point) {
-          icon.className = "point-icon";
-          icon.style.backgroundColor = "#" + element.getColorAsString();
-        } else {
-          icon.className = "triangle-icon";
-          icon.style.borderBottomColor = "#" + element.getColorAsString();
-        }
+    if (element instanceof Component) {
+      this.addHoverListeners(htmlElementText, element);
+    }
 
-        textToDisplay = element.getDisplayText
-          ? element.getName() + ": " + element.getDisplayText()
-          : element.getName();
+    return htmlElementText;
+  }
+
+  addHoverListeners(htmlElementText: HTMLDivElement, element: Component) {
+    htmlElementText.addEventListener("mouseover", function () {
+      if (element.hover) {
+        htmlElementText.style.cursor = "pointer";
+        element.hover();
       }
+    });
 
-      const renderedEquation = renderToString.renderToString(textToDisplay, {
-        output: "mathml",
-        strict: false,
-        trust: true,
-      });
-
-      const htmlElementText = document.createElement("div");
-      htmlElementText.innerHTML = renderedEquation;
-
-      if (element instanceof Component) {
-        htmlElementText.addEventListener("mouseover", function () {
-          if (element.hover) {
-            htmlElementText.style.cursor = "pointer";
-            element.hover();
-          }
-        });
-
-        htmlElementText.addEventListener("mouseout", function () {
-          if (element.unhover) {
-            element.unhover();
-          }
-        });
+    htmlElementText.addEventListener("mouseout", function () {
+      if (element.unhover) {
+        element.unhover();
       }
+    });
+  }
 
-      functionContainer.appendChild(htmlElementText);
-      this.htmlElement.appendChild(functionContainer);
+  getIconClass(element: Component | String | State<number>) {
+    if (typeof element === "string" || element instanceof State) {
+      return "point-icon";
+    } else if (element instanceof Plot) {
+      return "plot-icon";
+    } else if (element instanceof Point) {
+      return "point-icon";
+    } else {
+      return "triangle-icon";
     }
   }
 
-  updateButton(legendBoxWrapper: HTMLDivElement, button: HTMLButtonElement) {
-    if (!legendBoxWrapper.classList.contains("minimized")) {
-      button.innerHTML = "&#8601;";
+  getIconColor(element: Component | String | State<number>) {
+    if (element instanceof Component) {
+      if (element instanceof Plot) {
+        return "#" + element.getColor();
+      }
+      return "#" + element.getColorAsString();
     } else {
-      button.innerHTML = "&#8599;";
+      return "#faa307";
     }
   }
 
@@ -146,7 +191,7 @@ class LegendBox implements GuiComponent {
     }
     this.elements.push(element);
 
-    // Add observer if the element is a state
+    // Add to states if the element is a state
     if (element instanceof State) {
       if (this.states[element.getStateName()]) {
         return;
@@ -154,7 +199,7 @@ class LegendBox implements GuiComponent {
       this.states[element.getStateName()] = element;
     }
 
-    // If the element is a string, parse it to find state names
+    // If the element is a string, add it as an observer to the state variables it contains
     if (typeof element === "string") {
       this.addStringAsObserver(element);
     }
@@ -162,7 +207,7 @@ class LegendBox implements GuiComponent {
     this.updateComponents();
   }
 
-  // Parse a string to find state names and add the string as an observer to the corresponding states
+  // Adds string as an observer to the state variables it contains
   addStringAsObserver(str: string) {
     const stateNames = this.parseStateNames(str);
     stateNames.forEach((stateName) => {
@@ -172,12 +217,12 @@ class LegendBox implements GuiComponent {
     });
   }
 
-  // Parse a string to find state names
+  // Returns an array with the state variables present in the string
   parseStateNames(str: string): string[] {
     return Array.from(new Set(str.match(/[a-z]/gi) || []));
   }
 
-  // Replace state names in a string with their current values
+  // Replaces the state variables in str with their current value
   replaceStateNamesWithValues(str: string): string {
     let result = str;
     const stateNames = this.parseStateNames(str);
