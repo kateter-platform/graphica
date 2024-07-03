@@ -21,7 +21,7 @@ class OperationButtonPanel implements GuiComponent {
     this.operationList = operationList;
     this.reverseOperationList = [];
     this.backButton = new Button({label: "<"});
-    this.backButton.addObserver(() => this.executePreviousOperation());
+    this.backButton.addObserver(() => this.reversePreviousOperation());
     this.backButton.htmlElement
     this.fourthButton = new Button({label: ">"});
     this.fourthButton.addObserver(() => this.executeNextOperation());
@@ -30,6 +30,10 @@ class OperationButtonPanel implements GuiComponent {
     this.htmlElement.appendChild(this.fourthButton.htmlElement);
   }
 
+  /**
+   * Executes the next operation when ">"-button is clicked.
+   * Also automatically computes the inverse and adds it to reverseOperationlist.
+   */
   executeNextOperation(): void {
     if (this.counter < this.operationList.length) {
         const nextOperation = this.operationList[this.counter];
@@ -85,12 +89,13 @@ class OperationButtonPanel implements GuiComponent {
     }
   }
 
-  executePreviousOperation(): void {
+  /**
+   * Reverses the previous operation when "<"-button is clicked.
+   */
+  reversePreviousOperation(): void {
     if (this.counter > 0) {
       this.counter--;
       const prevOperation = this.reverseOperationList[this.counter];
-      console.log("HEI");
-      console.log(prevOperation);
       prevOperation();
     } else {
         console.log("No earlier operations to perform");

@@ -34,6 +34,13 @@ class Node extends Circle {
     this.adjacencyList = [...adjacencyList];
   }
 
+  /**
+   * Help function to avoid node label from going outside of the node
+   * 
+   * @param text - Node label
+   * @param radius - Radius of the node
+   * @returns FontSize which will keep the node label within the node
+   */
   private calculateFontSize(text: string, radius: number): number {
     const maxDiameter = radius * 2;
     let fontSize = radius;
@@ -49,6 +56,14 @@ class Node extends Circle {
     return this.adjacencyList.map((edge) => edge.node).includes(node);
   }
 
+  /**
+   * Adds an edge from this node to the other node given and updates adjacencyList accordingly.
+   * Calculations are made in order to have the edge go to/from the circle arc.
+   * 
+   * @param other - Node to connect with edge
+   * @param directed - Booleean for whether the edge is directed (directed edges will also have curve)
+   * @param value - Number for eeight/value of the edge
+   */
   connectTo(other: Node, directed=false, value?: number): void {
     if (!this.isAdjacentTo(other) && !(!directed && other.isAdjacentTo(this))) {
       const dx = other.position.x - this.position.x;
@@ -168,8 +183,6 @@ class Node extends Circle {
     const index = node.adjacencyList.map((edge) => edge.node).indexOf(other);
     if (index > -1) {
       (node.adjacencyList[index].line.material as LineMaterial).color = new Color(color);
-      /* (node.adjacencyList[index].line.material as LineMaterial).linewidth = linewidth;
-      (node.adjacencyList[index].line.material as LineMaterial).opacity = opacity; */
     }
   }
 

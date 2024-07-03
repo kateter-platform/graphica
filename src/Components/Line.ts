@@ -147,6 +147,7 @@ class Line extends Component implements Collider {
       );
     }
 
+    // Computation made in order to get label in the correct position
     const midPoint = new Vector2(startPosition.x+(endPosition.x-startPosition.x)/2, startPosition.y+(endPosition.y-startPosition.y)/2);
     const dir = midPoint.clone().sub(startPosition).normalize();
     let normal:Vector2;
@@ -207,6 +208,7 @@ class Line extends Component implements Collider {
       );
     }
 
+    // Computation made in order to get label in the correct position
     const midPoint = new Vector2(startPosition.x+(endPosition.x-startPosition.x)/2, startPosition.y+(endPosition.y-startPosition.y)/2);
     const direction = midPoint.clone().sub(startPosition).normalize();
     let normal:Vector2;
@@ -221,7 +223,9 @@ class Line extends Component implements Collider {
     this.add(this.label);
   }
 
-
+  /**
+   * Help function for to curved lines
+   */
   private getCurvePoints(start: Vector2, end: Vector2): Vector2[] {
     const point1 = start.clone().lerp(end, 0.25);
     const point2 = start.clone().lerp(end, 0.75);
