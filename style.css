@@ -201,7 +201,7 @@ body {
   height: 0;
   border-left: 6.5px solid transparent;
   border-right: 6.5px solid transparent;
-  border-bottom: 12.5px solid #000; /* This will be the color of the border */
+  border-bottom: 12.5px solid #000;
   z-index: -1;
 }
 

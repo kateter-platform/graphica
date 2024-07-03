@@ -22,7 +22,7 @@ class LegendBox implements GuiComponent {
     this.updateComponents();
   }
 
-  createLegendBoxWrapper(): HTMLElement {
+  private createLegendBoxWrapper(): HTMLElement {
     const legendBoxWrapper = document.createElement("div");
     legendBoxWrapper.className = "legendBox-wrapper";
     legendBoxWrapper.style.display =
@@ -30,7 +30,7 @@ class LegendBox implements GuiComponent {
     return legendBoxWrapper;
   }
 
-  createSizeAdjustButton(): HTMLButtonElement {
+  private createSizeAdjustButton(): HTMLButtonElement {
     const button = document.createElement("button");
     button.className = "size-adjust-button";
     button.addEventListener("click", () => {
@@ -41,18 +41,18 @@ class LegendBox implements GuiComponent {
     return button;
   }
 
-  updateButton(button: HTMLButtonElement): void {
+  private updateButton(button: HTMLButtonElement): void {
     button.innerHTML = this.htmlElement.classList.contains("minimized")
       ? "&#8599;"
       : "&#8601;";
   }
-  registerEventListeners(): void {
+  private registerEventListeners(): void {
     Plot.emitter.on("plotUpdated", () => this.updateComponents());
     Point.emitter.on("pointUpdated", () => this.updateComponents());
   }
 
   //States and strings given in the constructor are initialized (states are added to states-dictionary and strings are added as observers to the states they contain)
-  initializeStatesAndStrings(): void {
+  private initializeStatesAndStrings(): void {
     this.elements.forEach((element) => {
       if (element instanceof State) {
         this.states[element.getStateName()] = element;
@@ -62,7 +62,7 @@ class LegendBox implements GuiComponent {
     });
   }
 
-  updateComponents() {
+  public updateComponents() {
     this.clearChildren();
     if (!this.elements) {
       return;
@@ -71,7 +71,7 @@ class LegendBox implements GuiComponent {
     this.elements.forEach((element) => this.processElement(element));
   }
 
-  clearChildren() {
+  private clearChildren() {
     Array.from(this.htmlElement.children).forEach((child) => {
       if (child.className !== "size-adjust-button") {
         this.htmlElement.removeChild(child);
@@ -79,12 +79,12 @@ class LegendBox implements GuiComponent {
     });
   }
 
-  updateDisplay() {
+  private updateDisplay() {
     this.htmlElement.style.display =
       this.elements.length === 0 ? "none" : "block";
   }
 
-  processElement(element: Component | String | State<number>) {
+  private processElement(element: Component | String | State<number>) {
     const functionContainer = document.createElement("div");
     functionContainer.className = "function-container";
     const icon = this.createIcon(element);
@@ -105,7 +105,7 @@ class LegendBox implements GuiComponent {
     this.htmlElement.appendChild(functionContainer);
   }
 
-  createIcon(element: Component | String | State<number>) {
+  private createIcon(element: Component | String | State<number>) {
     const icon = document.createElement("span");
     icon.className = this.getIconClass(element);
     if (icon.className === "triangle-icon") {
@@ -116,7 +116,7 @@ class LegendBox implements GuiComponent {
     return icon;
   }
 
-  getTextToDisplay(element: Component | String | State<number>) {
+  private getTextToDisplay(element: Component | String | State<number>) {
     let textToDisplay = "";
 
     if (typeof element === "string") {
@@ -134,7 +134,7 @@ class LegendBox implements GuiComponent {
     return textToDisplay;
   }
 
-  createHtmlElementText(
+  private createHtmlElementText(
     renderedEquation: string,
     element: Component | String | State<number>
   ) {
@@ -148,7 +148,10 @@ class LegendBox implements GuiComponent {
     return htmlElementText;
   }
 
-  addHoverListeners(htmlElementText: HTMLDivElement, element: Component) {
+  private addHoverListeners(
+    htmlElementText: HTMLDivElement,
+    element: Component
+  ) {
     htmlElementText.addEventListener("mouseover", function () {
       if (element.hover) {
         htmlElementText.style.cursor = "pointer";
@@ -163,7 +166,7 @@ class LegendBox implements GuiComponent {
     });
   }
 
-  getIconClass(element: Component | String | State<number>) {
+  private getIconClass(element: Component | String | State<number>) {
     if (typeof element === "string" || element instanceof State) {
       return "point-icon";
     } else if (element instanceof Plot) {
@@ -175,7 +178,7 @@ class LegendBox implements GuiComponent {
     }
   }
 
-  getIconColor(element: Component | String | State<number>) {
+  private getIconColor(element: Component | String | State<number>) {
     if (element instanceof Component) {
       if (element instanceof Plot) {
         return "#" + element.getColor();
@@ -186,7 +189,7 @@ class LegendBox implements GuiComponent {
     }
   }
 
-  addElement(element: Component | String | State<number>) {
+  public addElement(element: Component | String | State<number>) {
     if (this.elements.includes(element)) {
       return;
     }
@@ -209,7 +212,7 @@ class LegendBox implements GuiComponent {
   }
 
   // Adds string as an observer to the state variables it contains
-  addStringAsObserver(str: string) {
+  private addStringAsObserver(str: string) {
     const stateNames = this.parseStateNames(str);
     stateNames.forEach((stateName) => {
       if (this.states[stateName]) {
@@ -219,12 +222,12 @@ class LegendBox implements GuiComponent {
   }
 
   // Returns an array with the state variables present in the string
-  parseStateNames(str: string): string[] {
+  private parseStateNames(str: string): string[] {
     return Array.from(new Set(str.match(/[a-z]/gi) || []));
   }
 
   // Replaces the state variables in str with their current value
-  replaceStateNamesWithValues(str: string): string {
+  private replaceStateNamesWithValues(str: string): string {
     let result = str;
     const stateNames = this.parseStateNames(str);
     stateNames.forEach((stateName) => {

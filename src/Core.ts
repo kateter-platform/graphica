@@ -52,7 +52,6 @@ class Core {
   draggables: Component[];
   updateComponents: Component[];
   updateGuiComponents: GuiComponent[];
-  plotCount: number = 0;
   stats?: Stats;
   renderer: WebGLRenderer;
   domRenderer: CSS3DRenderer;
@@ -279,10 +278,6 @@ class Core {
 
   public getClockTime(): number {
     return this.clock.getElapsedTime();
-  }
-
-  public getComponents(): Component[] {
-    return this.components;
   }
 
   private updateLegend(guiComponent: GuiComponent) {

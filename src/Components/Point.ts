@@ -78,6 +78,7 @@ class Point extends Component implements Collider, DragListener<Point> {
       this.add(text);
     }
 
+    //add name of point
     const nameText = new Text(this.pointName, {
       color: "black",
       fontSize: 18,
@@ -140,7 +141,7 @@ class Point extends Component implements Collider, DragListener<Point> {
   public setPosition(x: number, y: number) {
     this.position.set(x, y, this.position.z);
   }
-  setPointName() {
+  private setPointName() {
     this.pointName = String.fromCharCode(
       "A".charCodeAt(0) + Point.pointCounter
     );
@@ -149,13 +150,13 @@ class Point extends Component implements Collider, DragListener<Point> {
   public getName(): string {
     return this.pointName as string;
   }
-  getDisplayText(): string {
+  public getDisplayText(): string {
     return (
       "(" + this.position.x.toFixed(1) + ", " + this.position.y.toFixed(1) + ")"
     );
   }
 
-  hover() {
+  public hover() {
     let hoverStrokeMesh = this.getObjectByName("hoverStrokeMesh");
     if (!hoverStrokeMesh) {
       const hoverStrokeGeometry = new RingGeometry(8, 8 + 2, 32);
@@ -169,7 +170,7 @@ class Point extends Component implements Collider, DragListener<Point> {
       this.add(hoverStrokeMesh);
     }
   }
-  unhover() {
+  public unhover() {
     const hoverStrokeMesh = this.getObjectByName("hoverStrokeMesh");
     if (hoverStrokeMesh) {
       this.remove(hoverStrokeMesh);

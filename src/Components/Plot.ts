@@ -3,7 +3,6 @@ import { parse } from "mathjs";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
 import { Component } from "./interfaces";
 import { EventEmitter } from "events";
-import Text from "./Text";
 
 type PlotOptions = {
   numPoints?: number;
@@ -11,7 +10,7 @@ type PlotOptions = {
   lineWidth?: number;
   coefficients?: Coefficients;
   plotRange?: number;
-  plotBetween?: [number, number] | undefined;
+  plotBetween: [number, number] | undefined;
 };
 
 const defaultPlotOptions = {
@@ -176,15 +175,15 @@ class Plot extends Component {
     this.plotMaterial.resolution.set(window.innerWidth, window.innerHeight);
   }
 
-  getFunctionString() {
+  public getFunctionString() {
     return this.func;
   }
 
-  setFuncName() {
+  public setFuncName() {
     this.funcName = String.fromCharCode("f".charCodeAt(0) + Plot.counter);
   }
 
-  setColor() {
+  public setColor() {
     this.color = Plot.colors[Plot.counter % Plot.colors.length];
     if (this.plotMaterial) {
       this.plotMaterial.color.set(this.color);
@@ -192,22 +191,22 @@ class Plot extends Component {
     Plot.counter++;
   }
 
-  getColor() {
+  public getColor() {
     return this.plotMaterial.color.getHexString();
   }
 
-  getName(): string {
+  public getName(): string {
     return this.funcName as string;
   }
 
-  getDisplayText(): string {
+  public getDisplayText(): string {
     return this.func;
   }
-  hover() {
+  public hover() {
     this.plotMaterial.linewidth = 7;
   }
 
-  unhover() {
+  public unhover() {
     this.plotMaterial.linewidth = 4;
   }
 }
