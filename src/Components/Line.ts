@@ -224,7 +224,7 @@ class Line extends Component implements Collider {
   }
 
   /**
-   * Help function for to curved lines
+   * Help function for curved lines
    */
   private getCurvePoints(start: Vector2, end: Vector2): Vector2[] {
     const point1 = start.clone().lerp(end, 0.25);
