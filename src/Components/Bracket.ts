@@ -27,6 +27,7 @@ class Bracket extends Component {
     );
     this.add(this._bracket);
     this._updateBracketGeometry();
+    this.name = "Bracket";
 
     this._text = new Text(content, {
       fontSize: 20,

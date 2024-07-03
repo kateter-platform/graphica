@@ -1,3 +1,4 @@
+import { EventEmitter } from "events";
 import { Vector3, CatmullRomCurve3, Vector2, OrthographicCamera } from "three";
 import { parse } from "mathjs";
 import { Line2, LineGeometry, LineMaterial } from "three-fatline";
@@ -7,7 +8,6 @@ type PlotOptions = {
   numPoints?: number;
   dashed?: boolean;
   lineWidth?: number;
-  color?: number;
   coefficients?: Coefficients;
   plotRange?: number;
   plotBetween: [number, number] | undefined;
@@ -17,7 +17,6 @@ const defaultPlotOptions = {
   numPoints: 1500,
   dashed: false,
   lineWidth: 4,
-  color: 0xfaa307,
   coefficients: {},
   plotBetween: undefined,
 };
@@ -29,12 +28,16 @@ type Coefficients = {
 class Plot extends Component {
   draggable = undefined;
   public func: string;
+  public funcName: string | undefined;
   private numPoints: number;
   private currentMinX: number;
   private currentMaxX: number;
   private currentZoom: number;
   private coefficients: Coefficients;
   private plotBetween: [number, number] | undefined;
+  public color: number | undefined;
+  private static counter = 0;
+  private static colors = [0xeea73c, 0xe15745, 0x4e0da6, 0x3874b8];
 
   private RENDERTHRESHOLDX = 1400;
   private RENDERTHRESHOLDZOOM = 2.5;
@@ -42,15 +45,17 @@ class Plot extends Component {
   private DEFAULT_RENDERTHRESHOLD = 1400;
 
   private plotMaterial: LineMaterial;
+  static emitter = new EventEmitter();
 
   constructor(func: string, options?: PlotOptions) {
     super();
+    this.setFuncName();
+    this.setColor();
 
     const {
       numPoints = 1000,
       dashed = false,
       lineWidth = 1,
-      color = 0xffa500,
       coefficients = {},
       plotBetween = undefined,
     } = { ...defaultPlotOptions, ...options };
@@ -72,7 +77,7 @@ class Plot extends Component {
       points.flatMap((e) => [e.x, e.y, e.z])
     );
     this.plotMaterial = new LineMaterial({
-      color: color,
+      color: this.color,
       linewidth: lineWidth,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
       dashed: dashed,
@@ -127,6 +132,7 @@ class Plot extends Component {
   public setExpression(expression: string): void {
     this.func = expression;
     this.reRenderPlot(this.currentMinX, this.currentMaxX);
+    Plot.emitter.emit("plotUpdated", this);
   }
 
   private reRenderPlot(minX: number, maxX: number): void {
@@ -167,6 +173,41 @@ class Plot extends Component {
 
   onWindowResize() {
     this.plotMaterial.resolution.set(window.innerWidth, window.innerHeight);
+  }
+
+  public getFunctionString() {
+    return this.func;
+  }
+
+  public setFuncName() {
+    this.funcName = String.fromCharCode("f".charCodeAt(0) + Plot.counter);
+  }
+
+  public setColor() {
+    this.color = Plot.colors[Plot.counter % Plot.colors.length];
+    if (this.plotMaterial) {
+      this.plotMaterial.color.set(this.color);
+    }
+    Plot.counter++;
+  }
+
+  public getColorAsString(): string {
+    return this.plotMaterial.color.getHexString();
+  }
+
+  public getName(): string {
+    return this.funcName as string;
+  }
+
+  public getDisplayText(): string {
+    return this.func;
+  }
+  public hover() {
+    this.plotMaterial.linewidth = 7;
+  }
+
+  public unhover() {
+    this.plotMaterial.linewidth = 4;
   }
 }
 

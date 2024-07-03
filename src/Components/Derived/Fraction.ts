@@ -28,6 +28,7 @@ class Fraction extends Component {
     this.position.set(x, y, this.position.z);
     this.filled = filled;
     this.divisor = divisor;
+    this.name = "Fraction";
 
     this.divisors = new Group();
     this.generateDivisors(radius, divisor, filled);

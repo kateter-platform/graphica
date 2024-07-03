@@ -35,6 +35,7 @@ class Latex extends Component implements Collider {
     }: LatexOptions
   ) {
     super();
+    this.name = "Latex";
     const pos = toVector3(position);
     const renderedEquation = renderToString.renderToString(latex, {
       output: "mathml",

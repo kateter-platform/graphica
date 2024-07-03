@@ -7,6 +7,7 @@ class InfiniteLine extends Line {
   constructor(start: InputPosition, end: InputPosition, props?: LineOptions) {
     super(start, end, props);
     this.frustumCulled = false;
+    this.name = "Infinite line";
   }
 
   _updateGeometry(camera: OrthographicCamera) {

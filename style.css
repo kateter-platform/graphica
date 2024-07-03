@@ -130,6 +130,91 @@ body {
   font-size: 13px;
 }
 
+.legendBox-wrapper {
+  position: sticky;
+  width: 260px;
+  max-height: 170px;
+  background-color: #fae493;
+  border-radius: 6px;
+  border-style: solid;
+  border-width: 3px;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  padding-bottom: 6px;
+}
+
+.legendBox-wrapper.minimized {
+  width: 35px;
+  height: 30px;
+}
+
+.legendBox-wrapper.minimized .function-container {
+  display: none;
+}
+
+.legendBox-wrapper.minimized .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.function-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 12px;
+  margin-top: 8px;
+}
+
+.point-icon {
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  margin-right: 8px;
+  border: #000 solid 1px;
+}
+
+.plot-icon {
+  width: 13px;
+  height: 2px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.triangle-icon {
+  position: relative;
+  width: 0;
+  height: 0;
+  border-left: 5.5px solid transparent;
+  border-right: 5.5px solid transparent;
+  border-bottom: 11px solid;
+  margin-right: 7px;
+}
+
+.triangle-icon::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -6.5px;
+  width: 0;
+  height: 0;
+  border-left: 6.5px solid transparent;
+  border-right: 6.5px solid transparent;
+  border-bottom: 12.5px solid #000;
+  z-index: -1;
+}
+
+.size-adjust-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}
+
 .panel-wrapper {
   position: absolute;
   display: flex;

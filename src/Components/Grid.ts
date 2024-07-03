@@ -120,6 +120,7 @@ class Grid extends Component {
     this.hasLabels = labels;
     this.xLabelOffset = xLabelOffset ?? [0, 0];
     this.yLabelOffset = yLabelOffset ?? [0, 0];
+    this.name = "Grid";
     const gridGeometry = new PlaneGeometry(
       window.innerWidth,
       window.innerHeight

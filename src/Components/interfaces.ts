@@ -1,4 +1,4 @@
-import { OrthographicCamera, Mesh, Object3D } from "three";
+import { OrthographicCamera, Mesh, Object3D, MeshBasicMaterial } from "three";
 
 export class Component extends Mesh {
   draggable: Draggable;
@@ -15,9 +15,27 @@ export class Component extends Mesh {
   getZIndex(): number {
     return this.position.z;
   }
+  getName(): string {
+    return this.name ?? "";
+  }
+  hover?(): void;
+  unhover?(): void;
+
   update?(camera: OrthographicCamera): void;
   onWindowResize?(): void;
   dragUpdate?(): void;
+
+  getColorAsString(): string {
+    const color = (this.material as MeshBasicMaterial).color.getHexString();
+    return color === "ffffff" ? "faa307" : color;
+  }
+
+  getColorAsNumber(): number {
+    const color = (this.material as MeshBasicMaterial).color.getHex();
+    return color === 0xffffff ? 0xfaa307 : color;
+  }
+
+  getDisplayText?(): string;
 
   constructor() {
     super();
@@ -50,4 +68,5 @@ export type Draggable =
 
 export interface GuiComponent {
   htmlElement: HTMLElement;
+  update?(camera?: OrthographicCamera): void;
 }

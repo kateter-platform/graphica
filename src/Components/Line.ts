@@ -80,6 +80,7 @@ class Line extends Component implements Collider {
       opacity: opacity,
       transparent: transparent,
     });
+    this.name = "Line";
 
     this.geometry = new LineGeometry();
     if (arrowhead) {

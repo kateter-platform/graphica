@@ -1,3 +1,4 @@
+import { EventEmitter } from "events";
 import {
   CircleGeometry,
   MeshBasicMaterial,
@@ -6,6 +7,7 @@ import {
   Object3D,
   Box3,
   Vector3,
+  RingGeometry,
 } from "three";
 import Text from "./Text";
 import { Collider, Component, DragListener, Draggable } from "./interfaces";
@@ -27,6 +29,10 @@ const defaultPointOptions = {
 };
 
 class Point extends Component implements Collider, DragListener<Point> {
+  private pointName: string | undefined;
+  private static pointCounter = 0;
+  static emitter = new EventEmitter();
+  private color: string;
   dragListeners: ((point: Point) => void)[];
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
@@ -34,6 +40,9 @@ class Point extends Component implements Collider, DragListener<Point> {
       ...defaultPointOptions,
       ...options,
     };
+    //set point name and color
+    this.setPointName();
+    this.color = color;
 
     // set position of the point instance
     this.draggable = draggable;
@@ -68,6 +77,18 @@ class Point extends Component implements Collider, DragListener<Point> {
       text.name = "label";
       this.add(text);
     }
+
+    //add name of point
+    const nameText = new Text(this.pointName, {
+      color: "black",
+      fontSize: 18,
+      anchorY: "middle",
+      anchorX: "left",
+      position: [15, 0],
+      responsiveScale: false,
+    });
+    nameText.name = "name";
+    this.add(nameText);
   }
 
   addDragListener(listener: (point: Point) => void) {
@@ -109,6 +130,7 @@ class Point extends Component implements Collider, DragListener<Point> {
       message: "Point has been moved",
       position: this.position,
     }); // Dispatch the drag event
+    Point.emitter.emit("pointUpdated", this);
     this.dragListeners.forEach((fn) => fn(this));
   }
 
@@ -118,6 +140,41 @@ class Point extends Component implements Collider, DragListener<Point> {
 
   public setPosition(x: number, y: number) {
     this.position.set(x, y, this.position.z);
+  }
+  private setPointName() {
+    this.pointName = String.fromCharCode(
+      "A".charCodeAt(0) + Point.pointCounter
+    );
+    Point.pointCounter++;
+  }
+  public getName(): string {
+    return this.pointName as string;
+  }
+  public getDisplayText(): string {
+    return (
+      "(" + this.position.x.toFixed(1) + ", " + this.position.y.toFixed(1) + ")"
+    );
+  }
+
+  public hover() {
+    let hoverStrokeMesh = this.getObjectByName("hoverStrokeMesh");
+    if (!hoverStrokeMesh) {
+      const hoverStrokeGeometry = new RingGeometry(8, 8 + 2, 32);
+      const hoverStrokeMaterial = new MeshBasicMaterial({
+        color: "#080007",
+        opacity: 0.4,
+        transparent: true,
+      });
+      hoverStrokeMesh = new Mesh(hoverStrokeGeometry, hoverStrokeMaterial);
+      hoverStrokeMesh.name = "hoverStrokeMesh";
+      this.add(hoverStrokeMesh);
+    }
+  }
+  public unhover() {
+    const hoverStrokeMesh = this.getObjectByName("hoverStrokeMesh");
+    if (hoverStrokeMesh) {
+      this.remove(hoverStrokeMesh);
+    }
   }
 }
 export default Point;

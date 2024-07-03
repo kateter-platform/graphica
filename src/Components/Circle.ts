@@ -33,16 +33,16 @@ class Circle extends Component implements Collider {
     const { color, segments } = { ...defaultShapeOptions, ...options };
 
     const geometry = new CircleGeometry(radius, segments);
-    const material = new MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 0.5,
-    });
     this.segments = segments;
     const strokeGeometry = new RingGeometry(radius - 1, radius, this.segments);
     const strokeMaterial = new MeshBasicMaterial({ color: "#080007" });
     // set mesh of the point instance
-    const circleMesh = new Mesh(geometry, material);
+    const geometryMaterial = new MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.5,
+    });
+    const circleMesh = new Mesh(geometry, geometryMaterial);
     this._strokeMesh = new Mesh(strokeGeometry, strokeMaterial);
     this._strokeMesh.position.set(0, 0, 1);
     this.geometry = circleMesh.geometry;
@@ -50,6 +50,7 @@ class Circle extends Component implements Collider {
     this.add(this._strokeMesh);
     // set position of the mesh
     this.position.set(x, y, 0);
+    this.name = "Circle";
   }
 
   collidesWith(other: Object3D): boolean {
@@ -86,6 +87,24 @@ class Circle extends Component implements Collider {
       this.radius,
       this.segments
     );
+  }
+
+  hover() {
+    const color = this.getColorAsNumber();
+    this.material = new MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.7,
+    });
+  }
+
+  unhover() {
+    const color = this.getColorAsNumber();
+    this.material = new MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.5,
+    });
   }
 }
 

@@ -82,6 +82,7 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     this.lineWidth = lineWidth ?? 4;
     this.dashed = dashed ?? false;
     this.transparent = transparent ?? true;
+    this.name = "Shape";
 
     const shape = new Shape(vertices.map((e) => toVector2(e)));
     const material = new MeshBasicMaterial({

@@ -18,6 +18,7 @@ class SVG extends Component {
   constructor(url: string, position = new Vector3(0, 0, 0)) {
     super();
     const loader = new SVGLoader();
+    this.name = "SVG";
 
     loader.load(
       url,
