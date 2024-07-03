@@ -25,12 +25,12 @@ export class Component extends Mesh {
   onWindowResize?(): void;
   dragUpdate?(): void;
 
-  getColorAsString() {
+  getColorAsString(): string {
     const color = (this.material as MeshBasicMaterial).color.getHexString();
     return color === "ffffff" ? "faa307" : color;
   }
 
-  getColorAsNumber() {
+  getColorAsNumber(): number {
     const color = (this.material as MeshBasicMaterial).color.getHex();
     return color === 0xffffff ? 0xfaa307 : color;
   }

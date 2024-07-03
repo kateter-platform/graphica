@@ -191,7 +191,7 @@ class Plot extends Component {
     Plot.counter++;
   }
 
-  public getColorAsString() {
+  public getColorAsString(): string {
     return this.plotMaterial.color.getHexString();
   }
 
