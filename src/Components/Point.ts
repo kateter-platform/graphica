@@ -1,3 +1,4 @@
+import { EventEmitter } from "events";
 import {
   CircleGeometry,
   MeshBasicMaterial,
@@ -10,7 +11,6 @@ import {
 } from "three";
 import Text from "./Text";
 import { Collider, Component, DragListener, Draggable } from "./interfaces";
-import { EventEmitter } from "events";
 
 type PointOptions = {
   label?: boolean;

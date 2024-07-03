@@ -1,17 +1,15 @@
-import Core from "../Core";
 import renderToString from "katex";
 import Plot from "./Plot";
-import { Component, GuiComponent } from "./interfaces";
-import "style.css";
 import Point from "./Point";
 import State from "./State";
+import { Component, GuiComponent } from "./interfaces";
 
 class LegendBox implements GuiComponent {
-  elements: (Component | String | State<number>)[];
+  elements: (Component | string | State<number>)[];
   states: { [key: string]: State<number> };
   htmlElement: HTMLElement;
 
-  constructor(elements?: (Component | String | State<number>)[]) {
+  constructor(elements?: (Component | string | State<number>)[]) {
     this.elements = elements || [];
     this.states = {};
     this.htmlElement = this.createLegendBoxWrapper();
@@ -84,7 +82,7 @@ class LegendBox implements GuiComponent {
       this.elements.length === 0 ? "none" : "block";
   }
 
-  private processElement(element: Component | String | State<number>) {
+  private processElement(element: Component | string | State<number>) {
     const functionContainer = document.createElement("div");
     functionContainer.className = "function-container";
     const icon = this.createIcon(element);
@@ -105,7 +103,7 @@ class LegendBox implements GuiComponent {
     this.htmlElement.appendChild(functionContainer);
   }
 
-  private createIcon(element: Component | String | State<number>) {
+  private createIcon(element: Component | string | State<number>) {
     const icon = document.createElement("span");
     icon.className = this.getIconClass(element);
     if (icon.className === "triangle-icon") {
@@ -116,7 +114,7 @@ class LegendBox implements GuiComponent {
     return icon;
   }
 
-  private getTextToDisplay(element: Component | String | State<number>) {
+  private getTextToDisplay(element: Component | string | State<number>) {
     let textToDisplay = "";
 
     if (typeof element === "string") {
@@ -136,7 +134,7 @@ class LegendBox implements GuiComponent {
 
   private createHtmlElementText(
     renderedEquation: string,
-    element: Component | String | State<number>
+    element: Component | string | State<number>
   ) {
     const htmlElementText = document.createElement("div");
     htmlElementText.innerHTML = renderedEquation;
@@ -166,7 +164,7 @@ class LegendBox implements GuiComponent {
     });
   }
 
-  private getIconClass(element: Component | String | State<number>) {
+  private getIconClass(element: Component | string | State<number>) {
     if (typeof element === "string" || element instanceof State) {
       return "point-icon";
     } else if (element instanceof Plot) {
@@ -178,7 +176,7 @@ class LegendBox implements GuiComponent {
     }
   }
 
-  private getIconColor(element: Component | String | State<number>) {
+  private getIconColor(element: Component | string | State<number>) {
     if (element instanceof Component) {
       return "#" + element.getColorAsString();
     } else {
@@ -186,7 +184,7 @@ class LegendBox implements GuiComponent {
     }
   }
 
-  public addElement(element: Component | String | State<number>) {
+  public addElement(element: Component | string | State<number>) {
     if (this.elements.includes(element)) {
       return;
     }

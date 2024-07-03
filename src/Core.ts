@@ -10,6 +10,7 @@ import {
 import Stats from "stats.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer";
+import LegendBox from "./Components/LegendBox";
 import {
   Component,
   ConstrainFunction,
@@ -17,7 +18,6 @@ import {
 } from "./Components/interfaces";
 import { InputPosition } from "./Components/types";
 import { DragControls } from "./Controls/DragControls";
-import LegendBox from "./Components/LegendBox";
 
 const ORBIT_CONTROL_OPTIONS = {
   LEFT: MOUSE.PAN,
