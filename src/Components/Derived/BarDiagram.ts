@@ -1,19 +1,8 @@
-import {
-  MeshBasicMaterial,
-  Shape,
-  Mesh,
-  Group,
-  Object3D,
-  ShapeGeometry,
-  Event,
-  Box3,
-  Vector3,
-  Vector2,
-} from "three";
-import { Component } from "../interfaces";
+import { Group } from "three";
 import Polygon from "../Shape";
 import Text from "../Text";
 import Line from "../Line";
+import { Component } from "../interfaces";
 
 type BarDiagramOptions = {
   basePosition?: [number, number];
