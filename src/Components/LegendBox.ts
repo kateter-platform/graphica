@@ -180,9 +180,6 @@ class LegendBox implements GuiComponent {
 
   private getIconColor(element: Component | String | State<number>) {
     if (element instanceof Component) {
-      if (element instanceof Plot) {
-        return "#" + element.getColor();
-      }
       return "#" + element.getColorAsString();
     } else {
       return "#faa307";
