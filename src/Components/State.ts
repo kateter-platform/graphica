@@ -1,6 +1,5 @@
 import EventEmitter from "eventemitter3";
 
-// Define the event name for state changes
 const STATE_CHANGE_EVENT = "stateChange";
 
 class State<T> {
@@ -15,9 +14,6 @@ class State<T> {
   }
 
   getState(): T {
-    if (typeof this.state === "number") {
-      return parseFloat(this.state.toFixed(1)) as T;
-    }
     return this.state;
   }
 
@@ -25,18 +21,15 @@ class State<T> {
     return this.stateName;
   }
 
-  // Method to set a new state and notify observers
   setState(newState: T): void {
     this.state = newState;
     this.emitter.emit(STATE_CHANGE_EVENT, this.state);
   }
 
-  // Method to add an observer
   addObserver(callback: (state: number) => void): void {
     this.emitter.on(STATE_CHANGE_EVENT, callback);
   }
 
-  // Method to remove an observer
   removeObserver(callback: (state: number) => void): void {
     this.emitter.off(STATE_CHANGE_EVENT, callback);
   }

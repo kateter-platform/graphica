@@ -123,7 +123,8 @@ class LegendBox implements GuiComponent {
       textToDisplay =
         element + ": " + this.replaceStateNamesWithValues(element);
     } else if (element instanceof State) {
-      textToDisplay = element.getStateName() + ": " + element.getState();
+      textToDisplay =
+        element.getStateName() + ": " + element.getState().toFixed(1);
     } else if (element instanceof Component) {
       textToDisplay = element.getDisplayText
         ? element.getName() + ": " + element.getDisplayText()
@@ -230,7 +231,7 @@ class LegendBox implements GuiComponent {
       if (this.states[stateName]) {
         result = result.replace(
           new RegExp(stateName, "g"),
-          this.states[stateName].getState().toString()
+          this.states[stateName].getState().toFixed(1).toString()
         );
       }
     });
