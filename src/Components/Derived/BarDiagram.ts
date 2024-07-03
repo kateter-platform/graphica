@@ -14,11 +14,10 @@ import { Component } from "../interfaces";
 import Polygon from "../Shape";
 import Text from "../Text";
 import Line from "../Line";
-import { InputPosition } from "../types";
-import { toVector2 } from "../../utils";
 
 type BarDiagramOptions = {
   basePosition?: [number, number];
+  diagramTitle?: string;
   xAxisUnit?: string;
   yAxisUnit?: string;
 };
@@ -43,11 +42,10 @@ class BarDiagram extends Component {
   fontSize: number;
   labelsNextToLinePosition: number;
   distanceMultiplierBarLabels: number;
-  maxData: number;
   normalizationFactor: number;
 
   biggestElement: number;
-  smallesElement: number;
+  smallestElement: number;
 
   barsObject: { [key: number]: InfoAboutBar };
 
@@ -56,7 +54,6 @@ class BarDiagram extends Component {
     labels: string[],
     xAxisTitle: string,
     yAxisTitle: string,
-    diagramTitle?: string,
     options?: BarDiagramOptions
   ) {
     super();
@@ -64,7 +61,7 @@ class BarDiagram extends Component {
     this.labels = labels;
     this.xAxisTitle = xAxisTitle;
     this.yAxisTitle = yAxisTitle;
-    this.diagramTitle = diagramTitle ? diagramTitle : "";
+    this.diagramTitle = options?.diagramTitle ? options?.diagramTitle : "";
     this.xAxisUnit = options?.xAxisUnit ? options?.xAxisUnit : "";
     this.yAxisUnit = options?.yAxisUnit ? options?.yAxisUnit : "";
     this.basePosition = options?.basePosition ? options?.basePosition : [0, 0];
@@ -78,9 +75,8 @@ class BarDiagram extends Component {
     this.labelsNextToLinePosition =
       -this.fontSize * this.distanceMultiplierBarLabels;
 
-    this.maxData = Math.max(...this.data.map(Math.abs));
     this.biggestElement = Math.max(...this.data);
-    this.smallesElement = this.data.reduce((a, b) => {
+    this.smallestElement = this.data.reduce((a, b) => {
       if (a < b) {
         return a;
       } else {
@@ -89,7 +85,7 @@ class BarDiagram extends Component {
     });
 
     // The barDiagram will always have a max height. This is to make sure that the bars (collectively) always fill up the maxHeight
-    const totalHeightOfBars = Math.max(...this.data) + -this.smallesElement;
+    const totalHeightOfBars = Math.max(...this.data) + -this.smallestElement;
     this.normalizationFactor = totalHeightOfBars / this.maxHeight;
 
     this.barsObject = {};
@@ -103,10 +99,7 @@ class BarDiagram extends Component {
 
     const stringLengthMultiplier = 0.2; //For distributing the yAxisTitle and horizontal line-labels
 
-    const [xLineCoord, yLineCoord] = this.addAxes(
-      basePosition,
-      stringLengthMultiplier
-    );
+    const [xLineCoord, yLineCoord] = this.addAxes(basePosition);
 
     this.addTitle([basePosition, yLineCoord[1][1]]);
 
@@ -187,15 +180,15 @@ class BarDiagram extends Component {
     return basePosition;
   }
 
-  addAxes(basePosition: number, stringLengthMultiplier: number) {
+  addAxes(xAxisEnd: number) {
     const axes = new Group();
 
     const xLineCoord: Position = [
       [0, 0],
-      [basePosition, 0],
+      [xAxisEnd, 0],
     ];
     const yLineCoord: Position = [
-      [0, (1.25 * this.smallesElement) / this.normalizationFactor],
+      [0, (1.25 * this.smallestElement) / this.normalizationFactor],
       [0, (1.25 * Math.max(...this.data)) / this.normalizationFactor],
     ];
 
@@ -204,21 +197,23 @@ class BarDiagram extends Component {
       arrowhead: true,
     });
 
-    let hasNegativeBar = false;
-    this.data.forEach((elem) => {
-      if (elem < 0) {
-        hasNegativeBar = true;
-      }
-    });
+    const hasNegativeBar = this.hasNegativeBar();
 
     // Change the position of the xAxisTitle based on if there are negative bars
     const xAxisPosition: [number, number] = !hasNegativeBar
-      ? [basePosition / 2, this.labelsNextToLinePosition * 2.5]
+      ? [xAxisEnd / 2, this.labelsNextToLinePosition * 2.5]
       : [xLineCoord[1][0] + 0.1, 0];
     const anchorX = !hasNegativeBar ? "center" : "left";
     const anchorY = !hasNegativeBar ? "bottom" : "middle";
 
-    const xAxisTitle = new Text(this.xAxisTitle, {
+    // Change content of the xAxisTitle based on if there are negative bars (and a unit)
+    const xTitle = hasNegativeBar
+      ? this.xAxisUnit
+        ? this.xAxisTitle + "(" + this.xAxisUnit + ")"
+        : this.xAxisTitle
+      : this.xAxisTitle;
+
+    const xAxisTitle = new Text(xTitle, {
       fontSize: this.fontSize + 6,
       position: xAxisPosition,
       anchorX: anchorX,
@@ -227,12 +222,11 @@ class BarDiagram extends Component {
     const yAxisTitle = new Text(this.yAxisTitle, {
       fontSize: this.fontSize + 6,
       position: [
-        this.labelsNextToLinePosition * 2.5 -
-          this.maxData.toString().length * 4 * stringLengthMultiplier,
+        3 * this.labelsNextToLinePosition,
         (yLineCoord[1][1] + yLineCoord[0][1]) / 2,
       ],
       anchorX: "center",
-      anchorY: "top",
+      anchorY: "bottom",
     });
     yAxisTitle.rotateZ(Math.PI / 2);
 
@@ -260,7 +254,9 @@ class BarDiagram extends Component {
   }
 
   addAxisUnits(xLineCoord: Position, yLineCoord: Position) {
-    if (this.xAxisUnit) {
+    const hasNegativeBar = this.hasNegativeBar();
+
+    if (this.xAxisUnit && !hasNegativeBar) {
       const xAxisUnit = new Text(this.xAxisUnit, {
         fontSize: this.fontSize,
         position: [xLineCoord[1][0] + 0.1, 0],
@@ -286,12 +282,8 @@ class BarDiagram extends Component {
     const lineLabels = new Group();
 
     // Calculates the sum of the rounded biggest and smallest numbers
-    const maxNicePositiveNumber = this.roundNumberToNearestDigit(
-      this.biggestElement
-    );
-    const maxNiceNegativeNumber = this.roundNumberToNearestDigit(
-      this.smallesElement
-    );
+    const maxNicePositiveNumber = this.roundToNiceNumber(this.biggestElement);
+    const maxNiceNegativeNumber = this.roundToNiceNumber(this.smallestElement);
     const maxNiceNumber = maxNicePositiveNumber + -maxNiceNegativeNumber;
 
     // Choose best distribution of lines based on maxNiceNumber
@@ -314,6 +306,7 @@ class BarDiagram extends Component {
         ? Math.abs(maxNiceNegativeNumber).toString().length - 1
         : maxNicePositiveNumber.toString().length - 1;
 
+    // Adds all the lines from the bottom (maxNiceNegativeNumber)
     while (y <= maxNicePositiveNumber) {
       if (y === 0) {
         y += spacing;
@@ -364,27 +357,34 @@ class BarDiagram extends Component {
   }
 
   // Used for rounding a number to the nearest a*power of ten. EX: 324 => 300
-  roundNumberToNearestDigit(numberToRound: number) {
-    if (numberToRound === 0) {
+  roundToNiceNumber(num: number): number {
+    if (num === 0) {
       return 0;
     }
-    const exponent = Math.floor(Math.log10(Math.abs(numberToRound)));
+    const exponent = Math.floor(Math.log10(Math.abs(num)));
 
-    return (
-      Math.round(numberToRound / Math.pow(10, exponent)) *
-      Math.pow(10, exponent)
-    );
+    return Math.round(num / Math.pow(10, exponent)) * Math.pow(10, exponent);
   }
 
-  setColorForBar(barID: number, color?: number) {
-    const bar = this.barsObject[barID][0];
+  hasNegativeBar(): boolean {
+    let bool = false;
+    this.data.forEach((elem) => {
+      if (elem < 0) {
+        bool = true;
+      }
+    });
+    return bool;
+  }
+
+  setColorForBar(barIndex: number, color?: number) {
+    const bar = this.barsObject[barIndex][0];
     bar.setColor(color);
   }
 
-  switchBars(bar1Index: number, bar2Index: number) {
+  switchBars(barIndex1: number, barIndex2: number) {
     // Get the content for the two indices
-    const bar1 = this.barsObject[bar1Index];
-    const bar2 = this.barsObject[bar2Index];
+    const bar1 = this.barsObject[barIndex1];
+    const bar2 = this.barsObject[barIndex2];
 
     const newX1 = bar1[0].position.x;
     const newX2 = bar2[0].position.x;
@@ -404,8 +404,8 @@ class BarDiagram extends Component {
     bar2[2].setPosition([value1Pos[0], value2Pos[1]]);
 
     // Switch index for bars after switching their places
-    this.barsObject[bar2Index] = bar1;
-    this.barsObject[bar1Index] = bar2;
+    this.barsObject[barIndex2] = bar1;
+    this.barsObject[barIndex1] = bar2;
   }
 }
 
