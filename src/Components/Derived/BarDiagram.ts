@@ -3,15 +3,17 @@ import Polygon from "../Shape";
 import Text from "../Text";
 import Line from "../Line";
 import { Component } from "../interfaces";
+import { InputPosition } from "../types";
+import { toVector2 } from "../../utils";
 
 type BarDiagramOptions = {
-  basePosition?: [number, number];
+  basePosition?: InputPosition;
   diagramTitle?: string;
   xAxisUnit?: string;
   yAxisUnit?: string;
 };
 
-type Position = [[number, number], [number, number]];
+type Position = [InputPosition, InputPosition];
 
 type InfoAboutBar = [Polygon, Text, Text, number];
 
@@ -23,14 +25,13 @@ class BarDiagram extends Component {
   diagramTitle: string | undefined;
   xAxisUnit: string | undefined;
   yAxisUnit: string | undefined;
-  basePosition: [number, number] | undefined;
+  basePosition: InputPosition | undefined;
 
   maxLength: number;
   maxHeight: number;
 
   fontSize: number;
   labelsNextToLinePosition: number;
-  distanceMultiplierBarLabels: number;
   normalizationFactor: number;
 
   biggestElement: number;
@@ -60,9 +61,9 @@ class BarDiagram extends Component {
 
     this.fontSize = 26;
     // Used for calculating the distance from the label of the bar from the axisline
-    this.distanceMultiplierBarLabels = 0.03;
+    const distanceMultiplierBarLabels = 0.03;
     this.labelsNextToLinePosition =
-      -this.fontSize * this.distanceMultiplierBarLabels;
+      -this.fontSize * distanceMultiplierBarLabels;
 
     this.biggestElement = Math.max(...this.data);
     this.smallestElement = this.data.reduce((a, b) => {
@@ -79,7 +80,11 @@ class BarDiagram extends Component {
 
     this.barsObject = {};
 
-    this.position.set(this.basePosition[0], this.basePosition[1], 0);
+    this.position.set(
+      toVector2(this.basePosition).x,
+      toVector2(this.basePosition).y,
+      0
+    );
     this.createBarDiagram();
   }
 
@@ -90,11 +95,11 @@ class BarDiagram extends Component {
 
     const [xLineCoord, yLineCoord] = this.addAxes(basePosition);
 
-    this.addTitle([basePosition, yLineCoord[1][1]]);
+    this.addTitle([basePosition, toVector2(yLineCoord[1]).y]);
 
     this.addAxisUnits(xLineCoord, yLineCoord);
 
-    const length = xLineCoord[1][0];
+    const length = toVector2(xLineCoord[1]).x;
     this.addHorizontalLines(stringLengthMultiplier, length);
   }
 
@@ -191,7 +196,7 @@ class BarDiagram extends Component {
     // Change the position of the xAxisTitle based on if there are negative bars
     const xAxisPosition: [number, number] = !hasNegativeBar
       ? [xAxisEnd / 2, this.labelsNextToLinePosition * 2.5]
-      : [xLineCoord[1][0] + 0.1, 0];
+      : [toVector2(xLineCoord[1]).x + 0.1, 0];
     const anchorX = !hasNegativeBar ? "center" : "left";
     const anchorY = !hasNegativeBar ? "bottom" : "middle";
 
@@ -212,7 +217,7 @@ class BarDiagram extends Component {
       fontSize: this.fontSize + 6,
       position: [
         3 * this.labelsNextToLinePosition,
-        (yLineCoord[1][1] + yLineCoord[0][1]) / 2,
+        (toVector2(yLineCoord[1]).y + toVector2(yLineCoord[0]).y) / 2,
       ],
       anchorX: "center",
       anchorY: "bottom",
@@ -248,7 +253,7 @@ class BarDiagram extends Component {
     if (this.xAxisUnit && !hasNegativeBar) {
       const xAxisUnit = new Text(this.xAxisUnit, {
         fontSize: this.fontSize,
-        position: [xLineCoord[1][0] + 0.1, 0],
+        position: [toVector2(xLineCoord[1]).x + 0.1, 0],
         anchorX: "left",
         anchorY: "middle",
       });
@@ -258,7 +263,7 @@ class BarDiagram extends Component {
     if (this.yAxisUnit) {
       const yAxisUnit = new Text(this.yAxisUnit, {
         fontSize: this.fontSize,
-        position: [0, yLineCoord[1][1]],
+        position: [0, toVector2(yLineCoord[1]).y],
         anchorX: "center",
         anchorY: "bottom",
       });
