@@ -56,6 +56,9 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
   dashed: boolean;
   transparent: boolean;
 
+  material: MeshBasicMaterial;
+  geometry: ShapeGeometry;
+
   constructor(vertices: PolygonVertices, options?: PolygonOptions) {
     super();
 
@@ -85,14 +88,14 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     this.name = "Shape";
 
     const shape = new Shape(vertices.map((e) => toVector2(e)));
-    const material = new MeshBasicMaterial({
+    this.material = new MeshBasicMaterial({
       color: color,
       opacity: opacity,
       transparent: true,
     });
-    const geometry = new ShapeGeometry(shape);
+    this.geometry = new ShapeGeometry(shape);
 
-    this.mesh = new Mesh(geometry, material);
+    this.mesh = new Mesh(this.geometry, this.material);
     this.mesh.scale.set(1, 1, 1);
     this.add(this.mesh);
 
@@ -121,6 +124,16 @@ class Polygon extends Component implements Collider, DragListener<Polygon> {
     box2.max.z = 0;
 
     return box1.intersectsBox(box2);
+  }
+
+  setColor(color?: number) {
+    const material = new MeshBasicMaterial({
+      transparent: this.material.transparent,
+      opacity: this.material.opacity,
+      color: color ? color : this.color,
+    });
+    this.mesh = new Mesh(this.geometry, material);
+    this.add(this.mesh);
   }
 
   distanceTo(other: Object3D<Event>): number {

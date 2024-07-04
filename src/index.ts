@@ -21,4 +21,5 @@ export { default as Fraction } from "./Components/Derived/Fraction";
 export { default as SVGLoader } from "./Components/SVGLoader";
 export { default as Node } from "./Components/Derived/Node";
 export { default as OperationButtonPanel } from "./Components/Derived/OperationButtonPanel";
+export { default as BarDiagram } from "./Components/Derived/BarDiagram";
 export * as three from "three";
