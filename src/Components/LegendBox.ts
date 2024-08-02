@@ -85,6 +85,10 @@ class LegendBox implements GuiComponent {
   private processElement(element: Component | string | State<number>) {
     const functionContainer = document.createElement("div");
     functionContainer.className = "function-container";
+
+    if (element instanceof State && !element.inLegend) {
+      return;
+    }
     const icon = this.createIcon(element);
     functionContainer.appendChild(icon);
 

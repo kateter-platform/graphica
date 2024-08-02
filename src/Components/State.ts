@@ -2,14 +2,28 @@ import EventEmitter from "eventemitter3";
 
 const STATE_CHANGE_EVENT = "stateChange";
 
+type StateOptions = {
+  inLegend?: boolean;
+};
+
+const defaultStateOptions = {
+  inLegend: true,
+};
+
 class State<T> {
   private stateName: string;
   private state: T;
   private emitter: EventEmitter;
+  public inLegend: boolean;
 
-  constructor(stateName: string, initialState: T) {
+  constructor(stateName: string, initialState: T, options?: StateOptions) {
+    const { inLegend } = {
+      ...defaultStateOptions,
+      ...options,
+    };
     this.stateName = stateName;
     this.state = initialState;
+    this.inLegend = inLegend;
     this.emitter = new EventEmitter();
   }
 
