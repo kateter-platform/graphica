@@ -18,6 +18,9 @@ type PointOptions = {
   color?: string;
   draggable?: Draggable;
   dragListeners?: ((point: Point) => void)[];
+  customName?: string;
+  showName?: boolean;
+  legendCoordinates?: string;
 };
 
 const defaultPointOptions = {
@@ -26,23 +29,38 @@ const defaultPointOptions = {
   decimals: 1,
   label: false,
   dragListeners: [],
+  showName: true,
+  legendCoordinates: "",
 };
 
 class Point extends Component implements Collider, DragListener<Point> {
   private pointName: string | undefined;
+  private showName: boolean;
+  private legendCoordinates: string;
   private static pointCounter = 0;
   static emitter = new EventEmitter();
   private color: string;
   dragListeners: ((point: Point) => void)[];
   constructor(x = 0, y = 0, options?: PointOptions) {
     super();
-    const { color, draggable, decimals, label, dragListeners } = {
+    const {
+      color,
+      draggable,
+      decimals,
+      label,
+      dragListeners,
+      customName,
+      showName,
+      legendCoordinates,
+    } = {
       ...defaultPointOptions,
       ...options,
     };
     //set point name and color
-    this.setPointName();
+    this.setPointName(customName);
     this.color = color;
+    this.showName = showName;
+    this.legendCoordinates = legendCoordinates;
 
     // set position of the point instance
     this.draggable = draggable;
@@ -79,16 +97,18 @@ class Point extends Component implements Collider, DragListener<Point> {
     }
 
     //add name of point
-    const nameText = new Text(this.pointName, {
-      color: "black",
-      fontSize: 18,
-      anchorY: "middle",
-      anchorX: "left",
-      position: [15, 0],
-      responsiveScale: false,
-    });
-    nameText.name = "name";
-    this.add(nameText);
+    if (this.showName) {
+      const nameText = new Text(this.pointName, {
+        color: "black",
+        fontSize: 18,
+        anchorY: "middle",
+        anchorX: "left",
+        position: [15, 0],
+        responsiveScale: false,
+      });
+      nameText.name = "name";
+      this.add(nameText);
+    }
   }
 
   addDragListener(listener: (point: Point) => void) {
@@ -141,19 +161,35 @@ class Point extends Component implements Collider, DragListener<Point> {
   public setPosition(x: number, y: number) {
     this.position.set(x, y, this.position.z);
   }
-  private setPointName() {
-    this.pointName = String.fromCharCode(
-      "A".charCodeAt(0) + Point.pointCounter
-    );
-    Point.pointCounter++;
+  private setPointName(customName?: string) {
+    if (customName) {
+      this.pointName = customName;
+    } else {
+      this.pointName = String.fromCharCode(
+        "A".charCodeAt(0) + Point.pointCounter
+      );
+      Point.pointCounter++;
+    }
   }
+
   public getName(): string {
     return this.pointName as string;
   }
+
   public getDisplayText(): string {
-    return (
-      "(" + this.position.x.toFixed(1) + ", " + this.position.y.toFixed(1) + ")"
-    );
+    if (this.legendCoordinates === "x") {
+      return "(" + this.position.x.toFixed(1) + ")";
+    } else if (this.legendCoordinates === "y") {
+      return "(" + this.position.y.toFixed(1) + ")";
+    } else {
+      return (
+        "(" +
+        this.position.x.toFixed(1) +
+        ", " +
+        this.position.y.toFixed(1) +
+        ")"
+      );
+    }
   }
 
   public hover() {
