@@ -118,8 +118,7 @@ class LegendBox implements GuiComponent {
     let textToDisplay = "";
 
     if (typeof element === "string") {
-      textToDisplay =
-        element + ": " + this.replaceStateNamesWithValues(element);
+      textToDisplay = this.replaceStateNamesWithValues(element);
     } else if (element instanceof State) {
       textToDisplay =
         element.getStateName() + ": " + element.getState().toFixed(1);
