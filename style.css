@@ -132,6 +132,8 @@ body {
 
 .legendBox-wrapper {
   position: absolute;
+  top: 30px;
+  left: 30px;
   width: 260px;
   max-height: 170px;
   background-color: #fae493;
