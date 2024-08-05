@@ -8,6 +8,7 @@ export { default as InfiniteLine } from "./Components/InfiniteLine";
 export { default as InputField } from "./Components/InputField";
 export { default as Label } from "./Components/Label";
 export { default as Latex } from "./Components/Latex";
+export { default as LegendText } from "./Components/LegendText";
 export { default as LegendBox } from "./Components/LegendBox";
 export { default as Line } from "./Components/Line";
 export { default as Plot } from "./Components/Plot";

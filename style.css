@@ -132,6 +132,8 @@ body {
 
 .legendBox-wrapper {
   position: absolute;
+  top: 15px;
+  left: 15px;
   width: 260px;
   max-height: 170px;
   background-color: #fae493;
@@ -165,7 +167,7 @@ body {
   margin-top: 8px;
 }
 
-.point-icon {
+.circle-icon {
   border-radius: 50%;
   width: 8px;
   height: 8px;
@@ -174,7 +176,7 @@ body {
   border: #000 solid 1px;
 }
 
-.plot-icon {
+.rectangle-icon {
   width: 13px;
   height: 2px;
   display: inline-block;
