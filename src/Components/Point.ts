@@ -178,9 +178,9 @@ class Point extends Component implements Collider, DragListener<Point> {
 
   public getDisplayText(): string {
     if (this.legendCoordinates === "x") {
-      return "(" + this.position.x.toFixed(1) + ")";
+      return this.position.x.toFixed(1);
     } else if (this.legendCoordinates === "y") {
-      return "(" + this.position.y.toFixed(1) + ")";
+      return this.position.y.toFixed(1);
     } else {
       return (
         "(" +
