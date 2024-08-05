@@ -10,7 +10,14 @@ class LegendBox implements GuiComponent {
   htmlElement: HTMLElement;
 
   constructor(elements?: (Component | string | State<number>)[]) {
-    this.elements = elements || [];
+    this.elements = [];
+    if (elements) {
+      for (const element of elements || []) {
+        if (!this.elements.includes(element)) {
+          this.elements.push(element);
+        }
+      }
+    }
     this.states = {};
     this.htmlElement = this.createLegendBoxWrapper();
     const button = this.createSizeAdjustButton();
