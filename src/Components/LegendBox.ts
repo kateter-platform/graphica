@@ -54,6 +54,11 @@ class LegendBox implements GuiComponent {
     this.elements.forEach((element) => {
       if (element instanceof State) {
         this.states[element.getStateName()] = element;
+        for (const strings of this.elements) {
+          if (typeof strings === "string") {
+            this.addStringAsObserver(strings);
+          }
+        }
       } else if (typeof element === "string") {
         this.addStringAsObserver(element);
       }
@@ -199,6 +204,11 @@ class LegendBox implements GuiComponent {
         return;
       }
       this.states[element.getStateName()] = element;
+      for (const strings of this.elements) {
+        if (typeof strings === "string") {
+          this.addStringAsObserver(strings);
+        }
+      }
     }
 
     // If the element is a string, add it as an observer to the state variables it contains
