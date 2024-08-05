@@ -1,29 +1,29 @@
 type LegendTextOptions = {
+  shape?: "circle" | "rectangle" | "triangle";
   color?: string;
-  shape?: string;
   useStates?: boolean;
 };
 
 const defaultLegendTextOptions = {
-  color: "#faa307",
   shape: "circle",
+  color: "#faa307",
   useStates: false,
 };
 
 class LegendText {
   private expression: string;
-  private color: string;
   private shape: string;
+  private color: string;
   private useStates: boolean;
 
   constructor(expression: string, options?: LegendTextOptions) {
-    const { color, shape, useStates } = {
+    const { shape, color, useStates } = {
       ...defaultLegendTextOptions,
       ...options,
     };
     this.expression = expression;
-    this.color = color;
     this.shape = shape;
+    this.color = color;
     this.useStates = useStates;
   }
 
@@ -31,12 +31,12 @@ class LegendText {
     return this.expression;
   }
 
-  getColor(): string {
-    return this.color;
-  }
-
   getShape(): string {
     return this.shape;
+  }
+
+  getColor(): string {
+    return this.color;
   }
 
   getUseStates(): boolean {
