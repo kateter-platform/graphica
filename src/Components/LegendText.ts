@@ -1,5 +1,3 @@
-import { e } from "mathjs";
-
 type LegendTextOptions = {
   color?: string;
   shape?: string;
