@@ -40,11 +40,11 @@ class State<T> {
     this.emitter.emit(STATE_CHANGE_EVENT, this.state);
   }
 
-  addObserver(callback: (state: number) => void): void {
+  addObserver(callback: (state: T) => void): void {
     this.emitter.on(STATE_CHANGE_EVENT, callback);
   }
 
-  removeObserver(callback: (state: number) => void): void {
+  removeObserver(callback: (state: T) => void): void {
     this.emitter.off(STATE_CHANGE_EVENT, callback);
   }
 }
