@@ -28,6 +28,8 @@ const ORBIT_CONTROL_OPTIONS = {
 type GraphicaOptions = {
   root: HTMLElement;
   disableControls: boolean;
+  disableZoom: boolean;
+  disablePan: boolean;
   defaultZoom: number;
   defaultPosition: InputPosition;
   minZoom: number;
@@ -38,6 +40,8 @@ type GraphicaOptions = {
 const defaultGraphicaOptions: GraphicaOptions = {
   root: document.body,
   disableControls: false,
+  disableZoom: false,
+  disablePan: false,
   defaultZoom: 50,
   defaultPosition: [0, 0],
   minZoom: 1,
@@ -68,6 +72,8 @@ class Core {
     const {
       root,
       disableControls,
+      disableZoom,
+      disablePan,
       defaultZoom,
       minZoom,
       maxZoom,
@@ -111,7 +117,8 @@ class Core {
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
     controls.enableRotate = false;
-    controls.enablePan = true;
+    controls.enablePan = !disablePan;
+    controls.enableZoom = !disableZoom;
     controls.mouseButtons = ORBIT_CONTROL_OPTIONS;
     controls.minZoom = minZoom;
     controls.maxZoom = maxZoom;
