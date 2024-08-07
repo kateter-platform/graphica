@@ -5,7 +5,6 @@ type LegendTextOptions = {
 };
 
 const defaultLegendTextOptions = {
-
   shape: "circle",
   color: "#faa307",
   useStates: false,
