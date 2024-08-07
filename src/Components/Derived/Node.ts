@@ -6,17 +6,31 @@ import Text from "../Text";
 
 export type NodeOptions = CircleOptions & {
   label?: string;
+  color?: number;
 };
 
 const defaultNodeOptions: NodeOptions = {
   ...defaultShapeOptions,
   label: "",
+  color: 0xfaa307,
 };
 
 type Edge = {
   node: Node;
   line: Line;
   weight?: number;
+};
+
+type ConnectOptions = {
+  directed: boolean;
+  value: number | undefined;
+  color: number;
+};
+
+const defaultConnectOptions: ConnectOptions = {
+  directed: false,
+  value: undefined,
+  color: 0x080007,
 };
 
 class Node extends Circle {
@@ -75,7 +89,9 @@ class Node extends Circle {
    * @param directed - Booleean for whether the edge is directed (directed edges will also have curve)
    * @param value - Number for eeight/value of the edge
    */
-  connectTo(other: Node, directed = false, value?: number): void {
+  connectTo(other: Node, options?: ConnectOptions): void {
+    const { directed, value, color } = { ...defaultConnectOptions, ...options };
+
     if (!this.isAdjacentTo(other) && !(!directed && other.isAdjacentTo(this))) {
       const dx = other.position.x - this.position.x;
       const dy = other.position.y - this.position.y;
@@ -95,7 +111,8 @@ class Node extends Circle {
           {
             arrowhead: directed,
             curve: directed ? 2 : 0,
-            label: value !== undefined ? value.toString() : "",
+            label: value?.toString() ?? "",
+            color: color,
           }
         );
         this.adjacencyList.push({ node: other, line: line, weight: value });
@@ -154,7 +171,11 @@ class Node extends Circle {
       }
 
       if (!directed) {
-        other.connectTo(this, false);
+        other.connectTo(this, {
+          directed: false,
+          value: undefined,
+          color: 0x080007,
+        });
       }
     }
   }
