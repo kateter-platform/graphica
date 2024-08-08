@@ -11,6 +11,7 @@ type PlotOptions = {
   coefficients?: Coefficients;
   plotRange?: number;
   plotBetween: [number, number] | undefined;
+  color: number;
 };
 
 const defaultPlotOptions = {
@@ -19,6 +20,7 @@ const defaultPlotOptions = {
   lineWidth: 4,
   coefficients: {},
   plotBetween: undefined,
+  color: undefined,
 };
 
 type Coefficients = {
@@ -50,7 +52,6 @@ class Plot extends Component {
   constructor(func: string, options?: PlotOptions) {
     super();
     this.setFuncName();
-    this.setColor();
 
     const {
       numPoints = 1000,
@@ -58,8 +59,13 @@ class Plot extends Component {
       lineWidth = 1,
       coefficients = {},
       plotBetween = undefined,
+      color,
     } = { ...defaultPlotOptions, ...options };
-
+    if (!color) {
+      this.setColor();
+    } else {
+      this.color = color;
+    }
     const minX = (-this.PLOTRANGE / 1) * 2 + 0;
     const maxX = (this.PLOTRANGE / 1) * 2 + 0;
     const initialCurve = new CatmullRomCurve3(
