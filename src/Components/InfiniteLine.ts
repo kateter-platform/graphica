@@ -29,8 +29,13 @@ class InfiniteLine extends Line {
       b[0] = (left - startVec3.x) / dir.x;
     }
     if (dir.y != 0) {
-      a[1] = (top - startVec3.y) / dir.y;
-      b[1] = (bottom - startVec3.y) / dir.y;
+      if ((startVec3.y > endVec3.y && startVec3.x < endVec3.x) || (startVec3.y < endVec3.y && startVec3.x > endVec3.x)) {
+        a[1] = (bottom - startVec3.y) / dir.y;
+        b[1] = (top - startVec3.y) / dir.y;
+      } else {
+        a[1] = (top - startVec3.y) / dir.y;
+        b[1] = (bottom - startVec3.y) / dir.y;
+      }
     }
 
     const closestA = a.reduce((prev, curr) =>
